@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Heart Rate Monitoring App</string>
+    <string name="title_home">Home</string>
+    <string name="title_band">Band</string>
+    <string name="title_profile">Profile</string>
+    <string name="title_activity_login">LoginActivity</string>
+</resources>
