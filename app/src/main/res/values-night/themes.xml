@@ -1,6 +1,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Theme.HeartRateMonitoringApp" parent="Theme.MaterialComponents.DayNight.NoActionBar">
+    <style name="Theme.HeartRateMonitoringApp" parent="Theme.MaterialComponents.Light.NoActionBar">
         <!-- Primary brand color. -->
         <item name="colorPrimary">@color/primary_color</item>
         <item name="colorPrimaryVariant">@color/primary_dark_color</item>
@@ -10,31 +10,32 @@
         <item name="colorSecondaryVariant">@color/secondary_dark_color</item>
         <item name="colorOnSecondary">@color/secondary_text_color</item>
         <!-- Status bar color. -->
-        <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
+        <item name="android:statusBarColor">@color/white</item>
         <!-- Customize your theme here. -->
+        <item name="android:forceDarkAllowed" tools:targetApi="q">false</item>
     </style>
 
     <style name="TextRegular">
         <item name="android:fontFamily">@font/poppins</item>
-        <item name="android:textColor">@color/black</item>
+        <item name="android:textColor">@color/primary_text_color</item>
         <item name="android:textSize">12sp</item>
     </style>
 
     <style name="TextMedium">
         <item name="android:fontFamily">@font/poppins_medium</item>
-        <item name="android:textColor">@color/black</item>
+        <item name="android:textColor">@color/primary_text_color</item>
         <item name="android:textSize">14sp</item>
     </style>
 
     <style name="TextSemiBold">
         <item name="android:fontFamily">@font/poppins_semibold</item>
-        <item name="android:textColor">@color/black</item>
+        <item name="android:textColor">@color/primary_text_color</item>
         <item name="android:textSize">16sp</item>
     </style>
 
     <style name="TextBold">
         <item name="android:fontFamily">@font/poppins_bold</item>
-        <item name="android:textColor">@color/black</item>
+        <item name="android:textColor">@color/primary_text_color</item>
         <item name="android:textSize">18sp</item>
     </style>
 
@@ -55,7 +56,7 @@
         <item name="boxStrokeWidthFocused">1dp</item>
         <item name="boxStrokeColor">@color/primary_color</item>
         <item name="boxStrokeErrorColor">@color/red</item>
-        <item name="hintTextColor">@color/black</item>
+        <item name="hintTextColor">@color/primary_text_color</item>
         <item name="errorTextAppearance">@style/ErrorTextAppearance</item>
     </style>
 </resources>

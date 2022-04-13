@@ -4,56 +4,75 @@ import com.example.heartratemonitoringapp.data.source.remote.response.*
 import retrofit2.http.*
 
 interface ApiService {
-    @POST("/login")
+    @FormUrlEncoded
+    @POST("login")
     suspend fun login(
-        @Body
+        @Field (value = "email")
         email: String,
+        @Field (value = "password")
         password: String
     ): LoginResponse
 
-    @POST("/logout")
+    @POST("logout")
     suspend fun logout(
         @Header("Authorization")
         bearer: String,
     ): LogoutResponse
 
-    @POST("/register")
+    @FormUrlEncoded
+    @POST("register")
     suspend fun register(
-        @Body
+        @Field (value = "name")
         name: String,
+        @Field (value = "email")
         email: String,
+        @Field (value = "password")
         password: String,
     ): RegisterResponse
 
-    @POST("/data")
+    @FormUrlEncoded
+    @POST("data")
     suspend fun addData(
         @Header("Authorization")
         bearer: String,
-        @Body
+        @Field (value = "avg_heart_rate")
         avgHeartRate: Int,
+        @Field (value = "avg_step")
         avgStep: Int,
+        @Field (value = "label")
         label: String,
     ): StoreMonitoringDataResponse
 
-    @GET("/profile")
+    @FormUrlEncoded
+    @POST("find-data")
+    suspend fun findData(
+        @Header("Authorization")
+        bearer: String,
+        @Field (value = "avg_heart_rate")
+        avgHeartRate: Int,
+        @Field (value = "avg_step")
+        avgStep: Int,
+    ): FindDataResponse
+
+    @GET("profile")
     suspend fun getProfile(
         @Header("Authorization")
         bearer: String,
     ): ProfileResponse
 
-    @GET("/data")
+    @GET("data")
     suspend fun getUserData(
         @Header("Authorization")
         bearer: String,
     ): UserMonitoringDataResponse
 
-    @GET("/average")
+    @GET("average")
     suspend fun getaverageData(
         @Header("Authorization")
         bearer: String,
     ): AverageResponse
 
-    @DELETE("/data/{id}")
+    @DELETE("data/{id}")
     suspend fun deleteData(
         @Header("Authorization")
         bearer: String,
@@ -61,7 +80,7 @@ interface ApiService {
         id: Int
     ): DeleteResponse
 
-    @PUT("/data/{id}")
+    @PUT("data/{id}")
     suspend fun updateMonitoringData(
         @Header("Authorization")
         bearer: String,
@@ -73,7 +92,7 @@ interface ApiService {
         label: String
     ): MonitoringDataUpdateResponse
 
-    @PUT("/update-user")
+    @PUT("update-user")
     suspend fun updateUser(
         @Header("Authorization")
         bearer: String,

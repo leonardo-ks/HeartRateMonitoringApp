@@ -8,13 +8,9 @@ import com.example.heartratemonitoringapp.domain.usecase.model.AverageDomain
 import com.example.heartratemonitoringapp.domain.usecase.model.LoginDomain
 import com.example.heartratemonitoringapp.domain.usecase.model.MonitoringDataDomain
 import com.example.heartratemonitoringapp.domain.usecase.model.UserDataDomain
-import com.example.heartratemonitoringapp.util.toDomain
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.launch
 
 class Repository(
     private val localDataSource: LocalDataSource,
@@ -24,7 +20,6 @@ class Repository(
     override fun login(email: String, password: String): Flow<Resource<LoginDomain>> =
         flow {
             emit(Resource.Loading())
-            localDataSource.setUserEmail(email)
             when (val apiResponse = remoteDataSource.login(email, password).first()) {
                 is ApiResponse.Success -> {
                     localDataSource.setBearer(apiResponse.data.accessToken)
@@ -46,7 +41,6 @@ class Repository(
             when (val apiResponse = remoteDataSource.register(name, email, password).first()) {
                 is ApiResponse.Success -> {
                     if (apiResponse.data.data != null) {
-                        localDataSource.setUserEmail(apiResponse.data.data.email)
                         emit(Resource.Success(apiResponse.data.data.toDomain()))
                     } else {
                         emit(Resource.Success(UserDataDomain()))
@@ -92,6 +86,22 @@ class Repository(
             }
         }
 
+    override fun findData(
+        bearer: String,
+        avgHeartRate: Int,
+        avgStep: Int
+    ): Flow<Resource<List<String>>> =
+        flow {
+            emit(Resource.Loading())
+            when (val apiResponse = remoteDataSource.findData(bearer, avgHeartRate, avgStep).first()) {
+                is ApiResponse.Success -> {
+                    emit(Resource.Success(apiResponse.data.labels?: listOf()))
+                }
+                is ApiResponse.Empty -> emit(Resource.Success(listOf()))
+                is ApiResponse.Error -> emit(Resource.Error(apiResponse.errorMessage))
+            }
+        }
+
     override fun getProfile(bearer: String): Flow<Resource<UserDataDomain>> =
         flow {
             emit(Resource.Loading())
@@ -114,7 +124,7 @@ class Repository(
             when (val apiResponse = remoteDataSource.getUserMonitoringData(bearer).first()) {
                 is ApiResponse.Success -> {
                     if (apiResponse.data.data != null) {
-                        emit(Resource.Success(apiResponse.data.data.toDomain()))
+                        emit(Resource.Success(apiResponse.data.data.map { data -> data?.toDomain() ?: MonitoringDataDomain() }))
                     } else {
                         emit(Resource.Success(listOf(MonitoringDataDomain())))
                     }
@@ -187,37 +197,20 @@ class Repository(
         }
 
     override fun setBearer(bearer: String) {
-        CoroutineScope(Dispatchers.IO).launch {
-            localDataSource.setBearer(bearer)
-        }
+        localDataSource.setBearer(bearer)
     }
 
-    override fun getBearer() {
-        CoroutineScope(Dispatchers.IO).launch {
-            localDataSource.getBearer()
-        }    }
-
-    override fun setUserEmail(email: String) {
-        CoroutineScope(Dispatchers.IO).launch {
-            localDataSource.setUserEmail(email)
+    override fun getBearer(): Flow<String?> =
+        flow {
+            emit(localDataSource.getBearer())
         }
-    }
-
-    override fun getUserEmail() {
-        CoroutineScope(Dispatchers.IO).launch {
-            localDataSource.getUserEmail()
-        }
-    }
 
     override fun setLoginState(state: Boolean) {
-        CoroutineScope(Dispatchers.IO).launch {
-            localDataSource.setLoginState(state)
-        }
+        localDataSource.setLoginState(state)
     }
 
-    override fun getLoginState() {
-        CoroutineScope(Dispatchers.IO).launch {
-            localDataSource.getLoginState()
+    override fun getLoginState() =
+        flow {
+            emit(localDataSource.getLoginState())
         }
-    }
 }

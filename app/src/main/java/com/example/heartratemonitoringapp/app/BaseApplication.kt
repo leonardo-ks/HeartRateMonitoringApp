@@ -1,4 +1,4 @@
-package com.example.heartratemonitoringapp
+package com.example.heartratemonitoringapp.app
 
 import android.app.Application
 import com.example.heartratemonitoringapp.di.*

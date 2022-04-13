@@ -4,158 +4,27 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.home.HomeFragment">
+    tools:context=".app.dashboard.home.HomeFragment">
 
-    <androidx.cardview.widget.CardView
-        android:id="@+id/card_step"
+    <include
+        android:id="@+id/layout_not_connected"
+        layout="@layout/layout_not_connected"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="8dp"
-        android:elevation="16dp"
-        app:cardCornerRadius="10dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="8dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        android:layout_height="match_parent"
+        android:visibility="gone" />
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <TextView
-                android:id="@+id/tv_step_title"
-                style="@style/TextSemiBold"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="8dp"
-                android:text="Langkah"
-                android:textSize="24sp"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <TextView
-                android:id="@+id/tv_avg_step"
-                style="@style/TextRegular"
-                android:layout_width="80dp"
-                android:layout_height="80dp"
-                android:text="8000"
-                android:autoSizeTextType="uniform"
-                android:gravity="center"
-                android:ellipsize="none"
-                android:singleLine="false"
-                app:layout_constraintStart_toStartOf="@+id/tv_step_title"
-                app:layout_constraintTop_toBottomOf="@+id/tv_step_title" />
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                android:src="@drawable/ic_directions_walk"
-                android:layout_marginTop="-8dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="@+id/tv_avg_step"
-                app:layout_constraintStart_toStartOf="@+id/tv_avg_step"
-                app:layout_constraintTop_toBottomOf="@+id/tv_avg_step"
-                app:tint="@color/primary_text_color" />
-
-            <RelativeLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp"
-                app:layout_constraintBottom_toBottomOf="@+id/tv_avg_step"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/tv_avg_step"
-                app:layout_constraintTop_toTopOf="@+id/tv_avg_step">
-
-                <com.google.android.material.progressindicator.LinearProgressIndicator
-                    android:id="@+id/progress_bar"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:indeterminate="false"
-                    android:max="100"
-                    android:progress="80"
-                    app:trackCornerRadius="10dp"
-                    app:trackThickness="20dp" />
-
-                <TextView
-                    style="@style/TextRegular"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_alignStart="@id/progress_bar"
-                    android:layout_alignTop="@+id/progress_bar"
-                    android:layout_alignEnd="@+id/progress_bar"
-                    android:layout_alignBottom="@id/progress_bar"
-                    android:layout_centerVertical="true"
-                    android:gravity="center"
-                    android:background="@android:color/transparent"
-                    android:text="20 %"
-                    android:textAlignment="center"
-                    android:textColor="@color/primary_text_color" />
-
-            </RelativeLayout>
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-    </androidx.cardview.widget.CardView>
-
-    <androidx.cardview.widget.CardView
-        android:id="@+id/card_bpm"
+    <include
+        android:id="@+id/layout_average"
+        layout="@layout/layout_average"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:elevation="16dp"
-        android:padding="8dp"
-        app:cardCornerRadius="10dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/card_step">
+        android:layout_height="match_parent"
+        android:visibility="gone" />
 
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <TextView
-                android:id="@+id/tv_bpm_title"
-                style="@style/TextSemiBold"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:layout_marginTop="8dp"
-                android:text="Detak Jantung"
-                android:textSize="24sp"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <TextView
-                android:id="@+id/tv_avg_bpm"
-                style="@style/TextRegular"
-                android:layout_width="80dp"
-                android:layout_height="80dp"
-                android:text="60"
-                android:autoSizeTextType="uniform"
-                android:gravity="center"
-                app:layout_constraintStart_toStartOf="@+id/tv_bpm_title"
-                app:layout_constraintTop_toBottomOf="@+id/tv_bpm_title" />
-
-            <ImageView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                android:src="@drawable/ic_heart"
-                android:layout_marginTop="-8dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="@+id/tv_avg_bpm"
-                app:layout_constraintStart_toStartOf="@+id/tv_avg_bpm"
-                app:layout_constraintTop_toBottomOf="@+id/tv_avg_bpm"
-                app:tint="@color/primary_text_color"/>
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-    </androidx.cardview.widget.CardView>
+    <include
+        android:id="@+id/layout_loading"
+        layout="@layout/layout_loading"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

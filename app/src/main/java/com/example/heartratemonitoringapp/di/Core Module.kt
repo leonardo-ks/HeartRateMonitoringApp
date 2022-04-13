@@ -2,22 +2,23 @@ package com.example.heartratemonitoringapp.di
 
 import android.content.Context
 import androidx.room.Room
+import com.example.heartratemonitoringapp.app.auth.login.LoginViewModel
+import com.example.heartratemonitoringapp.app.auth.register.RegisterViewModel
+import com.example.heartratemonitoringapp.app.dashboard.band.BandViewModel
+import com.example.heartratemonitoringapp.app.dashboard.home.HomeViewModel
+import com.example.heartratemonitoringapp.app.dashboard.profile.ProfileViewModel
+import com.example.heartratemonitoringapp.app.monitoring.live.LiveMonitoringViewModel
 import com.example.heartratemonitoringapp.data.Repository
 import com.example.heartratemonitoringapp.data.source.local.LocalDataSource
 import com.example.heartratemonitoringapp.data.source.local.room.Database
 import com.example.heartratemonitoringapp.data.source.local.sharedpref.ISharedPreferences
-import com.example.heartratemonitoringapp.data.source.local.sharedpref.SharedPrederences
 import com.example.heartratemonitoringapp.data.source.local.sharedpref.SharedPref
+import com.example.heartratemonitoringapp.data.source.local.sharedpref.SharedPreferences
 import com.example.heartratemonitoringapp.data.source.remote.RemoteDataSource
 import com.example.heartratemonitoringapp.data.source.remote.network.ApiService
 import com.example.heartratemonitoringapp.domain.repository.IRepository
 import com.example.heartratemonitoringapp.domain.usecase.IUseCase
 import com.example.heartratemonitoringapp.domain.usecase.Interactor
-import com.example.heartratemonitoringapp.ui.band.BandViewModel
-import com.example.heartratemonitoringapp.ui.home.HomeViewModel
-import com.example.heartratemonitoringapp.ui.login.LoginViewModel
-import com.example.heartratemonitoringapp.ui.profile.ProfileViewModel
-import com.example.heartratemonitoringapp.ui.register.RegisterViewModel
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import org.koin.android.ext.koin.androidContext
@@ -32,7 +33,7 @@ val sharedPreferencesModule = module {
         androidContext().getSharedPreferences("shared_preferences", Context.MODE_PRIVATE)
     }
     single { SharedPref(get()) }
-    single<ISharedPreferences> { SharedPrederences(get()) }
+    single<ISharedPreferences> { SharedPreferences(get()) }
 }
 
 val databaseModule = module {
@@ -58,7 +59,7 @@ val networkModule = module {
 
     single {
         val retrofit = Retrofit.Builder()
-            .baseUrl("http://127.0.0.1:8000/api")
+            .baseUrl("http://192.168.18.144:8000/api/")
             .addConverterFactory(GsonConverterFactory.create())
             .client(get())
             .build()
@@ -82,4 +83,5 @@ val viewModelModule = module {
     viewModel { LoginViewModel(get()) }
     viewModel { ProfileViewModel(get()) }
     viewModel { RegisterViewModel(get()) }
+    viewModel { LiveMonitoringViewModel(get()) }
 }

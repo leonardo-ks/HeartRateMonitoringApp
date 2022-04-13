@@ -9,7 +9,7 @@ android {
 
     defaultConfig {
         applicationId "com.example.heartratemonitoringapp"
-        minSdk 21
+        minSdk 23
         targetSdk 32
         versionCode 1
         versionName "1.0"
@@ -84,4 +84,7 @@ dependencies {
 
     //Preference Datastoore
     implementation "androidx.datastore:datastore-preferences:1.0.0"
+
+    //BLE KTX
+    implementation 'no.nordicsemi.android:ble-ktx:2.4.0'
 }

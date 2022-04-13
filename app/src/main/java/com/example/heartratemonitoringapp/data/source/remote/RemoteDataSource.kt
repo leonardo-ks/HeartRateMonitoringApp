@@ -89,6 +89,25 @@ class RemoteDataSource(private val apiService: ApiService, ) {
             }
         }.flowOn(Dispatchers.IO)
 
+    suspend fun findData(bearer: String, avgHeartRate: Int, avgStep: Int): Flow<ApiResponse<FindDataResponse>> =
+        flow {
+            val response = apiService.findData(bearer, avgHeartRate, avgStep)
+            if (response.success == true) {
+                emit(ApiResponse.Success(response))
+            } else {
+                emit(ApiResponse.Error(response.message.toString()))
+            }
+        }.catch { e ->
+            when (e) {
+                is HttpException -> {
+                    val responseBody = e.response()?.errorBody()
+                    emit(ApiResponse.Error("${e.code()}: ${responseBody?.getMessage()}"))
+                } else -> {
+                emit(ApiResponse.Error(e.message.toString()))
+            }
+            }
+        }.flowOn(Dispatchers.IO)
+
     suspend fun getProfile(bearer: String): Flow<ApiResponse<ProfileResponse>> =
         flow {
             val response = apiService.getProfile(bearer)

@@ -4,9 +4,9 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "entities")
+@Entity(tableName = "band")
 data class Entities(
     @ColumnInfo(name = "id")
     @PrimaryKey
-    val id: Int,
+    val id: Int?,
 )

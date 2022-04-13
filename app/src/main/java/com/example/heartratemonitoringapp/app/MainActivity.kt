@@ -1,9 +1,10 @@
-package com.example.heartratemonitoringapp
+package com.example.heartratemonitoringapp.app
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
+import com.example.heartratemonitoringapp.R
 import com.example.heartratemonitoringapp.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
@@ -20,5 +21,9 @@ class MainActivity : AppCompatActivity() {
             itemIconTintList = null
             setupWithNavController(navHostFragment.navController)
         }
+    }
+
+    companion object {
+        const val EXTRA_DATA = "extra_data"
     }
 }

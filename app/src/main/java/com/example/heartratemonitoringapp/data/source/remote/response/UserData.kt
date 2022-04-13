@@ -3,9 +3,6 @@ package com.example.heartratemonitoringapp.data.source.remote.response
 import com.google.gson.annotations.SerializedName
 
 data class UserData (
-    @field:SerializedName("updated_at")
-    val updatedAt: String? = null,
-
     @field:SerializedName("profile")
     val profile: String? = null,
 
