@@ -23,4 +23,6 @@ interface IUseCase {
     fun getBearer(): Flow<String?>
     fun setLoginState(state: Boolean)
     fun getLoginState(): Flow<Boolean>
+    fun setLatestLoginDate(date: String)
+    fun getLatestLoginDate(): Flow<String?>
 }

@@ -9,7 +9,7 @@ android {
 
     defaultConfig {
         applicationId "com.example.heartratemonitoringapp"
-        minSdk 23
+        minSdk 26
         targetSdk 32
         versionCode 1
         versionName "1.0"
@@ -62,8 +62,8 @@ dependencies {
     implementation "com.google.android.material:material:1.5.0"
 
     //navigation fragment
-    implementation "androidx.navigation:navigation-fragment-ktx:2.4.1"
-    implementation "androidx.navigation:navigation-ui-ktx:2.4.1"
+    implementation "androidx.navigation:navigation-fragment-ktx:2.4.2"
+    implementation "androidx.navigation:navigation-ui-ktx:2.4.2"
 
     //Glide
     implementation "com.github.bumptech.glide:glide:4.13.0"
@@ -84,7 +84,4 @@ dependencies {
 
     //Preference Datastoore
     implementation "androidx.datastore:datastore-preferences:1.0.0"
-
-    //BLE KTX
-    implementation 'no.nordicsemi.android:ble-ktx:2.4.0'
 }

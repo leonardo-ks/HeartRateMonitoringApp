@@ -10,10 +10,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="32dp"
         android:layout_marginEnd="16dp"
-        app:cardElevation="8dp"
         app:cardCornerRadius="10dp"
+        app:cardElevation="8dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
@@ -27,14 +27,14 @@
                 android:layout_width="96dp"
                 android:layout_height="96dp"
                 android:layout_marginStart="8dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginBottom="8dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="16dp"
                 android:paddingVertical="4dp"
                 android:src="@drawable/ic_watch"
-                app:tint="@color/black"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
+                app:tint="@color/black"
                 tools:ignore="ContentDescription" />
 
             <LinearLayout
@@ -75,43 +75,15 @@
 
     </androidx.cardview.widget.CardView>
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btn_background_monitoring"
-        style="@style/TextRegular"
+    <include
+        android:id="@+id/layout_band_menu"
+        layout="@layout/layout_band_menu"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="16dp"
-        android:background="@drawable/bg_button"
-        android:text="Monitoring latar belakang"
-        android:textAlignment="textStart"
-        android:textAllCaps="false"
-        android:textColor="@color/primary_text_color"
-        android:textSize="16sp"
-        app:backgroundTint="@color/primary_light_color"
-        app:elevation="8dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/card_band" />
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btn_live_monitoring"
-        style="@style/TextRegular"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="16dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="16dp"
-        android:background="@drawable/bg_button"
-        android:text="Monitoring langsung"
-        android:textSize="16sp"
-        android:textAlignment="textStart"
-        android:textAllCaps="false"
-        android:textColor="@color/primary_text_color"
-        app:backgroundTint="@color/primary_light_color"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btn_background_monitoring" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

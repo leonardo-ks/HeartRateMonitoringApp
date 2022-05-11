@@ -10,13 +10,16 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.heartratemonitoring.ui.scanner.adapter.ScannerAdapter
 import com.example.heartratemonitoringapp.R
 import com.example.heartratemonitoringapp.app.MainActivity
 import com.example.heartratemonitoringapp.databinding.ActivityScannerBinding
+import kotlinx.coroutines.launch
 
 
 class ScannerActivity : AppCompatActivity() {
@@ -74,7 +77,19 @@ class ScannerActivity : AppCompatActivity() {
         }
 
         mAdapter.onItemClick = {
-            startActivity(Intent(this, MainActivity::class.java))
+            lifecycleScope.launch {
+                val device = bluetoothManager.adapter.getRemoteDevice(it.address)
+                device.createBond()
+                when (device.bondState) {
+                    BluetoothDevice.BOND_BONDED -> {
+                        binding.layoutLoading.root.visibility = View.GONE
+                        startActivity(Intent(baseContext, MainActivity::class.java))
+                    }
+                    BluetoothDevice.BOND_BONDING -> {
+                        binding.layoutLoading.root.visibility = View.VISIBLE
+                    }
+                }
+            }
         }
     }
 

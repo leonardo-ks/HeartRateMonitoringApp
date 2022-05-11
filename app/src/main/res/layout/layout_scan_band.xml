@@ -24,6 +24,8 @@
         android:layout_marginEnd="20dp"
         android:textAllCaps="false"
         android:text="Cari"
+        android:textColor="@color/white"
+        app:iconTint="@color/white"
         style="@style/TextRegular"
         app:icon="@drawable/ic_search"
         app:layout_constraintBottom_toBottomOf="@+id/tv_search_title"

@@ -1,9 +1,11 @@
 package com.example.heartratemonitoringapp.app.auth.login
 
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.view.WindowManager
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.lifecycleScope
@@ -13,7 +15,6 @@ import com.example.heartratemonitoringapp.app.auth.register.RegisterActivity
 import com.example.heartratemonitoringapp.databinding.ActivityLoginBinding
 import com.example.heartratemonitoringapp.util.hideSoftKeyboard
 import com.google.android.material.snackbar.Snackbar
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 
@@ -21,23 +22,19 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var binding: ActivityLoginBinding
     private val viewModel: LoginViewModel by viewModel()
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        lifecycleScope.launch {
-            if (viewModel.getLoginState().first()) {
-                startActivity(Intent(baseContext, MainActivity::class.java))
-            }
-        }
-
         if (intent.extras != null) {
             val email = intent.extras?.getString("email") ?: ""
             binding.loginForm.loginTidtEmail.setText(email)
             viewModel.setEmailValue(email)
         }
+
         lifecycleScope.launch {
             viewModel.loginState.collect {
                 when (it) {
@@ -48,12 +45,13 @@ class LoginActivity : AppCompatActivity() {
                             WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
                         )
                     }
-                    is AuthState.Success -> startActivity(Intent(baseContext, MainActivity::class.java))
+                    is AuthState.Success -> {
+                        startActivity(Intent(baseContext, MainActivity::class.java))
+                    }
                     is AuthState.Fail -> {
                         binding.layoutLoading.root.visibility = View.GONE
                         window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
-                        Snackbar.make(binding.root, it.message, Snackbar.LENGTH_SHORT)
-                            .show()
+                        Snackbar.make(binding.root, it.message, Snackbar.LENGTH_SHORT).show()
                     }
                     else -> {
                     }

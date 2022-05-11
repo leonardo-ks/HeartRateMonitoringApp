@@ -24,4 +24,6 @@ class Interactor(private val repository: IRepository): IUseCase {
     override fun getBearer(): Flow<String?> = repository.getBearer()
     override fun setLoginState(state: Boolean) = repository.setLoginState(state)
     override fun getLoginState(): Flow<Boolean> = repository.getLoginState()
+    override fun setLatestLoginDate(date: String) = repository.setLatestLoginDate(date)
+    override fun getLatestLoginDate(): Flow<String?> = repository.getLatestLoginDate()
 }

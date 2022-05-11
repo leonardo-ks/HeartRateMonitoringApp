@@ -12,6 +12,7 @@
     <color name="white">#FFFFFFFF</color>
     <color name="red">#BA0000</color>
     <color name="light_grey">#DEDEDE</color>
+    <color name="white_grey">#F2F3F5</color>
     <color name="dark_grey">#AAAAAA</color>
-    <color name="yellow">#FEDE00</color>
+    <color name="orange">#FFA500</color>
 </resources>

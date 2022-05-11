@@ -1,5 +1,6 @@
 package com.example.heartratemonitoringapp.data
 
+import android.annotation.SuppressLint
 import com.example.heartratemonitoringapp.data.source.local.LocalDataSource
 import com.example.heartratemonitoringapp.data.source.remote.RemoteDataSource
 import com.example.heartratemonitoringapp.data.source.remote.network.ApiResponse
@@ -11,19 +12,25 @@ import com.example.heartratemonitoringapp.domain.usecase.model.UserDataDomain
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
+import java.text.SimpleDateFormat
+import java.util.*
 
 class Repository(
     private val localDataSource: LocalDataSource,
     private val remoteDataSource: RemoteDataSource
 ): IRepository {
 
+    @SuppressLint("SimpleDateFormat")
     override fun login(email: String, password: String): Flow<Resource<LoginDomain>> =
         flow {
             emit(Resource.Loading())
             when (val apiResponse = remoteDataSource.login(email, password).first()) {
                 is ApiResponse.Success -> {
+                    val sdf = SimpleDateFormat("dd-MM-yyyy")
+                    val currentDate = sdf.format(Date())
                     localDataSource.setBearer(apiResponse.data.accessToken)
                     localDataSource.setLoginState(true)
+                    localDataSource.setLatestLoginDate(currentDate)
                     emit(Resource.Success(apiResponse.data.toDomain()))
                 }
                 is ApiResponse.Empty -> emit(Resource.Success(LoginDomain()))
@@ -212,5 +219,14 @@ class Repository(
     override fun getLoginState() =
         flow {
             emit(localDataSource.getLoginState())
+        }
+
+    override fun setLatestLoginDate(date: String) {
+        localDataSource.setLatestLoginDate(date)
+    }
+
+    override fun getLatestLoginDate(): Flow<String?> =
+        flow {
+            emit(localDataSource.getLatestLoginDate())
         }
 }

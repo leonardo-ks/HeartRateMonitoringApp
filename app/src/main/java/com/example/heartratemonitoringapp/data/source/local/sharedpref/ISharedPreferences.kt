@@ -5,4 +5,6 @@ interface ISharedPreferences {
     fun getBearer() : String?
     fun setLoginState(state : Boolean)
     fun getLoginState() : Boolean
+    fun setLatestLoginDate(date : String?)
+    fun getLatestLoginDate(): String?
 }

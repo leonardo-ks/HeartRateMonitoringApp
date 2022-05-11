@@ -9,9 +9,7 @@
         android:id="@+id/iv_profile"
         android:layout_width="96dp"
         android:layout_height="96dp"
-        android:layout_marginStart="16dp"
         android:layout_marginTop="64dp"
-        android:layout_marginEnd="16dp"
         android:foregroundGravity="center"
         android:src="@drawable/selector_profile"
         app:layout_constraintEnd_toEndOf="parent"
@@ -20,10 +18,11 @@
         tools:ignore="ContentDescription" />
 
     <LinearLayout
-        android:id="@+id/linearLayout2"
+        android:id="@+id/linearLayout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
+        android:gravity="center"
         app:layout_constraintEnd_toEndOf="@+id/iv_profile"
         app:layout_constraintStart_toStartOf="@+id/iv_profile"
         app:layout_constraintTop_toBottomOf="@+id/iv_profile">
@@ -41,7 +40,7 @@
         <TextView
             android:id="@+id/tv_email"
             style="@style/TextRegular"
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="16sp"
             app:layout_constraintBottom_toBottomOf="@+id/iv_profile"
@@ -65,11 +64,11 @@
         android:textAlignment="textStart"
         android:textAllCaps="false"
         android:textSize="16sp"
-        app:backgroundTint="@color/primary_light_color"
+        app:backgroundTint="@color/white"
         app:icon="@drawable/ic_edit"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/linearLayout2" />
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btn_change_password"
@@ -85,7 +84,7 @@
         android:textAllCaps="false"
         android:textSize="16sp"
         app:icon="@drawable/ic_edit"
-        app:backgroundTint="@color/primary_light_color"
+        app:backgroundTint="@color/white"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/btn_change_name" />
@@ -95,15 +94,15 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
+        android:layout_marginTop="48dp"
         android:layout_marginEnd="16dp"
-        android:layout_marginBottom="16dp"
         android:background="@drawable/bg_button"
         android:text="Keluar"
         android:textAllCaps="false"
         android:textColor="@color/white"
         app:backgroundTint="@color/red"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btn_change_password" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

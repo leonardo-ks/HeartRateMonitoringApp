@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.example.heartratemonitoringapp">
 
     <uses-permission android:name="android.permission.INTERNET" />
@@ -19,20 +20,20 @@
         android:theme="@style/Theme.HeartRateMonitoringApp"
         android:usesCleartextTraffic="true">
         <activity
-            android:name=".app.monitoring.background.BackgroundMonitoringActivity"
-            android:exported="false" />
+            android:name=".app.splashscreen.SplashActivity"
+            android:exported="true"
+            android:theme="@style/Theme.HeartRateMonitoringApp.Splash">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
         <activity
             android:name=".app.monitoring.live.LiveMonitoringActivity"
             android:exported="false" />
         <activity
             android:name=".app.auth.login.LoginActivity"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
+            android:exported="false" />
         <activity
             android:name=".app.MainActivity"
             android:exported="false" />
@@ -42,7 +43,9 @@
         <activity
             android:name=".app.scanner.ScannerActivity"
             android:exported="false" />
-        <service android:name=".app.monitoring.background.BackgroundMonitoringService"/>
+
+        <service android:name=".app.monitoring.background.BackgroundMonitoringService"
+            tools:ignore="Instantiatable" />
     </application>
 
 </manifest>

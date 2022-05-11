@@ -14,12 +14,13 @@ import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import com.example.heartratemonitoringapp.R
+import com.example.heartratemonitoringapp.app.MainActivity
 import com.example.heartratemonitoringapp.app.monitoring.ble.BLE
 import com.example.heartratemonitoringapp.app.monitoring.ble.UUIDs
 import java.util.*
 import kotlin.concurrent.schedule
 
-class BackgroundMonitoringService: Service() {
+class BackgroundMonitoringService(): Service() {
 
     private var device: BluetoothDevice? = null
     private val timer1 = Timer()
@@ -34,18 +35,13 @@ class BackgroundMonitoringService: Service() {
     override fun onCreate() {
         super.onCreate()
         notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
-        if (Build.VERSION.SDK_INT >= 26) {
-            val channel = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                NotificationChannel(
-                    channelId,
-                    "Channel human readable title",
-                    NotificationManager.IMPORTANCE_DEFAULT
-                )
-            } else {
-                TODO("VERSION.SDK_INT < O")
-            }
-            notificationManager.createNotificationChannel(channel)
-        }
+        val channel =
+            NotificationChannel(
+                channelId,
+                "Channel human readable title",
+                NotificationManager.IMPORTANCE_DEFAULT
+            )
+        notificationManager.createNotificationChannel(channel)
     }
 
     @SuppressLint("MissingPermission", "UnspecifiedImmutableFlag")
@@ -54,15 +50,17 @@ class BackgroundMonitoringService: Service() {
         val connectedDevices = bluetoothManager.getConnectedDevices(BluetoothProfile.GATT)
         device = connectedDevices.first()
 
-        BLE.bluetoothGatt = device?.connectGatt(this, false, gattCallback)
         timer1.schedule(0, 1000) {
             scanHeartRate()
-        }
+            }
         timer2.schedule(0, 1000) {
             getStep()
         }
 
-        val notificationIntent = Intent(this, BackgroundMonitoringActivity::class.java)
+        BLE.bluetoothGatt = device?.connectGatt(this, true, gattCallback)
+
+
+        val notificationIntent = Intent(this, MainActivity::class.java)
         val pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0)
 
         val notification = NotificationCompat.Builder(this, channelId)
@@ -99,9 +97,7 @@ class BackgroundMonitoringService: Service() {
         timer3.cancel()
         timer3.purge()
         disconnect()
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            notificationManager.deleteNotificationChannel(channelId)
-        }
+        notificationManager.deleteNotificationChannel(channelId)
         super.onDestroy()
     }
 
@@ -165,14 +161,13 @@ class BackgroundMonitoringService: Service() {
         val basicService = BLE.bluetoothGatt?.getService(UUIDs.BASIC_SERVICE)
         if (basicService == null) {
             Log.d("basic service", "Step service not found!")
-            return
-        }
-        val stepLevel = basicService.getCharacteristic(UUIDs.BASIC_STEP_CHARACTERISTIC)
-        if (stepLevel == null) {
-            Log.d("step level", "Step level not found!")
-            return
         } else {
-            BLE.bluetoothGatt?.readCharacteristic(stepLevel)
+            val stepLevel = basicService.getCharacteristic(UUIDs.BASIC_STEP_CHARACTERISTIC)
+            if (stepLevel == null) {
+                Log.d("step level", "Step level not found!")
+            } else {
+                BLE.bluetoothGatt?.readCharacteristic(stepLevel)
+            }
         }
     }
 
@@ -181,8 +176,8 @@ class BackgroundMonitoringService: Service() {
         BLE.bluetoothGatt?.disconnect()
     }
 
-    fun sendData(avgHeart: Int, avgStep: Int) {
-
+    private fun sendData(avgHeart: Int, avgStep: Int) {
+//        userCase.addData(userCase.getBearer().toString(), avgHeart, avgStep, "")
     }
 
     override fun onBind(p0: Intent?): IBinder? {

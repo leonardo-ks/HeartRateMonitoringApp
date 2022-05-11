@@ -25,6 +25,8 @@ class LiveMonitoringActivity : AppCompatActivity() {
     private lateinit var binding: ActivityLiveMonitoringBinding
     private val viewModel: LiveMonitoringViewModel by viewModel()
     private var device: BluetoothDevice? = null
+    private val timer1 = Timer()
+    private val timer2 = Timer()
 
     @SuppressLint("MissingPermission", "SetTextI18n")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,12 +45,12 @@ class LiveMonitoringActivity : AppCompatActivity() {
         val connectedDevices = bluetoothManager.getConnectedDevices(BluetoothProfile.GATT)
         device = connectedDevices.first()
         binding.layoutLiveMonitoring.tvDevice.text = device?.name
-        BLE.bluetoothGatt = device?.connectGatt(this, false, gattCallback)
+        BLE.bluetoothGatt = device?.connectGatt(this, true, gattCallback)
         lifecycleScope.launch {
-            Timer().schedule(0, 1000) {
+            timer1.schedule(0, 1000) {
                 scanHeartRate()
             }
-            Timer().schedule(0, 1000) {
+            timer2.schedule(0, 1000) {
                 getStep()
             }
         }
@@ -149,6 +151,10 @@ class LiveMonitoringActivity : AppCompatActivity() {
     @SuppressLint("MissingPermission")
     fun disconnect() {
         BLE.bluetoothGatt?.disconnect()
+        timer1.cancel()
+        timer1.purge()
+        timer2.cancel()
+        timer2.purge()
     }
 
     private fun requestPermissions() {
