@@ -9,6 +9,7 @@ import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.lifecycleScope
+import com.example.heartratemonitoringapp.R
 import com.example.heartratemonitoringapp.app.MainActivity
 import com.example.heartratemonitoringapp.app.auth.AuthState
 import com.example.heartratemonitoringapp.app.auth.register.RegisterActivity
@@ -17,12 +18,12 @@ import com.example.heartratemonitoringapp.util.hideSoftKeyboard
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import java.time.LocalDateTime
 
 class LoginActivity : AppCompatActivity() {
     private lateinit var binding: ActivityLoginBinding
     private val viewModel: LoginViewModel by viewModel()
 
-    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -46,6 +47,7 @@ class LoginActivity : AppCompatActivity() {
                         )
                     }
                     is AuthState.Success -> {
+                        viewModel.setLatestLoginDate(LocalDateTime.now().toString())
                         startActivity(Intent(baseContext, MainActivity::class.java))
                     }
                     is AuthState.Fail -> {
@@ -108,7 +110,7 @@ class LoginActivity : AppCompatActivity() {
                 if (it != null) {
                     binding.loginForm.loginTilEmail.apply {
                         isErrorEnabled = it
-                        error = if (it) "Email tidak valid" else null
+                        error = if (it) context.getString(R.string.email_not_valid) else null
                     }
                 }
             }
@@ -122,7 +124,7 @@ class LoginActivity : AppCompatActivity() {
                 if (it != null) {
                     binding.loginForm.loginTilPassword.apply {
                         isErrorEnabled = it
-                        error = if (it) "Password tidak valid" else null
+                        error = if (it) context.getString(R.string.password_not_valid) else null
                     }
                 }
             }

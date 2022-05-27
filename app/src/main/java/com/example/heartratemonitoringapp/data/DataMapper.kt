@@ -14,7 +14,9 @@ fun LoginResponse.toDomain(): LoginDomain = LoginDomain(accessToken)
 fun UserData.toDomain(): UserDataDomain = UserDataDomain(
     email = email,
     name = name,
+    dob = dob,
     id = id,
+    gender = gender,
     profile = profile
 )
 
@@ -29,5 +31,5 @@ fun MonitoringData.toDomain(): MonitoringDataDomain = MonitoringDataDomain(
 
 fun AverageResponse.toDomain(): AverageDomain = AverageDomain(
     avgHeartRate = avgHeartRate,
-    avgStep = avgStep
+    todaySteps = todaySteps
 )

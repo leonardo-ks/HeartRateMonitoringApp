@@ -13,7 +13,7 @@
         android:layout_height="wrap_content">
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/login_tidt_email"
-            android:hint="Email"
+            android:hint="@string/email"
             android:gravity="center_vertical"
             android:drawableStart="@drawable/ic_outline_email"
             android:drawablePadding="16dp"
@@ -33,7 +33,7 @@
         app:passwordToggleEnabled="true">
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/login_tidt_password"
-            android:hint="Password"
+            android:hint="@string/password"
             android:drawableStart="@drawable/ic_outline_vpn_key"
             android:drawablePadding="16dp"
             android:maxLength="20"
@@ -47,7 +47,7 @@
         android:id="@+id/login_btn"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Masuk"
+        android:text="@string/login"
         android:textAllCaps="false"
         android:layout_marginTop="16dp"
         android:textColor="@color/white"

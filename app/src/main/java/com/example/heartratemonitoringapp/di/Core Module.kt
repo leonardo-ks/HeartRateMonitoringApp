@@ -7,6 +7,8 @@ import com.example.heartratemonitoringapp.app.auth.register.RegisterViewModel
 import com.example.heartratemonitoringapp.app.dashboard.band.BandViewModel
 import com.example.heartratemonitoringapp.app.dashboard.home.HomeViewModel
 import com.example.heartratemonitoringapp.app.dashboard.profile.ProfileViewModel
+import com.example.heartratemonitoringapp.app.dashboard.profile.editpassword.EditPasswordViewModel
+import com.example.heartratemonitoringapp.app.dashboard.profile.editprofile.EditProfileViewModel
 import com.example.heartratemonitoringapp.app.monitoring.live.LiveMonitoringViewModel
 import com.example.heartratemonitoringapp.app.splashscreen.SplashViewModel
 import com.example.heartratemonitoringapp.data.Repository
@@ -60,7 +62,7 @@ val networkModule = module {
 
     single {
         val retrofit = Retrofit.Builder()
-            .baseUrl("http://192.168.1.9:8000/api/")
+            .baseUrl("http://192.168.100.231:8000/api/")
             .addConverterFactory(GsonConverterFactory.create())
             .client(get())
             .build()
@@ -86,4 +88,6 @@ val viewModelModule = module {
     viewModel { ProfileViewModel(get()) }
     viewModel { RegisterViewModel(get()) }
     viewModel { LiveMonitoringViewModel(get()) }
+    viewModel { EditProfileViewModel(get()) }
+    viewModel { EditPasswordViewModel(get()) }
 }

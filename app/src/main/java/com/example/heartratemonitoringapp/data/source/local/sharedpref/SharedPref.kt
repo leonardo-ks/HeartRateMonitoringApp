@@ -20,4 +20,13 @@ class SharedPref(private val sharedPref: SharedPreferences) {
     }
 
     fun getBoolean(key: String): Boolean = sharedPref.getBoolean(key, false)
+
+    fun setInt(key: String, value: Int) {
+        with(sharedPref.edit()) {
+            putInt(key, value)
+            apply()
+        }
+    }
+
+    fun getInt(key: String): Int = sharedPref.getInt(key, 60000)
 }

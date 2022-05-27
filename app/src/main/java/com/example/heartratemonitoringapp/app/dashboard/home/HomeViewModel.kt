@@ -5,11 +5,14 @@ import androidx.lifecycle.viewModelScope
 import com.example.heartratemonitoringapp.data.Resource
 import com.example.heartratemonitoringapp.domain.usecase.IUseCase
 import com.example.heartratemonitoringapp.domain.usecase.model.AverageDomain
+import com.example.heartratemonitoringapp.domain.usecase.model.MonitoringDataDomain
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
 class HomeViewModel(private val useCase: IUseCase) : ViewModel() {
+
+    val backgroundMonitoringState = useCase.getBackgroundMonitoringState()
 
     private val _average = MutableStateFlow<Resource<AverageDomain>>(Resource.Loading())
     val average: StateFlow<Resource<AverageDomain>> get() = _average

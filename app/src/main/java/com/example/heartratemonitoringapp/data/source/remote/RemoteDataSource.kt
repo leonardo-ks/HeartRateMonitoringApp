@@ -70,9 +70,9 @@ class RemoteDataSource(private val apiService: ApiService, ) {
             }
         }.flowOn(Dispatchers.IO)
 
-    suspend fun addData(bearer: String, avgHeartRate: Int, avgStep: Int, label: String): Flow<ApiResponse<StoreMonitoringDataResponse>> =
+    suspend fun addData(bearer: String, avgHeartRate: Int, avgStep: Int, label: String?): Flow<ApiResponse<StoreMonitoringDataResponse>> =
         flow {
-            val response = apiService.addData(bearer, avgHeartRate, avgStep, label)
+            val response = apiService.addData(bearer, avgHeartRate, avgStep, label.toString())
             if (response.success == true) {
                 emit(ApiResponse.Success(response))
             } else {
@@ -148,7 +148,7 @@ class RemoteDataSource(private val apiService: ApiService, ) {
 
     suspend fun getAverageData(bearer: String): Flow<ApiResponse<AverageResponse>> =
         flow {
-            val response = apiService.getaverageData(bearer)
+            val response = apiService.getAverageData(bearer)
             if (response.success == true) {
                 emit(ApiResponse.Success(response))
             } else {
@@ -203,9 +203,9 @@ class RemoteDataSource(private val apiService: ApiService, ) {
             }
         }.flowOn(Dispatchers.IO)
 
-    suspend fun updateUser(bearer: String, name: String): Flow<ApiResponse<UserDataUpdateResponse>> =
+    suspend fun updateUser(bearer: String, name: String, email: String, dob: String, gender: Int): Flow<ApiResponse<UserDataUpdateResponse>> =
         flow {
-            val response = apiService.updateUser(bearer, name)
+            val response = apiService.updateUser(bearer, name, email, dob, gender)
             if (response.success == true) {
                 emit(ApiResponse.Success(response))
             } else {

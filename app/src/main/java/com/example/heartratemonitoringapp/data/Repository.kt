@@ -76,11 +76,11 @@ class Repository(
         bearer: String,
         avgHeartRate: Int,
         avgStep: Int,
-        label: String
+        label: String?
     ): Flow<Resource<MonitoringDataDomain>> =
         flow {
             emit(Resource.Loading())
-            when (val apiResponse = remoteDataSource.addData(bearer, avgHeartRate, avgStep, label).first()) {
+            when (val apiResponse = remoteDataSource.addData(bearer, avgHeartRate, avgStep, label.toString()).first()) {
                 is ApiResponse.Success -> {
                     if (apiResponse.data.data != null) {
                         emit(Resource.Success(apiResponse.data.data.toDomain()))
@@ -187,10 +187,10 @@ class Repository(
             }
         }
 
-    override fun updateUser(bearer: String, name: String): Flow<Resource<UserDataDomain>> =
+    override fun updateUser(bearer: String, name: String, email: String, dob: String, gender: Int): Flow<Resource<UserDataDomain>> =
         flow {
             emit(Resource.Loading())
-            when (val apiResponse = remoteDataSource.updateUser(bearer, name).first()) {
+            when (val apiResponse = remoteDataSource.updateUser(bearer, name, email, dob, gender).first()) {
                 is ApiResponse.Success -> {
                     if (apiResponse.data.data != null) {
                         emit(Resource.Success(apiResponse.data.data.toDomain()))
@@ -203,30 +203,34 @@ class Repository(
             }
         }
 
-    override fun setBearer(bearer: String) {
-        localDataSource.setBearer(bearer)
+    override fun setBearer(bearer: String) = localDataSource.setBearer(bearer)
+
+    override fun getBearer(): Flow<String?> = flow {
+        emit(localDataSource.getBearer())
     }
 
-    override fun getBearer(): Flow<String?> =
-        flow {
-            emit(localDataSource.getBearer())
-        }
+    override fun setLoginState(state: Boolean) = localDataSource.setLoginState(state)
 
-    override fun setLoginState(state: Boolean) {
-        localDataSource.setLoginState(state)
+    override fun getLoginState() = flow {
+        emit(localDataSource.getLoginState())
     }
 
-    override fun getLoginState() =
-        flow {
-            emit(localDataSource.getLoginState())
-        }
+    override fun setLatestLoginDate(date: String) = localDataSource.setLatestLoginDate(date)
 
-    override fun setLatestLoginDate(date: String) {
-        localDataSource.setLatestLoginDate(date)
+
+    override fun getLatestLoginDate(): Flow<String?> = flow {
+        emit(localDataSource.getLatestLoginDate())
     }
 
-    override fun getLatestLoginDate(): Flow<String?> =
-        flow {
-            emit(localDataSource.getLatestLoginDate())
-        }
+    override fun setMonitoringPeriod(period: Int) = localDataSource.setMonitoringPeriod(period)
+
+    override fun getMonitoringPeriod(): Flow<Int> = flow {
+        emit(localDataSource.getMonitoringPeriod())
+    }
+
+    override fun setBackgroundMonitoringState(state: Boolean) = localDataSource.setBackgroundMonitoringState(state)
+
+    override fun getBackgroundMonitoringState(): Flow<Boolean> = flow {
+        emit(localDataSource.getBackgroundMonitoringState())
+    }
 }

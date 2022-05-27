@@ -1,7 +1,57 @@
 <resources>
-    <string name="app_name">Heart Rate Monitoring App</string>
-    <string name="title_home">Home</string>
-    <string name="title_band">Band</string>
-    <string name="title_profile">Profile</string>
-    <string name="title_activity_login">LoginActivity</string>
+<string name="app_name">Heart Rate Monitoring App</string>
+<string name="title_home">Home</string>
+<string name="title_band">Band</string>
+<string name="title_profile">Profile</string>
+<string name="title_activity_login">LoginActivity</string>
+<string name="no">No</string>
+<string name="yes">Yes</string>
+<string name="email_not_valid">Email not valid</string>
+<string name="password_not_valid">Password not valid</string>
+<string name="name_cannot_empty">Name cannot be empty</string>
+<string name="password_not_same">Retyped password not matched</string>
+<string name="gender">Gender</string>
+<string name="male">Male</string>
+<string name="female">Female</string>
+<string name="success_change_profile">Profile changed successfully</string>
+<string name="logout_failed">Logout failed</string>
+<string name="connecting">Connecting</string>
+<string name="step">Step</string>
+<string name="step_title">Today\'s step</string>
+<string name="change_password">Change password</string>
+<string name="change_profile">Change profile</string>
+<string name="have_no_account">Dont\'t have an account yet?</string>
+<string name="register">Register</string>
+<string name="already_have_account">Already have an account?</string>
+<string name="login">Login</string>
+<string name="connect_device">Connect device</string>
+<string name="app_tittle">Monitoring App</string>
+<string name="heart_rate">Average heart rate</string>
+<string name="bpm">BPM</string>
+<string name="background_monitoring">Background monitoring</string>
+<string name="live_monitoring">Live monitoring</string>
+<string name="monitoring_period">Monitoring period</string>
+<string name="heart_rate_limit">Heart rate limit</string>
+<string name="old_password">Old password</string>
+<string name="new_password">New password</string>
+<string name="retype_password">Retype new password</string>
+<string name="save">Save</string>
+<string name="email">Email</string>
+<string name="name">Name</string>
+<string name="date_of_birth">Date of birth</string>
+<string name="loading">Loading</string>
+<string name="password">Password</string>
+<string name="band_not_detected">Connected smartband not detected</string>
+<string name="connect">Connect</string>
+<string name="logout">Logout</string>
+<string name="detected_devices">Detected devices</string>
+<string name="search">Search</string>
+
+<string-array name="periods">
+    <item>1 minute</item>
+    <item>5 minutes</item>
+    <item>10 minutes</item>
+    <item>15 minutes</item>
+</string-array>
+
 </resources>

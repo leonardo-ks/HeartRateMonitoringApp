@@ -30,7 +30,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:text="Sudah memiliki akun?" />
+            android:text="@string/already_have_account" />
 
         <TextView
             android:id="@+id/tv_login"
@@ -39,7 +39,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"
             android:layout_marginTop="8dp"
-            android:text="Masuk"
+            android:text="@string/login"
             android:textColor="@color/primary_color"
             android:textSize="12sp"/>
     </LinearLayout>

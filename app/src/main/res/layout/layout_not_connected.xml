@@ -13,7 +13,8 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        android:contentDescription="@string/title_band" />
 
     <TextView
         android:id="@+id/tv_not_connected"
@@ -23,7 +24,7 @@
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
-        android:text="Tidak terdeteksi smartband yang terhubung"
+        android:text="@string/band_not_detected"
         android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -38,7 +39,7 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
         android:background="@drawable/bg_button"
-        android:text="Hubungkan"
+        android:text="@string/connect"
         android:textAllCaps="false"
         android:textColor="@color/primary_text_color"
         app:backgroundTint="@color/primary_color"

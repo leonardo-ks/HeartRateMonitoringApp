@@ -10,7 +10,11 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.example.heartratemonitoringapp.R
+import com.example.heartratemonitoringapp.app.MainActivity
 import com.example.heartratemonitoringapp.app.auth.login.LoginActivity
+import com.example.heartratemonitoringapp.app.dashboard.profile.editpassword.EditPasswordActivity
+import com.example.heartratemonitoringapp.app.dashboard.profile.editpassword.EditPasswordViewModel
+import com.example.heartratemonitoringapp.app.dashboard.profile.editprofile.EditProfileActivity
 import com.example.heartratemonitoringapp.data.Resource
 import com.example.heartratemonitoringapp.databinding.FragmentProfileBinding
 import com.google.android.material.snackbar.Snackbar
@@ -40,6 +44,14 @@ class ProfileFragment : Fragment() {
         lifecycleScope.launch {
             val bearer = viewModel.getBearer().first()
             viewModel.getProfile(bearer.toString())
+        }
+
+        binding.layoutProfile.btnChangeProfile.setOnClickListener {
+            startActivity(Intent(context, EditProfileActivity::class.java))
+        }
+
+        binding.layoutProfile.btnChangePassword.setOnClickListener {
+            startActivity(Intent(context, EditPasswordActivity::class.java))
         }
 
         binding.layoutProfile.btnLogout.setOnClickListener {
@@ -90,7 +102,7 @@ class ProfileFragment : Fragment() {
                     is Resource.Success -> startActivity(Intent(requireContext(), LoginActivity::class.java))
                     is Resource.Error -> {
                         binding.layoutProfile.btnLogout.isEnabled = true
-                        Toast.makeText(requireContext(), "Logout Gagal", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(requireContext(), getString(R.string.logout_failed), Toast.LENGTH_SHORT).show()
                     }
                 }
             }

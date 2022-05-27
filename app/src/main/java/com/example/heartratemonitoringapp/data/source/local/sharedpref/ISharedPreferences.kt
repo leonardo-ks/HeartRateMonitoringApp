@@ -7,4 +7,8 @@ interface ISharedPreferences {
     fun getLoginState() : Boolean
     fun setLatestLoginDate(date : String?)
     fun getLatestLoginDate(): String?
+    fun setMonitoringPeriod(period: Int)
+    fun getMonitoringPeriod(): Int
+    fun setBackgroundMonitoringState(state : Boolean)
+    fun getBackgroundMonitoringState() : Boolean
 }

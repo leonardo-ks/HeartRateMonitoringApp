@@ -2,14 +2,13 @@ package com.example.heartratemonitoringapp.app.scanner
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.bluetooth.BluetoothAdapter
-import android.bluetooth.BluetoothDevice
-import android.bluetooth.BluetoothManager
+import android.bluetooth.*
 import android.bluetooth.le.*
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
@@ -18,6 +17,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.heartratemonitoring.ui.scanner.adapter.ScannerAdapter
 import com.example.heartratemonitoringapp.R
 import com.example.heartratemonitoringapp.app.MainActivity
+import com.example.heartratemonitoringapp.app.monitoring.ble.UUIDs
 import com.example.heartratemonitoringapp.databinding.ActivityScannerBinding
 import kotlinx.coroutines.launch
 
@@ -55,8 +55,8 @@ class ScannerActivity : AppCompatActivity() {
         }
 
         if (!bluetoothAdapter.isEnabled) {
-            val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            startActivity(enableBtIntent);
+            val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
+            startActivity(enableBtIntent)
         }
 
         binding.layoutScanner.btnSearch.setOnClickListener {
@@ -79,20 +79,26 @@ class ScannerActivity : AppCompatActivity() {
         mAdapter.onItemClick = {
             lifecycleScope.launch {
                 val device = bluetoothManager.adapter.getRemoteDevice(it.address)
-                device.createBond()
-                when (device.bondState) {
-                    BluetoothDevice.BOND_BONDED -> {
+                device.connectGatt(baseContext, true, gattCallback)
+                binding.layoutLoading.textLoading.text = resources.getString(R.string.connecting)
+                binding.layoutLoading.root.visibility = View.VISIBLE
+            }
+        }
+    }
+
+    private val gattCallback = object : BluetoothGattCallback() {
+        @SuppressLint("MissingPermission", "SetTextI18n")
+        override fun onConnectionStateChange(gatt: BluetoothGatt?, status: Int, newState: Int) {
+            when (newState) {
+                BluetoothGatt.STATE_CONNECTED -> {
+                    lifecycleScope.launch {
                         binding.layoutLoading.root.visibility = View.GONE
                         startActivity(Intent(baseContext, MainActivity::class.java))
-                    }
-                    BluetoothDevice.BOND_BONDING -> {
-                        binding.layoutLoading.root.visibility = View.VISIBLE
                     }
                 }
             }
         }
     }
-
     @SuppressLint("MissingPermission")
     private fun scanBLE() {
         val filters = ArrayList<ScanFilter>()

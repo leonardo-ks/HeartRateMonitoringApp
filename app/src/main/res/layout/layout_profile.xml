@@ -51,7 +51,7 @@
     </LinearLayout>
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/btn_change_name"
+        android:id="@+id/btn_change_profile"
         style="@style/TextRegular"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -60,12 +60,11 @@
         android:layout_marginEnd="16dp"
         android:background="@drawable/bg_button"
         android:shadowRadius="8"
-        android:text="Ubah Nama"
+        android:text="@string/change_profile"
         android:textAlignment="textStart"
         android:textAllCaps="false"
         android:textSize="16sp"
         app:backgroundTint="@color/white"
-        app:icon="@drawable/ic_edit"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/linearLayout" />
@@ -79,25 +78,24 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="16dp"
         android:background="@drawable/bg_button"
-        android:text="Ubah Password"
+        android:text="@string/change_password"
         android:textAlignment="textStart"
         android:textAllCaps="false"
         android:textSize="16sp"
-        app:icon="@drawable/ic_edit"
         app:backgroundTint="@color/white"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btn_change_name" />
+        app:layout_constraintTop_toBottomOf="@+id/btn_change_profile" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btn_logout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="48dp"
+        android:layout_marginTop="32dp"
         android:layout_marginEnd="16dp"
         android:background="@drawable/bg_button"
-        android:text="Keluar"
+        android:text="@string/logout"
         android:textAllCaps="false"
         android:textColor="@color/white"
         app:backgroundTint="@color/red"

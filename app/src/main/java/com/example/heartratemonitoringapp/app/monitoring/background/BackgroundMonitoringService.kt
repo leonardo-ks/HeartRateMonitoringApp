@@ -8,8 +8,8 @@ import android.app.Service
 import android.bluetooth.*
 import android.content.Context
 import android.content.Intent
-import android.os.Build
-import android.os.IBinder
+import android.os.*
+import android.text.method.TextKeyListener.clear
 import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
@@ -17,67 +17,86 @@ import com.example.heartratemonitoringapp.R
 import com.example.heartratemonitoringapp.app.MainActivity
 import com.example.heartratemonitoringapp.app.monitoring.ble.BLE
 import com.example.heartratemonitoringapp.app.monitoring.ble.UUIDs
+import com.example.heartratemonitoringapp.domain.usecase.IUseCase
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.first
+import org.koin.android.ext.android.inject
+import org.koin.android.scope.serviceScope
+import java.sql.Time
+import java.time.Period
 import java.util.*
 import kotlin.concurrent.schedule
 
-class BackgroundMonitoringService(): Service() {
+class BackgroundMonitoringService : Service() {
 
     private var device: BluetoothDevice? = null
-    private val timer1 = Timer()
-    private val timer2 = Timer()
-    private val timer3 = Timer()
+    private val timer = Timer()
     private val heartList = arrayListOf<Int>()
     private val stepList = arrayListOf<Int>()
     private val channelId = "Background Monitoring"
+    private val useCase: IUseCase by inject()
     private lateinit var notificationManager: NotificationManager
+    private lateinit var countDownTimer: CountDownTimer
+    private var period: Long = 0
+    private val job = SupervisorJob()
+    private val scope = CoroutineScope(Dispatchers.IO + job)
 
-    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate() {
         super.onCreate()
         notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
         val channel =
             NotificationChannel(
                 channelId,
-                "Channel human readable title",
+                "Background Monitoring Channel",
                 NotificationManager.IMPORTANCE_DEFAULT
             )
         notificationManager.createNotificationChannel(channel)
     }
 
-    @SuppressLint("MissingPermission", "UnspecifiedImmutableFlag")
+    @SuppressLint("MissingPermission")
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+
         val bluetoothManager = this.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
         val connectedDevices = bluetoothManager.getConnectedDevices(BluetoothProfile.GATT)
         device = connectedDevices.first()
-
-        timer1.schedule(0, 1000) {
-            scanHeartRate()
-            }
-        timer2.schedule(0, 1000) {
-            getStep()
-        }
-
         BLE.bluetoothGatt = device?.connectGatt(this, true, gattCallback)
 
-
         val notificationIntent = Intent(this, MainActivity::class.java)
-        val pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0)
+        val pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, flags)
 
         val notification = NotificationCompat.Builder(this, channelId)
             .setContentTitle("Monitoring latar belakang")
-            .setSmallIcon(R.drawable.ic_launcher_foreground)
+            .setSmallIcon(R.drawable.ic_watch)
             .setContentIntent(pendingIntent)
-            .setContentText(getText())
-        timer3.schedule(0, 60000) {
-            if (heartList.size > 0 && stepList.size > 0) {
-                Log.d("average", "${heartList.average().toInt()} ${stepList.last() - stepList.first()}")
-                sendData(heartList.average().toInt(), stepList.lastIndex - stepList.first())
+
+        countDownTimer = object : CountDownTimer(60000, 1000) {
+            override fun onTick(p0: Long) {
+                notification.setContentText(getText())
+                notificationManager.notify(1, notification.build())
+                getStep()
             }
-            notification.setContentText(getText())
-            notificationManager.notify(1, notification.build())
-            heartList.clear()
-            stepList.clear()
+
+            override fun onFinish() {
+                scope.launch {
+                    if (heartList.size > 0 && stepList.size > 0) {
+                        sendData(heartList.average().toInt(), stepList.last() - stepList.first())
+                    }
+                }
+                notificationManager.cancel(1)
+                cancel()
+            }
         }
+
+        scope.launch {
+            period = useCase.getMonitoringPeriod().first().toLong()
+            timer.schedule(0, period) {
+                heartList.clear()
+                stepList.clear()
+                countDownTimer.start()
+            }
+        }
+
         return START_STICKY
     }
 
@@ -85,20 +104,25 @@ class BackgroundMonitoringService(): Service() {
         return if (heartList.size > 0 && stepList.size > 0) {
             "Heartrate: ${heartList.last()}, Step: ${stepList.last()}"
         } else {
-            "Monitoring sedang berjalan"
+            "Menghubungkan"
         }
     }
 
     override fun onDestroy() {
-        timer1.cancel()
-        timer1.purge()
-        timer2.cancel()
-        timer2.purge()
-        timer3.cancel()
-        timer3.purge()
-        disconnect()
-        notificationManager.deleteNotificationChannel(channelId)
+        clear()
+        job.cancel()
         super.onDestroy()
+    }
+
+    @SuppressLint("MissingPermission")
+    fun clear() {
+        countDownTimer.cancel()
+        timer.cancel()
+        timer.purge()
+        heartList.clear()
+        stepList.clear()
+        BLE.bluetoothGatt?.disconnect()
+        notificationManager.deleteNotificationChannel(channelId)
     }
 
     @SuppressLint("MissingPermission")
@@ -121,6 +145,7 @@ class BackgroundMonitoringService(): Service() {
                     val step = characteristic.value[1].toInt()
                     stepList.add(step)
                     Log.d("callback", "Step: $step")
+                    scanHeartRate()
                 }
             }
         }
@@ -171,13 +196,12 @@ class BackgroundMonitoringService(): Service() {
         }
     }
 
-    @SuppressLint("MissingPermission")
-    fun disconnect() {
-        BLE.bluetoothGatt?.disconnect()
-    }
-
     private fun sendData(avgHeart: Int, avgStep: Int) {
-//        userCase.addData(userCase.getBearer().toString(), avgHeart, avgStep, "")
+        scope.launch {
+            useCase.addData(useCase.getBearer().first().toString(), avgHeart, avgStep, "").collect {
+
+            }
+        }
     }
 
     override fun onBind(p0: Intent?): IBinder? {

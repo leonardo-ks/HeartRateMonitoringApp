@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -33,14 +32,14 @@
                 android:padding="8dp">
 
                 <TextView
-                    android:id="@+id/tv_avg_step_title"
+                    android:id="@+id/tv_today_steps_title"
                     style="@style/TextSemiBold"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="8dp"
                     android:layout_marginTop="8dp"
                     android:layout_marginEnd="8dp"
-                    android:text=" Langkah"
+                    android:text="@string/step"
                     android:textAlignment="center"
                     android:textColor="@color/black"
                     android:textSize="24sp"
@@ -52,7 +51,7 @@
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
-                    android:id="@+id/tv_avg_step_value"
+                    android:id="@+id/tv_today_steps_value"
                     style="@style/TextRegular"
                     android:layout_width="80dp"
                     android:layout_height="80dp"
@@ -61,14 +60,12 @@
                     android:autoSizeTextType="uniform"
                     android:gravity="center"
                     android:padding="8dp"
-                    android:text="200"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/tv_avg_step_title"
-                    tools:targetApi="o" />
+                    app:layout_constraintTop_toBottomOf="@+id/tv_today_steps_title" />
 
                 <TextView
-                    android:id="@+id/tv_avg_step_unit"
+                    android:id="@+id/tv_today_steps_unit"
                     style="@style/TextSemiBold"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -77,12 +74,11 @@
                     android:layout_marginBottom="8dp"
                     android:autoSizeTextType="uniform"
                     android:gravity="center"
-                    android:text="Langkah"
+                    android:text="@string/step"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/tv_avg_step_value"
-                    tools:targetApi="o" />
+                    app:layout_constraintTop_toBottomOf="@+id/tv_today_steps_value" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -112,7 +108,7 @@
                     android:layout_marginStart="8dp"
                     android:layout_marginTop="8dp"
                     android:layout_marginEnd="8dp"
-                    android:text=" Detak Jantung"
+                    android:text="@string/heart_rate"
                     android:textAlignment="center"
                     android:textColor="@color/black"
                     android:textSize="24sp"
@@ -133,11 +129,9 @@
                     android:autoSizeTextType="uniform"
                     android:gravity="center"
                     android:padding="8dp"
-                    android:text="200"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/tv_avg_heart_title"
-                    tools:targetApi="o" />
+                    app:layout_constraintTop_toBottomOf="@+id/tv_avg_heart_title" />
 
                 <TextView
                     android:id="@+id/tv_avg_heart_unit"
@@ -149,12 +143,12 @@
                     android:layout_marginBottom="8dp"
                     android:autoSizeTextType="uniform"
                     android:gravity="center"
-                    android:text=" BPM"
+                    android:text="@string/bpm"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/tv_avg_heart_value"
-                    tools:targetApi="o" />
+                     />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 

@@ -11,6 +11,7 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.lifecycleScope
+import com.example.heartratemonitoringapp.R
 import com.example.heartratemonitoringapp.app.monitoring.ble.BLE
 import com.example.heartratemonitoringapp.app.monitoring.ble.UUIDs
 import com.example.heartratemonitoringapp.databinding.ActivityLiveMonitoringBinding
@@ -37,7 +38,7 @@ class LiveMonitoringActivity : AppCompatActivity() {
         if (!isLocationPermissionGranted()) {
             requestPermissions()
         }
-        binding.layoutLoading.textLoading.text = "Menghubungkan"
+        binding.layoutLoading.textLoading.text = getString(R.string.connecting)
         binding.layoutLoading.root.visibility = View.VISIBLE
         binding.layoutLiveMonitoring.root.visibility = View.GONE
 
@@ -73,7 +74,7 @@ class LiveMonitoringActivity : AppCompatActivity() {
             binding.layoutLiveMonitoring.tvHeartRate.text = " $it BPM"
         }
         viewModel.stepValue.observe(this) {
-            binding.layoutLiveMonitoring.tvStep.text = " $it Langkah"
+            binding.layoutLiveMonitoring.tvStep.text = "$it ${getString(R.string.step)}"
         }
     }
 
@@ -96,7 +97,7 @@ class LiveMonitoringActivity : AppCompatActivity() {
                 if (characteristic.uuid == UUIDs.BASIC_STEP_CHARACTERISTIC) {
                     val step = characteristic.value[1].toInt()
                     viewModel.updateStepValue(step)
-                    Log.d("callback", "Step is: $step")
+                    Log.d("callback", "Step: $step")
                 }
             }
         }
@@ -115,7 +116,7 @@ class LiveMonitoringActivity : AppCompatActivity() {
                 if (characteristic.uuid == UUIDs.HEART_RATE_MEASUREMENT_CHARACTERISTIC) {
                     val heartRate = characteristic.value[1].toInt()
                     viewModel.updateHeartRateValue(heartRate)
-                    Log.d("callback", "Heart Rate is: $heartRate")
+                    Log.d("callback", "Heart Rate: $heartRate")
                 }
             }
         }

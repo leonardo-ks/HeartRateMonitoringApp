@@ -5,31 +5,31 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white_grey"
-    tools:context=".app.scanner.ScannerActivity">
+    tools:context=".app.dashboard.profile.editprofile.EditProfileActivity">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?actionBarSize"
         style="@style/TextRegular"
-        app:title="@string/connect_device"
+        app:title="@string/change_profile"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <include
-        android:id="@+id/layout_scanner"
-        layout="@layout/layout_scan_band"
+        android:id="@+id/layout_edit_profile"
+        layout="@layout/layout_edit_profile"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="?actionBarSize"
+        android:layout_height="0dp"
+        android:layout_marginTop="16dp"
         android:visibility="visible"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/toolbar" />
 
     <include
         android:id="@+id/layout_loading"
         layout="@layout/layout_loading"
+        android:elevation="2dp"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:visibility="gone" />

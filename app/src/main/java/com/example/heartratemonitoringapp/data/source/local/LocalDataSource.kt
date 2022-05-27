@@ -10,4 +10,8 @@ class LocalDataSource(private val dao: Dao, private val sharedPreferences: IShar
     fun getLoginState() = sharedPreferences.getLoginState()
     fun setLatestLoginDate(date: String?) = sharedPreferences.setLatestLoginDate(date)
     fun getLatestLoginDate() = sharedPreferences.getLatestLoginDate()
+    fun setMonitoringPeriod(period: Int) = sharedPreferences.setMonitoringPeriod(period)
+    fun getMonitoringPeriod() = sharedPreferences.getMonitoringPeriod()
+    fun setBackgroundMonitoringState(state: Boolean) = sharedPreferences.setBackgroundMonitoringState(state)
+    fun getBackgroundMonitoringState() = sharedPreferences.getBackgroundMonitoringState()
 }

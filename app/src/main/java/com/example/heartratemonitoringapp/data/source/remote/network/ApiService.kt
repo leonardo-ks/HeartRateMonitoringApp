@@ -50,8 +50,21 @@ interface ApiService {
         bearer: String,
         @Field (value = "avg_heart_rate")
         avgHeartRate: Int,
-        @Field (value = "avg_step")
-        avgStep: Int,
+        @Field (value = "today_steps")
+        todaySteps: Int,
+    ): FindDataResponse
+
+    @FormUrlEncoded
+    @POST("change-password")
+    suspend fun changePassword(
+        @Header("Authorization")
+        bearer: String,
+        @Field (value = "old_password")
+        oldPassword: String,
+        @Field (value = "new_password")
+        newPassword: String,
+        @Field (value = "new_password_confirmation")
+        confirmation: String,
     ): FindDataResponse
 
     @GET("profile")
@@ -67,7 +80,7 @@ interface ApiService {
     ): UserMonitoringDataResponse
 
     @GET("average")
-    suspend fun getaverageData(
+    suspend fun getAverageData(
         @Header("Authorization")
         bearer: String,
     ): AverageResponse
@@ -97,6 +110,12 @@ interface ApiService {
         @Header("Authorization")
         bearer: String,
         @Query("name")
-        name: String
+        name: String,
+        @Query("email")
+        email: String,
+        @Query("dob")
+        dob: String,
+        @Query("gender")
+        gender: Int
     ): UserDataUpdateResponse
 }

@@ -7,6 +7,7 @@ import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.lifecycleScope
+import com.example.heartratemonitoringapp.R
 import com.example.heartratemonitoringapp.app.auth.AuthState
 import com.example.heartratemonitoringapp.app.auth.login.LoginActivity
 import com.example.heartratemonitoringapp.databinding.ActivityRegisterBinding
@@ -117,7 +118,7 @@ class RegisterActivity : AppCompatActivity() {
                 if (it != null) {
                     binding.registerForm.registerTilName.apply {
                         isErrorEnabled = it
-                        error = if (it) "Nama tidak boleh kosong" else null
+                        error = if (it) context.getString(R.string.name_cannot_empty) else null
                     }
                 }
             }
@@ -130,7 +131,7 @@ class RegisterActivity : AppCompatActivity() {
                 if (it != null) {
                     binding.registerForm.registerTilEmail.apply {
                         isErrorEnabled = it
-                        error = if (it) "Email tidak valid" else null
+                        error = if (it) context.getString(R.string.email_not_valid) else null
                     }
                 }
             }
@@ -143,7 +144,7 @@ class RegisterActivity : AppCompatActivity() {
                 if (it != null) {
                     binding.registerForm.registerTilPassword.apply {
                         isErrorEnabled = it
-                        error = if (it) "Password tidak valid" else null
+                        error = if (it) context.getString(R.string.password_not_valid) else null
                     }
                 }
             }
@@ -156,7 +157,7 @@ class RegisterActivity : AppCompatActivity() {
                 if (it != null) {
                     binding.registerForm.registerTilRepassword.apply {
                         isErrorEnabled = it
-                        error = if (it) "Password yang dimasukkan tidak sama" else null
+                        error = if (it) context.getString(R.string.password_not_same) else null
                     }
                 }
             }

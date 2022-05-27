@@ -24,7 +24,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:text="Aplikasi Monitoring"
+        android:text="@string/app_tittle"
         android:textAlignment="center"
         android:textColor="@color/primary_dark_color"
         app:layout_constraintBottom_toBottomOf="parent"

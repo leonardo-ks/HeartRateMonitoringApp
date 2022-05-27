@@ -11,6 +11,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import com.example.heartratemonitoringapp.app.monitoring.background.BackgroundMonitoringService
 import com.example.heartratemonitoringapp.app.scanner.ScannerActivity
 import com.example.heartratemonitoringapp.data.Resource
 import com.example.heartratemonitoringapp.databinding.FragmentHomeBinding
@@ -52,6 +53,12 @@ class HomeFragment : Fragment() {
             }
         }
 
+        lifecycleScope.launch {
+            if (connectedDevices != null && viewModel.backgroundMonitoringState.first()) {
+                activity?.startService(Intent(activity, BackgroundMonitoringService::class.java))
+            }
+        }
+
         binding.layoutNotConnected.btnConnect.setOnClickListener {
             startActivity(Intent(activity, ScannerActivity::class.java))
         }
@@ -71,7 +78,7 @@ class HomeFragment : Fragment() {
                         binding.layoutLoading.root.visibility = View.GONE
                         binding.layoutAverage.root.visibility = View.VISIBLE
                         binding.layoutAverage.tvAvgHeartValue.text = res.data?.avgHeartRate.toString()
-                        binding.layoutAverage.tvAvgStepValue.text = res.data?.avgStep.toString()
+                        binding.layoutAverage.tvTodayStepsValue.text = res.data?.todaySteps.toString()
                     }
                     is Resource.Error -> {
                         binding.layoutAverage.root.visibility = View.VISIBLE

@@ -13,6 +13,6 @@ data class AverageResponse(
 	@field:SerializedName("message")
 	val message: String? = null,
 
-	@field:SerializedName("avg_step")
-	val avgStep: Int? = null
+	@field:SerializedName("today_steps")
+	val todaySteps: Int? = null
 )

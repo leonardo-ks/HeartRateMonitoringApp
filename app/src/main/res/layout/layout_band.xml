@@ -53,7 +53,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="4dp"
-                    android:text="Mi Band 3"
                     android:textSize="24sp"
                     app:layout_constraintStart_toEndOf="@+id/iv_watch"
                     app:layout_constraintTop_toTopOf="@+id/iv_watch" />
@@ -64,7 +63,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="4dp"
-                    android:text="F8:FF:AB:FG:22:2D"
                     android:textSize="16sp"
                     app:layout_constraintStart_toEndOf="@+id/iv_watch"
                     app:layout_constraintTop_toBottomOf="@+id/tv_name" />

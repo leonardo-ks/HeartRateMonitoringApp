@@ -58,4 +58,5 @@ class LoginViewModel(private val useCase: IUseCase) : ViewModel() {
             }
         }
 
+    fun setLatestLoginDate(date: String) = useCase.setLatestLoginDate(date)
 }

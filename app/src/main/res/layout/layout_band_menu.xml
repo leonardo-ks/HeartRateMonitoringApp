@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto">
@@ -25,7 +26,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"
             android:layout_marginEnd="4dp"
-            android:text="Monitoring latar belakang"
+            android:text="@string/background_monitoring"
             android:textAlignment="textStart"
             android:textAllCaps="false"
             android:textColor="@color/primary_text_color"
@@ -56,7 +57,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"
             android:layout_marginEnd="4dp"
-            android:text="Monitoring langsung"
+            android:text="@string/live_monitoring"
             android:textAlignment="textStart"
             android:textAllCaps="false"
             android:textColor="@color/primary_text_color"
@@ -86,7 +87,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="4dp"
             android:layout_marginEnd="4dp"
-            android:text="Periode monitoring"
+            android:text="@string/monitoring_period"
             android:textAlignment="textStart"
             android:textAllCaps="false"
             android:textColor="@color/primary_text_color"
@@ -114,19 +115,68 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/card_period">
 
-        <TextView
-            android:id="@+id/tv_heart_limit"
-            style="@style/TextRegular"
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="4dp"
-            android:layout_marginEnd="4dp"
-            android:text="Batas detak jantung"
-            android:textAlignment="textStart"
-            android:textAllCaps="false"
-            android:textColor="@color/primary_text_color"
-            android:textSize="16sp"
-            android:theme="@style/Switch" />
+            android:layout_height="match_parent" >
+
+            <TextView
+                android:id="@+id/tv_heart_limit"
+                style="@style/TextRegular"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:text="@string/heart_rate_limit"
+                android:textAlignment="textStart"
+                android:textAllCaps="false"
+                android:textColor="@color/primary_text_color"
+                android:textSize="16sp"
+                android:theme="@style/Switch"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/tidt_lower_limit"
+                android:layout_width="48sp"
+                android:layout_height="wrap_content"
+                android:inputType="number"
+                android:gravity="center"
+                android:maxLength="3"
+                android:textSize="16sp"
+                android:textAppearance="@style/FormTextAppearance"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/tv_stripe"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/tv_stripe"
+                style="@style/TextRegular"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=" - "
+                android:textAlignment="textStart"
+                android:textColor="@color/primary_text_color"
+                android:textSize="16sp"
+                app:layout_constraintBottom_toBottomOf="@+id/tidt_lower_limit"
+                app:layout_constraintEnd_toStartOf="@+id/tidt_upper_limit"
+                app:layout_constraintTop_toTopOf="@+id/tidt_lower_limit"
+                tools:ignore="HardcodedText" />
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/tidt_upper_limit"
+                android:layout_width="48sp"
+                android:layout_height="wrap_content"
+                android:inputType="number"
+                android:gravity="center"
+                android:maxLength="3"
+                android:textSize="16sp"
+                android:layout_marginEnd="8dp"
+                android:textAppearance="@style/FormTextAppearance"
+                app:layout_constraintBottom_toBottomOf="@+id/tidt_lower_limit"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/tidt_lower_limit" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.cardview.widget.CardView>
 

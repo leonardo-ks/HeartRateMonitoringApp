@@ -20,11 +20,18 @@
         android:theme="@style/Theme.HeartRateMonitoringApp"
         android:usesCleartextTraffic="true">
         <activity
+            android:name=".app.dashboard.profile.editpassword.EditPasswordActivity"
+            android:exported="false" />
+        <activity
+            android:name=".app.dashboard.profile.editprofile.EditProfileActivity"
+            android:exported="false" />
+        <activity
             android:name=".app.splashscreen.SplashActivity"
             android:exported="true"
             android:theme="@style/Theme.HeartRateMonitoringApp.Splash">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -44,7 +51,10 @@
             android:name=".app.scanner.ScannerActivity"
             android:exported="false" />
 
-        <service android:name=".app.monitoring.background.BackgroundMonitoringService"
+        <service
+            android:name=".app.monitoring.background.BackgroundMonitoringService"
+            android:stopWithTask="false"
+            android:process=":my_process"
             tools:ignore="Instantiatable" />
     </application>
 
