@@ -20,6 +20,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.example.heartratemonitoringapp.R
 import com.example.heartratemonitoringapp.app.monitoring.background.BackgroundMonitoringService
+import com.example.heartratemonitoringapp.app.monitoring.ble.BLE
 import com.example.heartratemonitoringapp.app.monitoring.live.LiveMonitoringActivity
 import com.example.heartratemonitoringapp.app.scanner.ScannerActivity
 import com.example.heartratemonitoringapp.databinding.FragmentBandBinding
@@ -48,17 +49,22 @@ class BandFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val bluetoothManager = requireActivity().getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
+        val bluetoothManager = requireContext().getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
         val connectedDevices = bluetoothManager.getConnectedDevices(BluetoothProfile.GATT)
-        val device: BluetoothDevice?
-        if (connectedDevices.size < 1) {
+
+        if (connectedDevices.isNotEmpty()) {
+            if (BLE.bluetoothDevice == null) {
+                BLE.bluetoothDevice = connectedDevices.first()
+            }
+            bluetoothManager.adapter.getRemoteDevice(BLE.bluetoothDevice?.address)
+            binding.layoutBand.root.visibility = View.VISIBLE
+            binding.layoutBand.tvName.text = BLE.bluetoothDevice?.name
+            binding.layoutBand.tvMac.text = BLE.bluetoothDevice?.address
+        } else {
+
             binding.layoutNotConnected.root.visibility = View.VISIBLE
             binding.layoutBand.root.visibility = View.GONE
-        } else {
-            device = connectedDevices.first()
-            binding.layoutBand.root.visibility = View.VISIBLE
-            binding.layoutBand.tvName.text = device?.name
-            binding.layoutBand.tvMac.text = device?.address
+            binding.layoutLoading.root.visibility = View.GONE
         }
 
         val spinner = binding.layoutBand.layoutBandMenu.spinnerMonitoringPeriod

@@ -1,6 +1,7 @@
 package com.example.heartratemonitoringapp.app.dashboard.home
 
 import android.annotation.SuppressLint
+import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothManager
 import android.bluetooth.BluetoothProfile
 import android.content.Context
@@ -12,6 +13,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.example.heartratemonitoringapp.app.monitoring.background.BackgroundMonitoringService
+import com.example.heartratemonitoringapp.app.monitoring.ble.BLE
 import com.example.heartratemonitoringapp.app.scanner.ScannerActivity
 import com.example.heartratemonitoringapp.data.Resource
 import com.example.heartratemonitoringapp.databinding.FragmentHomeBinding
@@ -41,20 +43,25 @@ class HomeFragment : Fragment() {
 
         val bluetoothManager = requireContext().getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
         val connectedDevices = bluetoothManager.getConnectedDevices(BluetoothProfile.GATT)
-        if (connectedDevices.size < 1) {
-            binding.layoutNotConnected.root.visibility = View.VISIBLE
-            binding.layoutAverage.root.visibility = View.GONE
-            binding.layoutLoading.root.visibility = View.GONE
-        } else {
+
+        if (connectedDevices.isNotEmpty()) {
+            if (BLE.bluetoothDevice == null) {
+                BLE.bluetoothDevice = connectedDevices.first()
+            }
+            bluetoothManager.adapter.getRemoteDevice(BLE.bluetoothDevice?.address)
             averageDataObserver()
             lifecycleScope.launch {
                 val bearer = viewModel.getBearer().first()
                 viewModel.getAverage(bearer.toString())
             }
+        } else {
+            binding.layoutNotConnected.root.visibility = View.VISIBLE
+            binding.layoutAverage.root.visibility = View.GONE
+            binding.layoutLoading.root.visibility = View.GONE
         }
 
         lifecycleScope.launch {
-            if (connectedDevices != null && viewModel.backgroundMonitoringState.first()) {
+            if (BLE.bluetoothDevice != null && viewModel.backgroundMonitoringState.first()) {
                 activity?.startService(Intent(activity, BackgroundMonitoringService::class.java))
             }
         }
@@ -87,13 +94,6 @@ class HomeFragment : Fragment() {
                     }
                 }
             }
-        }
-        val bluetoothManager = requireContext().getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
-        val connectedDevices = bluetoothManager.getConnectedDevices(BluetoothProfile.GATT)
-        if (connectedDevices.size < 1) {
-            binding.layoutNotConnected.root.visibility = View.VISIBLE
-            binding.layoutAverage.root.visibility = View.GONE
-            binding.layoutLoading.root.visibility = View.GONE
         }
     }
 

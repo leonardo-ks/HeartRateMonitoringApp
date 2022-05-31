@@ -4,6 +4,7 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.bluetooth.*
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
@@ -12,6 +13,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.lifecycleScope
 import com.example.heartratemonitoringapp.R
+import com.example.heartratemonitoringapp.app.MainActivity
 import com.example.heartratemonitoringapp.app.monitoring.ble.BLE
 import com.example.heartratemonitoringapp.app.monitoring.ble.UUIDs
 import com.example.heartratemonitoringapp.databinding.ActivityLiveMonitoringBinding
@@ -25,7 +27,6 @@ class LiveMonitoringActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityLiveMonitoringBinding
     private val viewModel: LiveMonitoringViewModel by viewModel()
-    private var device: BluetoothDevice? = null
     private val timer1 = Timer()
     private val timer2 = Timer()
 
@@ -43,10 +44,13 @@ class LiveMonitoringActivity : AppCompatActivity() {
         binding.layoutLiveMonitoring.root.visibility = View.GONE
 
         val bluetoothManager = this.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
-        val connectedDevices = bluetoothManager.getConnectedDevices(BluetoothProfile.GATT)
-        device = connectedDevices.first()
-        binding.layoutLiveMonitoring.tvDevice.text = device?.name
-        BLE.bluetoothGatt = device?.connectGatt(this, true, gattCallback)
+        if (BLE.bluetoothDevice != null) {
+            binding.layoutLiveMonitoring.tvDevice.text = BLE.bluetoothDevice?.name
+            BLE.bluetoothGatt = BLE.bluetoothDevice?.connectGatt(this, true, gattCallback)
+        } else {
+            val connectedDevices = bluetoothManager.getConnectedDevices(BluetoothProfile.GATT)
+            BLE.bluetoothDevice = connectedDevices.first()
+        }
         lifecycleScope.launch {
             timer1.schedule(0, 1000) {
                 scanHeartRate()
@@ -81,11 +85,20 @@ class LiveMonitoringActivity : AppCompatActivity() {
     @SuppressLint("MissingPermission")
     private val gattCallback = object : BluetoothGattCallback() {
         override fun onConnectionStateChange(gatt: BluetoothGatt?, status: Int, newState: Int) {
-            when (newState) {
-                BluetoothGatt.STATE_CONNECTED -> {
-                    gatt?.discoverServices()
-                }
+            if (newState == BluetoothProfile.STATE_CONNECTED) {
+                gatt?.discoverServices()
+            } else {
+                gatt?.close()
             }
+        }
+
+        override fun onServicesDiscovered(gatt: BluetoothGatt?, status: Int) {
+            val heartRateCharacteristic = gatt?.getService(UUIDs.HEART_RATE_SERVICE)?.getCharacteristic(UUIDs.HEART_RATE_MEASUREMENT_CHARACTERISTIC)
+            gatt?.setCharacteristicNotification(heartRateCharacteristic, true)
+
+            val descriptor = heartRateCharacteristic?.getDescriptor(UUIDs.HEART_RATE_DESCRIPTOR)
+            descriptor?.value = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
+            gatt?.writeDescriptor(descriptor)
         }
 
         override fun onCharacteristicRead(
@@ -98,17 +111,12 @@ class LiveMonitoringActivity : AppCompatActivity() {
                     val step = characteristic.value[1].toInt()
                     viewModel.updateStepValue(step)
                     Log.d("callback", "Step: $step")
+                    lifecycleScope.launch {
+                        binding.layoutLoading.root.visibility = View.GONE
+                        startActivity(Intent(baseContext, MainActivity::class.java))
+                    }
                 }
             }
-        }
-
-        override fun onServicesDiscovered(gatt: BluetoothGatt?, status: Int) {
-            val heartRateCharacteristic = gatt?.getService(UUIDs.HEART_RATE_SERVICE)?.getCharacteristic(UUIDs.HEART_RATE_MEASUREMENT_CHARACTERISTIC)
-            gatt?.setCharacteristicNotification(heartRateCharacteristic, true)
-
-            val descriptor = heartRateCharacteristic?.getDescriptor(UUIDs.HEART_RATE_DESCRIPTOR)
-            descriptor?.value = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
-            gatt?.writeDescriptor(descriptor)
         }
 
         override fun onCharacteristicChanged(gatt: BluetoothGatt?, characteristic: BluetoothGattCharacteristic?) {
@@ -126,27 +134,16 @@ class LiveMonitoringActivity : AppCompatActivity() {
     private fun scanHeartRate() {
         if (BLE.bluetoothGatt != null) {
             val bluetoothCharacteristic = BLE.bluetoothGatt?.getService(UUIDs.HEART_RATE_SERVICE)?.getCharacteristic(UUIDs.HEART_RATE_CONTROL_CHARACTERISTIC)
-            if (bluetoothCharacteristic != null) {
-                bluetoothCharacteristic.value = byteArrayOf(21, 1, 1)
-                BLE.bluetoothGatt!!.writeCharacteristic(bluetoothCharacteristic)
-            }
+            bluetoothCharacteristic?.value = byteArrayOf(21, 1, 1)
+            BLE.bluetoothGatt?.writeCharacteristic(bluetoothCharacteristic)
         }
     }
 
     @SuppressLint("MissingPermission")
     fun getStep() {
         val basicService = BLE.bluetoothGatt?.getService(UUIDs.BASIC_SERVICE)
-        if (basicService == null) {
-            Log.d("basic service", "Step service not found!")
-            return
-        }
-        val stepLevel = basicService.getCharacteristic(UUIDs.BASIC_STEP_CHARACTERISTIC)
-        if (stepLevel == null) {
-            Log.d("step level", "Step level not found!")
-            return
-        } else {
-            BLE.bluetoothGatt?.readCharacteristic(stepLevel)
-        }
+        val stepLevel = basicService?.getCharacteristic(UUIDs.BASIC_STEP_CHARACTERISTIC)
+        BLE.bluetoothGatt?.readCharacteristic(stepLevel)
     }
 
     @SuppressLint("MissingPermission")

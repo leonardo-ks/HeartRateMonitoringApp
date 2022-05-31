@@ -30,7 +30,6 @@ import kotlin.concurrent.schedule
 
 class BackgroundMonitoringService : Service() {
 
-    private var device: BluetoothDevice? = null
     private val timer = Timer()
     private val heartList = arrayListOf<Int>()
     private val stepList = arrayListOf<Int>()
@@ -58,9 +57,12 @@ class BackgroundMonitoringService : Service() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
 
         val bluetoothManager = this.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
-        val connectedDevices = bluetoothManager.getConnectedDevices(BluetoothProfile.GATT)
-        device = connectedDevices.first()
-        BLE.bluetoothGatt = device?.connectGatt(this, true, gattCallback)
+        if (BLE.bluetoothDevice != null) {
+            BLE.bluetoothGatt = BLE.bluetoothDevice?.connectGatt(this, true, gattCallback)
+        } else {
+            val connectedDevices = bluetoothManager.getConnectedDevices(BluetoothProfile.GATT)
+            BLE.bluetoothDevice = connectedDevices.first()
+        }
 
         val notificationIntent = Intent(this, MainActivity::class.java)
         val pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, flags)
@@ -128,10 +130,10 @@ class BackgroundMonitoringService : Service() {
     @SuppressLint("MissingPermission")
     private val gattCallback = object : BluetoothGattCallback() {
         override fun onConnectionStateChange(gatt: BluetoothGatt?, status: Int, newState: Int) {
-            when (newState) {
-                BluetoothGatt.STATE_CONNECTED -> {
-                    gatt?.discoverServices()
-                }
+            if (newState == BluetoothProfile.STATE_CONNECTED) {
+                gatt?.discoverServices()
+            } else {
+                gatt?.close()
             }
         }
 
@@ -174,33 +176,21 @@ class BackgroundMonitoringService : Service() {
     private fun scanHeartRate() {
         if (BLE.bluetoothGatt != null) {
             val bluetoothCharacteristic = BLE.bluetoothGatt?.getService(UUIDs.HEART_RATE_SERVICE)?.getCharacteristic(UUIDs.HEART_RATE_CONTROL_CHARACTERISTIC)
-            if (bluetoothCharacteristic != null) {
-                bluetoothCharacteristic.value = byteArrayOf(21, 1, 1)
-                BLE.bluetoothGatt!!.writeCharacteristic(bluetoothCharacteristic)
-            }
+            bluetoothCharacteristic?.value = byteArrayOf(21, 1, 1)
+            BLE.bluetoothGatt?.writeCharacteristic(bluetoothCharacteristic)
         }
     }
 
     @SuppressLint("MissingPermission")
     fun getStep() {
         val basicService = BLE.bluetoothGatt?.getService(UUIDs.BASIC_SERVICE)
-        if (basicService == null) {
-            Log.d("basic service", "Step service not found!")
-        } else {
-            val stepLevel = basicService.getCharacteristic(UUIDs.BASIC_STEP_CHARACTERISTIC)
-            if (stepLevel == null) {
-                Log.d("step level", "Step level not found!")
-            } else {
-                BLE.bluetoothGatt?.readCharacteristic(stepLevel)
-            }
-        }
+        val stepLevel = basicService?.getCharacteristic(UUIDs.BASIC_STEP_CHARACTERISTIC)
+        BLE.bluetoothGatt?.readCharacteristic(stepLevel)
     }
 
     private fun sendData(avgHeart: Int, avgStep: Int) {
         scope.launch {
-            useCase.addData(useCase.getBearer().first().toString(), avgHeart, avgStep, "").collect {
-
-            }
+            useCase.addData(useCase.getBearer().first().toString(), avgHeart, avgStep, "")
         }
     }
 

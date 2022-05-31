@@ -10,6 +10,7 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.lifecycleScope
@@ -17,7 +18,10 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.heartratemonitoring.ui.scanner.adapter.ScannerAdapter
 import com.example.heartratemonitoringapp.R
 import com.example.heartratemonitoringapp.app.MainActivity
+import com.example.heartratemonitoringapp.app.monitoring.ble.BLE
 import com.example.heartratemonitoringapp.app.monitoring.ble.UUIDs
+import com.example.heartratemonitoringapp.app.monitoring.live.LiveMonitoringActivity.Companion.REQUEST_CODE_PERMISSION
+import com.example.heartratemonitoringapp.app.monitoring.live.LiveMonitoringActivity.Companion.REQUIRED_PERMISSIONS
 import com.example.heartratemonitoringapp.databinding.ActivityScannerBinding
 import kotlinx.coroutines.launch
 
@@ -77,9 +81,15 @@ class ScannerActivity : AppCompatActivity() {
         }
 
         mAdapter.onItemClick = {
+            isScanning = false
+            val bluetoothLeScanner: BluetoothLeScanner  = bluetoothAdapter.bluetoothLeScanner
+            bluetoothLeScanner.stopScan(mLeScanCallback)
+            bluetoothLeScanner.flushPendingScanResults(mLeScanCallback)
+            binding.layoutScanner.btnSearch.text = "Cari"
+            binding.layoutScanner.btnSearch.icon = getDrawable(R.drawable.ic_search)
+            BLE.bluetoothDevice = it
             lifecycleScope.launch {
-                val device = bluetoothManager.adapter.getRemoteDevice(it.address)
-                device.connectGatt(baseContext, true, gattCallback)
+                BLE.bluetoothDevice?.connectGatt(baseContext, true, gattCallback)
                 binding.layoutLoading.textLoading.text = resources.getString(R.string.connecting)
                 binding.layoutLoading.root.visibility = View.VISIBLE
             }
@@ -89,14 +99,22 @@ class ScannerActivity : AppCompatActivity() {
     private val gattCallback = object : BluetoothGattCallback() {
         @SuppressLint("MissingPermission", "SetTextI18n")
         override fun onConnectionStateChange(gatt: BluetoothGatt?, status: Int, newState: Int) {
-            when (newState) {
-                BluetoothGatt.STATE_CONNECTED -> {
-                    lifecycleScope.launch {
-                        binding.layoutLoading.root.visibility = View.GONE
-                        startActivity(Intent(baseContext, MainActivity::class.java))
-                    }
-                }
+            if (newState == BluetoothProfile.STATE_CONNECTED) {
+                gatt?.discoverServices()
+                pair()
+            } else {
+                gatt?.close()
             }
+        }
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun pair() {
+        if (BLE.bluetoothGatt != null) {
+            val service = BLE.bluetoothGatt?.getService(UUIDs.BASIC_SERVICE)
+            val characteristic = service?.getCharacteristic(UUIDs.UUID_CHAR_PAIR)
+            characteristic?.value = byteArrayOf(2)
+            BLE.bluetoothGatt?.writeCharacteristic(characteristic)
         }
     }
     @SuppressLint("MissingPermission")
