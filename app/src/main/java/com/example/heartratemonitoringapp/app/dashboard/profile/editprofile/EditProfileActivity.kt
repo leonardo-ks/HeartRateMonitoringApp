@@ -24,8 +24,8 @@ import java.util.*
 class EditProfileActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityEditProfileBinding
+    private lateinit var gender: Array<String>
     private val viewModel: EditProfileViewModel by viewModel()
-    private val gender = arrayOf(getString(R.string.male), getString(R.string.female))
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,6 +33,8 @@ class EditProfileActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         setSupportActionBar(binding.toolbar)
+
+        gender = resources.getStringArray(R.array.genders)
 
         if (supportActionBar != null) {
             this.supportActionBar?.setDisplayHomeAsUpEnabled(true)

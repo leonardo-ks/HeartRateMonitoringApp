@@ -70,10 +70,10 @@ class RemoteDataSource(private val apiService: ApiService, ) {
             }
         }.flowOn(Dispatchers.IO)
 
-    suspend fun addData(bearer: String, avgHeartRate: Int, avgStep: Int, label: String?): Flow<ApiResponse<StoreMonitoringDataResponse>> =
+    suspend fun addData(bearer: String, avgHeartRate: Int, stepChanges: Int, step:Int, label: String?): Flow<ApiResponse<StoreMonitoringDataResponse>> =
         flow {
-            val response = apiService.addData(bearer, avgHeartRate, avgStep, label.toString())
-            if (response.success == true) {
+            val response = apiService.addData(bearer, avgHeartRate, stepChanges, step, label.toString())
+            if (response.success) {
                 emit(ApiResponse.Success(response))
             } else {
                 emit(ApiResponse.Error(response.message.toString()))

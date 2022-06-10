@@ -29,6 +29,8 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import kotlin.math.max
+import kotlin.math.min
 
 
 class BandFragment : Fragment() {
@@ -88,6 +90,21 @@ class BandFragment : Fragment() {
             }
         }
 
+        val minLimit: Int? = null
+        val maxLimit: Int? = null
+
+        if (minLimit != null) {
+            binding.layoutBand.layoutBandMenu.tidtLowerLimit.setText(minLimit.toString())
+        } else {
+            binding.layoutBand.layoutBandMenu.tidtLowerLimit.setText("40")
+        }
+
+        if (maxLimit != null) {
+            binding.layoutBand.layoutBandMenu.tidtUpperLimit.setText(maxLimit.toString())
+        } else {
+            binding.layoutBand.layoutBandMenu.tidtUpperLimit.setText("100")
+        }
+
         lifecycleScope.launch {
             binding.layoutBand.layoutBandMenu.switchToogleMonitoring.isChecked = viewModel.backgroundMonitoringState.first()
         }
@@ -118,7 +135,7 @@ class BandFragment : Fragment() {
         val pm : PowerManager = context.getSystemService(POWER_SERVICE) as PowerManager
 
         val requestDialog = MaterialAlertDialogBuilder(context)
-            .setMessage("Agar dapat melakukan monitoring latar belakang aplikasi membutuhkan anda untuk menonaktifkan pengoptimalan daya. \nNonaktifkan pengoptimalan daya?")
+            .setMessage(getString(R.string.power_dialog))
             .setNegativeButton(getString(R.string.no)) { _, _ ->
 
             }

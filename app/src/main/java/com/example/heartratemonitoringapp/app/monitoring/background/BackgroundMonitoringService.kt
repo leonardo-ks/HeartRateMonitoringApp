@@ -5,39 +5,46 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.Service
-import android.bluetooth.*
-import android.content.Context
-import android.content.Intent
-import android.os.*
-import android.text.method.TextKeyListener.clear
+import android.bluetooth.BluetoothManager
+import android.bluetooth.BluetoothProfile
+import android.content.*
+import android.os.CountDownTimer
+import android.os.IBinder
 import android.util.Log
-import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import com.example.heartratemonitoringapp.R
 import com.example.heartratemonitoringapp.app.MainActivity
 import com.example.heartratemonitoringapp.app.monitoring.ble.BLE
+import com.example.heartratemonitoringapp.app.monitoring.ble.BLEService
+import com.example.heartratemonitoringapp.app.monitoring.ble.BLEService.LocalBinder
 import com.example.heartratemonitoringapp.app.monitoring.ble.UUIDs
+import com.example.heartratemonitoringapp.app.monitoring.live.LiveMonitoringActivity
+import com.example.heartratemonitoringapp.data.Resource
 import com.example.heartratemonitoringapp.domain.usecase.IUseCase
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.collect
+import com.example.heartratemonitoringapp.domain.usecase.model.MonitoringDataDomain
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
-import org.koin.android.scope.serviceScope
-import java.sql.Time
-import java.time.Period
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import java.util.*
 import kotlin.concurrent.schedule
 
+
 class BackgroundMonitoringService : Service() {
 
+    private lateinit var notificationManager: NotificationManager
+    private lateinit var countDownTimer: CountDownTimer
     private val timer = Timer()
     private val heartList = arrayListOf<Int>()
     private val stepList = arrayListOf<Int>()
     private val channelId = "Background Monitoring"
     private val useCase: IUseCase by inject()
-    private lateinit var notificationManager: NotificationManager
-    private lateinit var countDownTimer: CountDownTimer
-    private var period: Long = 0
+    private var bluetoothService : BLEService? = null
+    private var period: Long = 60000
     private val job = SupervisorJob()
     private val scope = CoroutineScope(Dispatchers.IO + job)
 
@@ -51,24 +58,56 @@ class BackgroundMonitoringService : Service() {
                 NotificationManager.IMPORTANCE_DEFAULT
             )
         notificationManager.createNotificationChannel(channel)
+
+        val bindIntent = Intent(this, BLEService::class.java)
+        bindService(bindIntent, serviceConnection, Context.BIND_AUTO_CREATE)
+    }
+
+    private val serviceConnection: ServiceConnection = object : ServiceConnection {
+        override fun onServiceConnected(
+            componentName: ComponentName,
+            service: IBinder
+        ) {
+            val binder = service as LocalBinder
+            bluetoothService = binder.getService()
+            bluetoothService?.let { bluetooth ->
+                if (!bluetooth.initialize()) {
+                    Log.e(LiveMonitoringActivity.TAG, "Unable to initialize Bluetooth")
+                } else {
+                    bluetooth.connect(BLE.bluetoothDevice?.address.toString())
+                }
+            }
+        }
+
+        override fun onServiceDisconnected(componentName: ComponentName) {
+            bluetoothService = null
+        }
     }
 
     @SuppressLint("MissingPermission")
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
 
+        registerReceiver(gattUpdateReceiver, makeGattUpdateIntentFilter())
+        if (bluetoothService != null) {
+            val result = BLE.bluetoothDevice?.let { bluetoothService!!.connect(it.address) }
+            Log.d(LiveMonitoringActivity.TAG, "Connect request result=$result")
+        }
+
         val bluetoothManager = this.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
-        if (BLE.bluetoothDevice != null) {
-            BLE.bluetoothGatt = BLE.bluetoothDevice?.connectGatt(this, true, gattCallback)
-        } else {
-            val connectedDevices = bluetoothManager.getConnectedDevices(BluetoothProfile.GATT)
-            BLE.bluetoothDevice = connectedDevices.first()
+        BLE.bluetoothAdapter = bluetoothManager.adapter
+        val connectedDevices = bluetoothManager.getConnectedDevices(BluetoothProfile.GATT)
+
+        if (connectedDevices.isNotEmpty()) {
+            if (BLE.bluetoothDevice == null) {
+                BLE.bluetoothDevice = connectedDevices.first()
+            }
         }
 
         val notificationIntent = Intent(this, MainActivity::class.java)
         val pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, flags)
 
         val notification = NotificationCompat.Builder(this, channelId)
-            .setContentTitle("Monitoring latar belakang")
+            .setContentTitle(resources.getString(R.string.background_monitoring))
             .setSmallIcon(R.drawable.ic_watch)
             .setContentIntent(pendingIntent)
 
@@ -80,26 +119,46 @@ class BackgroundMonitoringService : Service() {
             }
 
             override fun onFinish() {
-                scope.launch {
-                    if (heartList.size > 0 && stepList.size > 0) {
-                        sendData(heartList.average().toInt(), stepList.last() - stepList.first())
+                val avgHeart = heartList.average().toInt()
+                val stepChanges = stepList.last() - stepList.first()
+                val step = stepList.maxOrNull()
+                Log.d("average", "HR: $avgHeart, Step: $stepChanges")
+                sendData(avgHeart, stepChanges, step?: 0)
+                notificationManager.cancel(1)
+            }
+        }
+        return START_STICKY
+    }
+
+    private val gattUpdateReceiver: BroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) {
+            when (intent.action) {
+                BLEService.ACTION_GATT_SERVICES_DISCOVERED -> {
+                    scope.launch {
+                        heartList.clear()
+                        stepList.clear()
+                        countDownTimer.start()
                     }
                 }
-                notificationManager.cancel(1)
-                cancel()
+                BLEService.ACTION_HR_AVAILABLE -> {
+                    if (intent.extras != null) {
+                        val heartRate = intent.extras?.getInt("HR")
+                        if (heartRate != null) {
+                            heartList.add(heartRate)
+                        }
+                    }
+                }
+                BLEService.ACTION_STEP_AVAILABLE -> {
+                    if (intent.extras != null) {
+                        scanHeartRate()
+                        val step = intent.extras?.getInt("step")
+                        if (step != null) {
+                            stepList.add(step)
+                        }
+                    }
+                }
             }
         }
-
-        scope.launch {
-            period = useCase.getMonitoringPeriod().first().toLong()
-            timer.schedule(0, period) {
-                heartList.clear()
-                stepList.clear()
-                countDownTimer.start()
-            }
-        }
-
-        return START_STICKY
     }
 
     private fun getText(): String {
@@ -110,8 +169,17 @@ class BackgroundMonitoringService : Service() {
         }
     }
 
+    private fun makeGattUpdateIntentFilter(): IntentFilter {
+        return IntentFilter().apply {
+            addAction(BLEService.ACTION_GATT_SERVICES_DISCOVERED)
+            addAction(BLEService.ACTION_HR_AVAILABLE)
+            addAction(BLEService.ACTION_STEP_AVAILABLE)
+        }
+    }
+
     override fun onDestroy() {
         clear()
+        unregisterReceiver(gattUpdateReceiver)
         job.cancel()
         super.onDestroy()
     }
@@ -128,56 +196,13 @@ class BackgroundMonitoringService : Service() {
     }
 
     @SuppressLint("MissingPermission")
-    private val gattCallback = object : BluetoothGattCallback() {
-        override fun onConnectionStateChange(gatt: BluetoothGatt?, status: Int, newState: Int) {
-            if (newState == BluetoothProfile.STATE_CONNECTED) {
-                gatt?.discoverServices()
-            } else {
-                gatt?.close()
-            }
-        }
-
-        override fun onCharacteristicRead(
-            gatt: BluetoothGatt?,
-            characteristic: BluetoothGattCharacteristic?,
-            status: Int
-        ) {
-            if (characteristic != null) {
-                if (characteristic.uuid == UUIDs.BASIC_STEP_CHARACTERISTIC) {
-                    val step = characteristic.value[1].toInt()
-                    stepList.add(step)
-                    Log.d("callback", "Step: $step")
-                    scanHeartRate()
-                }
-            }
-        }
-
-        override fun onServicesDiscovered(gatt: BluetoothGatt?, status: Int) {
-            val heartRateCharacteristic = gatt?.getService(UUIDs.HEART_RATE_SERVICE)?.getCharacteristic(UUIDs.HEART_RATE_MEASUREMENT_CHARACTERISTIC)
-            gatt?.setCharacteristicNotification(heartRateCharacteristic, true)
-
-            val descriptor = heartRateCharacteristic?.getDescriptor(UUIDs.HEART_RATE_DESCRIPTOR)
-            descriptor?.value = BluetoothGattDescriptor.ENABLE_NOTIFICATION_VALUE
-            gatt?.writeDescriptor(descriptor)
-        }
-
-        override fun onCharacteristicChanged(gatt: BluetoothGatt?, characteristic: BluetoothGattCharacteristic?) {
-            if (characteristic != null) {
-                if (characteristic.uuid == UUIDs.HEART_RATE_MEASUREMENT_CHARACTERISTIC) {
-                    val heartRate = characteristic.value[1].toInt()
-                    heartList.add(heartRate)
-                    Log.d("callback", "Heart Rate: $heartRate")
-                }
-            }
-        }
-    }
-
-    @SuppressLint("MissingPermission")
     private fun scanHeartRate() {
         if (BLE.bluetoothGatt != null) {
             val bluetoothCharacteristic = BLE.bluetoothGatt?.getService(UUIDs.HEART_RATE_SERVICE)?.getCharacteristic(UUIDs.HEART_RATE_CONTROL_CHARACTERISTIC)
             bluetoothCharacteristic?.value = byteArrayOf(21, 1, 1)
-            BLE.bluetoothGatt?.writeCharacteristic(bluetoothCharacteristic)
+            if (bluetoothCharacteristic != null) {
+                bluetoothService?.writeCharacteristic(bluetoothCharacteristic)
+            }
         }
     }
 
@@ -185,12 +210,46 @@ class BackgroundMonitoringService : Service() {
     fun getStep() {
         val basicService = BLE.bluetoothGatt?.getService(UUIDs.BASIC_SERVICE)
         val stepLevel = basicService?.getCharacteristic(UUIDs.BASIC_STEP_CHARACTERISTIC)
-        BLE.bluetoothGatt?.readCharacteristic(stepLevel)
+        if (stepLevel != null) {
+            bluetoothService?.readCharacteristic(stepLevel)
+        }
     }
 
-    private fun sendData(avgHeart: Int, avgStep: Int) {
+    private fun sendData(avgHeart: Int, stepChanges: Int, step: Int) {
         scope.launch {
-            useCase.addData(useCase.getBearer().first().toString(), avgHeart, avgStep, "")
+            val format = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+            val date = LocalDateTime.now().format(format)
+            useCase.insertMonitoringData(
+                MonitoringDataDomain(
+                    avgHeartRate = avgHeart,
+                    stepChanges = stepChanges,
+                    createdAt = date.toString(),
+                    label = "",
+                    userId = useCase.getUserId().first(),
+                    step = step
+                )
+            )
+            period = useCase.getMonitoringPeriod().first().toLong()
+            useCase.addData(useCase.getBearer().first().toString(), avgHeart, stepChanges, step,"").collect {
+                when (it) {
+                    is Resource.Success -> {
+                        stepList.clear()
+                        heartList.clear()
+                        useCase.deleteMonitoringDataByDate(date)
+                        timer.schedule(period - 60000) {
+                            countDownTimer.start()
+                        }
+                    }
+                    else -> {
+                        stepList.clear()
+                        heartList.clear()
+                        timer.schedule(period - 60000) {
+                            countDownTimer.start()
+                        }
+                        Log.d("failed", "failed sending data")
+                    }
+                }
+            }
         }
     }
 

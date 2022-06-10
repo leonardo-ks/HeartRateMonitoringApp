@@ -2,6 +2,7 @@ package com.example.heartratemonitoringapp.data
 
 import android.annotation.SuppressLint
 import com.example.heartratemonitoringapp.data.source.local.LocalDataSource
+import com.example.heartratemonitoringapp.data.source.local.entities.MonitoringDataEntities
 import com.example.heartratemonitoringapp.data.source.remote.RemoteDataSource
 import com.example.heartratemonitoringapp.data.source.remote.network.ApiResponse
 import com.example.heartratemonitoringapp.domain.repository.IRepository
@@ -9,9 +10,13 @@ import com.example.heartratemonitoringapp.domain.usecase.model.AverageDomain
 import com.example.heartratemonitoringapp.domain.usecase.model.LoginDomain
 import com.example.heartratemonitoringapp.domain.usecase.model.MonitoringDataDomain
 import com.example.heartratemonitoringapp.domain.usecase.model.UserDataDomain
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -75,20 +80,17 @@ class Repository(
     override fun addData(
         bearer: String,
         avgHeartRate: Int,
-        avgStep: Int,
+        stepChanges: Int,
+        step: Int,
         label: String?
-    ): Flow<Resource<MonitoringDataDomain>> =
+    ): Flow<Resource<Boolean>> =
         flow {
             emit(Resource.Loading())
-            when (val apiResponse = remoteDataSource.addData(bearer, avgHeartRate, avgStep, label.toString()).first()) {
+            when (val apiResponse = remoteDataSource.addData(bearer, avgHeartRate, stepChanges, step, label.toString()).first()) {
                 is ApiResponse.Success -> {
-                    if (apiResponse.data.data != null) {
-                        emit(Resource.Success(apiResponse.data.data.toDomain()))
-                    } else {
-                        emit(Resource.Success(MonitoringDataDomain()))
-                    }
+                    emit(Resource.Success(apiResponse.data.success))
                 }
-                is ApiResponse.Empty -> emit(Resource.Success(MonitoringDataDomain()))
+                is ApiResponse.Empty -> emit(Resource.Success(false))
                 is ApiResponse.Error -> emit(Resource.Error(apiResponse.errorMessage))
             }
         }
@@ -115,6 +117,7 @@ class Repository(
             when (val apiResponse = remoteDataSource.getProfile(bearer).first()) {
                 is ApiResponse.Success -> {
                     if (apiResponse.data.profile != null) {
+                        apiResponse.data.profile.id?.let { localDataSource.setUserId(it) }
                         emit(Resource.Success(apiResponse.data.profile.toDomain()))
                     } else {
                         emit(Resource.Success(UserDataDomain()))
@@ -215,6 +218,12 @@ class Repository(
         emit(localDataSource.getLoginState())
     }
 
+    override fun setUserId(id: Int) = localDataSource.setUserId(id)
+
+    override fun getUserId(): Flow<Int> = flow {
+        emit(localDataSource.getUserId())
+    }
+
     override fun setLatestLoginDate(date: String) = localDataSource.setLatestLoginDate(date)
 
 
@@ -233,4 +242,35 @@ class Repository(
     override fun getBackgroundMonitoringState(): Flow<Boolean> = flow {
         emit(localDataSource.getBackgroundMonitoringState())
     }
+
+    override fun getMonitoringDataList(): List<MonitoringDataDomain> {
+        val domain = arrayListOf<MonitoringDataDomain>()
+        CoroutineScope(Dispatchers.IO).launch {
+            localDataSource.getMonitoringDataList().map { list ->
+                list.map {
+                    domain.add(it.toDomain())
+                }
+            }
+        }
+        return domain
+    }
+
+    override fun deleteMonitoringDataById(id: Int) {
+        CoroutineScope(Dispatchers.IO).launch {
+            localDataSource.deleteMonitoringDataById(id)
+        }
+    }
+
+    override fun deleteMonitoringDataByDate(date: String) {
+        CoroutineScope(Dispatchers.IO).launch {
+            localDataSource.deleteMonitoringDataByDate(date)
+        }
+    }
+
+    override fun insertMonitoringData(monitoringData: MonitoringDataDomain) {
+        CoroutineScope(Dispatchers.IO).launch {
+            localDataSource.insertMonitoringData(monitoringData.toEntities())
+        }
+    }
+
 }

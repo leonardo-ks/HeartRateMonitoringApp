@@ -8,11 +8,14 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.core.os.HandlerCompat.postDelayed
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.heartratemonitoring.ui.scanner.adapter.ScannerAdapter
@@ -66,16 +69,20 @@ class ScannerActivity : AppCompatActivity() {
         binding.layoutScanner.btnSearch.setOnClickListener {
             if (!isScanning) {
                 isScanning = true
+                Handler(Looper.getMainLooper()).postDelayed({
+                    isScanning = false
+                    bluetoothAdapter.bluetoothLeScanner.stopScan(mLeScanCallback)
+                }, 60000)
                 scanBLE()
                 showRecycleView()
-                binding.layoutScanner.btnSearch.text = "Berhenti"
+                binding.layoutScanner.btnSearch.text = getString(R.string.stop)
                 binding.layoutScanner.btnSearch.icon = getDrawable(R.drawable.ic_stop)
             } else {
                 isScanning = false
                 val bluetoothLeScanner: BluetoothLeScanner  = bluetoothAdapter.bluetoothLeScanner
                 bluetoothLeScanner.stopScan(mLeScanCallback)
                 bluetoothLeScanner.flushPendingScanResults(mLeScanCallback)
-                binding.layoutScanner.btnSearch.text = "Cari"
+                binding.layoutScanner.btnSearch.text = getString(R.string.search)
                 binding.layoutScanner.btnSearch.icon = getDrawable(R.drawable.ic_search)
             }
         }
@@ -89,7 +96,7 @@ class ScannerActivity : AppCompatActivity() {
             binding.layoutScanner.btnSearch.icon = getDrawable(R.drawable.ic_search)
             BLE.bluetoothDevice = it
             lifecycleScope.launch {
-                BLE.bluetoothDevice?.connectGatt(baseContext, true, gattCallback)
+                BLE.bluetoothGatt = BLE.bluetoothDevice?.connectGatt(baseContext, true, gattCallback)
                 binding.layoutLoading.textLoading.text = resources.getString(R.string.connecting)
                 binding.layoutLoading.root.visibility = View.VISIBLE
             }

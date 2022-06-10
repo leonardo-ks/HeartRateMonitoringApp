@@ -37,8 +37,10 @@ interface ApiService {
         bearer: String,
         @Field (value = "avg_heart_rate")
         avgHeartRate: Int,
-        @Field (value = "avg_step")
-        avgStep: Int,
+        @Field (value = "step_changes")
+        stepChanges: Int,
+        @Field (value = "step")
+        step: Int,
         @Field (value = "label")
         label: String,
     ): StoreMonitoringDataResponse
@@ -50,8 +52,8 @@ interface ApiService {
         bearer: String,
         @Field (value = "avg_heart_rate")
         avgHeartRate: Int,
-        @Field (value = "today_steps")
-        todaySteps: Int,
+        @Field (value = "step_changes")
+        stepChanges: Int,
     ): FindDataResponse
 
     @FormUrlEncoded
@@ -99,8 +101,8 @@ interface ApiService {
         bearer: String,
         @Query("avg_heart_rate")
         avgHeartRate: Int,
-        @Query("avg_step")
-        avgStep: Int,
+        @Query("step_changes")
+        stepChanges: Int,
         @Query("label")
         label: String
     ): MonitoringDataUpdateResponse

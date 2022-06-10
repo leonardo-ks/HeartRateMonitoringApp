@@ -12,6 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="?actionBarSize"
         style="@style/TextRegular"
+        app:title="@string/live_monitoring_title"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

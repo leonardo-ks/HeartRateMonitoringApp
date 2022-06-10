@@ -99,7 +99,11 @@ class ProfileFragment : Fragment() {
             viewModel.logout(bearer).collect {
                 when (it) {
                     is Resource.Loading -> binding.layoutProfile.btnLogout.isEnabled = false
-                    is Resource.Success -> startActivity(Intent(requireContext(), LoginActivity::class.java))
+                    is Resource.Success -> {
+                        val intent = Intent(requireContext(), LoginActivity::class.java)
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
+                        startActivity(intent)
+                    }
                     is Resource.Error -> {
                         binding.layoutProfile.btnLogout.isEnabled = true
                         Toast.makeText(requireContext(), getString(R.string.logout_failed), Toast.LENGTH_SHORT).show()

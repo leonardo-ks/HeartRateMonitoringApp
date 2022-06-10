@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName
 data class MonitoringData(
 
     @field:SerializedName("avg_heart_rate")
-    val avgHeartRate: String? = null,
+    val avgHeartRate: Int? = null,
 
     @field:SerializedName("updated_at")
     val updatedAt: String? = null,
@@ -22,6 +22,9 @@ data class MonitoringData(
     @field:SerializedName("label")
     val label: String? = null,
 
-    @field:SerializedName("avg_step")
-    val avgStep: String? = null
+    @field:SerializedName("step_changes")
+    val stepChanges: Int? = null,
+
+    @field:SerializedName("step")
+    val step: Int? = null
 )

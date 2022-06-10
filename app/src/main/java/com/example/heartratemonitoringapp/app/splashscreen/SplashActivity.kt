@@ -5,15 +5,20 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.lifecycle.lifecycleScope
+import com.example.heartratemonitoringapp.R
 import com.example.heartratemonitoringapp.app.MainActivity
 import com.example.heartratemonitoringapp.app.auth.login.LoginActivity
+import com.example.heartratemonitoringapp.data.Resource
 import com.example.heartratemonitoringapp.databinding.ActivitySplashBinding
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.time.LocalDateTime
+import kotlin.math.log
 
 @SuppressLint("CustomSplashScreen")
 class SplashActivity : AppCompatActivity() {
@@ -48,8 +53,7 @@ class SplashActivity : AppCompatActivity() {
                             val latestLoginDate = LocalDateTime.parse(savedLoginDate)
                             val now = LocalDateTime.now()
                             if (now.minusDays(7).isAfter(latestLoginDate)) {
-                                val intent = Intent(applicationContext, LoginActivity::class.java)
-                                startActivity(intent)
+                                logout(viewModel.getBearer().first().toString())
                             } else {
                                 val intent = Intent(applicationContext, MainActivity::class.java)
                                 startActivity(intent)
@@ -66,5 +70,16 @@ class SplashActivity : AppCompatActivity() {
             }
         }, 1500)
 
+    }
+
+    private fun logout(bearer: String) {
+        lifecycleScope.launch {
+            viewModel.logout(bearer).collect {
+                when (it) {
+                    is Resource.Success -> startActivity(Intent(this@SplashActivity, LoginActivity::class.java))
+                    else -> Toast.makeText(this@SplashActivity, getString(R.string.logout_failed), Toast.LENGTH_SHORT).show()
+                }
+            }
+        }
     }
 }

@@ -11,8 +11,6 @@
     <string name="name_cannot_empty">Nama tidak boleh kosong</string>
     <string name="password_not_same">Password yang dimasukkan tidak sama</string>
     <string name="gender">Jenis Kelamin</string>
-    <string name="male">Pria</string>
-    <string name="female">Wanita</string>
     <string name="success_change_profile">Berhasil mengubah profil</string>
     <string name="logout_failed">Logout Gagal</string>
     <string name="connecting">Menghubungkan</string>
@@ -46,12 +44,20 @@
     <string name="logout">Keluar</string>
     <string name="detected_devices">Perangkat Tersedia</string>
     <string name="search">Cari</string>
+    <string name="stop">Berhenti</string>
+    <string name="live_monitoring_title">Monitoring langsung</string>
+    <string name="power_dialog">Agar dapat melakukan monitoring latar belakang aplikasi membutuhkan anda untuk menonaktifkan pengoptimalan daya. Nonaktifkan pengoptimalan daya?</string>
 
     <string-array name="periods">
         <item>1 menit</item>
         <item>5 menit</item>
         <item>10 menit</item>
         <item>15 menit</item>
+    </string-array>
+
+    <string-array name="genders">
+        <item>Pria</item>
+        <item>Wanita</item>
     </string-array>
 
 </resources>

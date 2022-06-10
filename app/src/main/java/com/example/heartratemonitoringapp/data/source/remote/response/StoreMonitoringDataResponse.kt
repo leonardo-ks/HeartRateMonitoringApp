@@ -8,7 +8,7 @@ data class StoreMonitoringDataResponse(
 	val data: MonitoringData? = null,
 
 	@field:SerializedName("success")
-	val success: Boolean? = null,
+	val success: Boolean = false,
 
 	@field:SerializedName("message")
 	val message: String? = null

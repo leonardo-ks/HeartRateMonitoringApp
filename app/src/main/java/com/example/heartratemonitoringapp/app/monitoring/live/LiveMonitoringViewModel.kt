@@ -39,8 +39,4 @@ class LiveMonitoringViewModel(private val useCase: IUseCase): ViewModel() {
             }
         }
     }
-
-    fun addData(bearer: String, avgHeartRate: Int, avgStep: Int, label: String) {
-        useCase.addData(bearer, avgHeartRate, avgStep, label)
-    }
 }

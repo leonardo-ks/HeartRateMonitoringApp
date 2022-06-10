@@ -22,8 +22,4 @@ class MainActivity : AppCompatActivity() {
             setupWithNavController(navHostFragment.navController)
         }
     }
-
-    companion object {
-        const val EXTRA_DATA = "extra_data"
-    }
 }

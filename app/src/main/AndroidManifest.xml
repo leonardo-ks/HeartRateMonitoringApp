@@ -38,6 +38,7 @@
         </activity>
         <activity
             android:name=".app.monitoring.live.LiveMonitoringActivity"
+            android:process=":ble_process"
             android:exported="false" />
         <activity
             android:name=".app.auth.login.LoginActivity"
@@ -51,12 +52,17 @@
         <activity
             android:name=".app.scanner.ScannerActivity"
             android:exported="false" />
-
         <service
             android:name=".app.monitoring.background.BackgroundMonitoringService"
             android:stopWithTask="false"
-            android:process=":my_process"
+            android:process=":ble_process"
             tools:ignore="Instantiatable" />
+        <service
+            android:name=".app.monitoring.ble.BLEService"
+            android:enabled="true"
+            android:exported="true"
+            android:process=":ble_process"
+            tools:ignore="ExportedService" />
     </application>
 
 </manifest>

@@ -5,6 +5,8 @@ class SharedPreferences(private val sharedPref: SharedPref): ISharedPreferences 
     override fun getBearer(): String = sharedPref.getString("bearer")
     override fun setLoginState(state: Boolean) = sharedPref.setBoolean("login", state)
     override fun getLoginState(): Boolean = sharedPref.getBoolean("login")
+    override fun setUserId(id: Int) = sharedPref.setInt("id", id)
+    override fun getUserId(): Int = sharedPref.getInt("id")
     override fun setLatestLoginDate(date : String?) = sharedPref.setString("date", date)
     override fun getLatestLoginDate(): String = sharedPref.getString("date")
     override fun setMonitoringPeriod(period: Int) = sharedPref.setInt("period", period)
