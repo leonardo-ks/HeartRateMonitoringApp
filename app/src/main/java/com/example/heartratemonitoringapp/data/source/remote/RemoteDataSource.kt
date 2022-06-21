@@ -51,7 +51,7 @@ class RemoteDataSource(private val apiService: ApiService, ) {
             }
         }.flowOn(Dispatchers.IO)
 
-    suspend fun logout(bearer: String): Flow<ApiResponse<LogoutResponse>> =
+    suspend fun logout(bearer: String): Flow<ApiResponse<BasicResponse>> =
         flow {
             val response = apiService.logout(bearer)
             if (response.success == true) {
@@ -70,9 +70,10 @@ class RemoteDataSource(private val apiService: ApiService, ) {
             }
         }.flowOn(Dispatchers.IO)
 
-    suspend fun addData(bearer: String, avgHeartRate: Int, stepChanges: Int, step:Int, label: String?): Flow<ApiResponse<StoreMonitoringDataResponse>> =
+    suspend fun addData(bearer: String, avgHeartRate: Int, stepChanges: Int, step:Int, label: String?, createdAt: String?): Flow<ApiResponse<StoreMonitoringDataResponse>> =
         flow {
-            val response = apiService.addData(bearer, avgHeartRate, stepChanges, step, label.toString())
+            val response = apiService.addData(bearer, avgHeartRate, stepChanges, step, label.toString(), createdAt.toString()
+            )
             if (response.success) {
                 emit(ApiResponse.Success(response))
             } else {
@@ -85,7 +86,7 @@ class RemoteDataSource(private val apiService: ApiService, ) {
                     emit(ApiResponse.Error("${e.code()}: ${responseBody?.getMessage()}"))
                 } else -> {
                 emit(ApiResponse.Error(e.message.toString()))
-            }
+                }
             }
         }.flowOn(Dispatchers.IO)
 
@@ -165,7 +166,7 @@ class RemoteDataSource(private val apiService: ApiService, ) {
             }
         }.flowOn(Dispatchers.IO)
 
-    suspend fun deleteData(bearer: String, id: Int): Flow<ApiResponse<DeleteResponse>> =
+    suspend fun deleteData(bearer: String, id: Int): Flow<ApiResponse<BasicResponse>> =
         flow {
             val response = apiService.deleteData(bearer, id)
             if (response.success == true) {
@@ -206,6 +207,25 @@ class RemoteDataSource(private val apiService: ApiService, ) {
     suspend fun updateUser(bearer: String, name: String, email: String, dob: String, gender: Int): Flow<ApiResponse<UserDataUpdateResponse>> =
         flow {
             val response = apiService.updateUser(bearer, name, email, dob, gender)
+            if (response.success == true) {
+                emit(ApiResponse.Success(response))
+            } else {
+                emit(ApiResponse.Error(response.message.toString()))
+            }
+        }.catch { e ->
+            when (e) {
+                is HttpException -> {
+                    val responseBody = e.response()?.errorBody()
+                    emit(ApiResponse.Error("${e.code()}: ${responseBody?.getMessage()}"))
+                } else -> {
+                emit(ApiResponse.Error(e.message.toString()))
+            }
+            }
+        }.flowOn(Dispatchers.IO)
+
+    suspend fun changePassword(bearer: String, old: String, new: String, confirmation: String): Flow<ApiResponse<BasicResponse>> =
+        flow {
+            val response = apiService.changePassword(bearer, old, new, confirmation)
             if (response.success == true) {
                 emit(ApiResponse.Success(response))
             } else {

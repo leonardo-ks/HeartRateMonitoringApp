@@ -11,10 +11,12 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.PowerManager
 import android.provider.Settings
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
+import android.widget.Toast
 import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
@@ -23,6 +25,7 @@ import com.example.heartratemonitoringapp.app.monitoring.background.BackgroundMo
 import com.example.heartratemonitoringapp.app.monitoring.ble.BLE
 import com.example.heartratemonitoringapp.app.monitoring.live.LiveMonitoringActivity
 import com.example.heartratemonitoringapp.app.scanner.ScannerActivity
+import com.example.heartratemonitoringapp.data.Resource
 import com.example.heartratemonitoringapp.databinding.FragmentBandBinding
 import com.example.heartratemonitoringapp.util.selected
 import com.google.android.material.dialog.MaterialAlertDialogBuilder

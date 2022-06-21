@@ -5,6 +5,7 @@ import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.view.WindowManager
+import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.addTextChangedListener
@@ -53,7 +54,7 @@ class LoginActivity : AppCompatActivity() {
                     is AuthState.Fail -> {
                         binding.layoutLoading.root.visibility = View.GONE
                         window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
-                        Snackbar.make(binding.root, it.message, Snackbar.LENGTH_SHORT).show()
+                        Toast.makeText(this@LoginActivity, it.message, Toast.LENGTH_SHORT).show()
                     }
                     else -> {
                     }

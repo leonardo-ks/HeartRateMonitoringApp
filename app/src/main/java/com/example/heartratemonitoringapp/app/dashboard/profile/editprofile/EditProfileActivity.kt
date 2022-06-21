@@ -118,7 +118,7 @@ class EditProfileActivity : AppCompatActivity() {
                     is Resource.Error -> {
                         binding.layoutEditProfile.root.visibility = View.VISIBLE
                         binding.layoutLoading.root.visibility = View.GONE
-                        Snackbar.make(binding.root, res.message.toString(), Snackbar.LENGTH_SHORT).show()
+                        Toast.makeText(this@EditProfileActivity, res.message.toString(), Toast.LENGTH_SHORT).show()
                     }
                 }
             }

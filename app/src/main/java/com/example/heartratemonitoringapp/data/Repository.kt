@@ -82,11 +82,12 @@ class Repository(
         avgHeartRate: Int,
         stepChanges: Int,
         step: Int,
-        label: String?
+        label: String?,
+        createdAt: String?
     ): Flow<Resource<Boolean>> =
         flow {
             emit(Resource.Loading())
-            when (val apiResponse = remoteDataSource.addData(bearer, avgHeartRate, stepChanges, step, label.toString()).first()) {
+            when (val apiResponse = remoteDataSource.addData(bearer, avgHeartRate, stepChanges, step, label.toString(), createdAt.toString()).first()) {
                 is ApiResponse.Success -> {
                     emit(Resource.Success(apiResponse.data.success))
                 }
@@ -161,7 +162,6 @@ class Repository(
             emit(Resource.Loading())
             when (val apiResponse = remoteDataSource.deleteData(bearer, id).first()) {
                 is ApiResponse.Success -> {
-                    localDataSource.setBearer(null)
                     emit(Resource.Success(apiResponse.data.message.toString()))
                 }
                 is ApiResponse.Empty -> emit(Resource.Success(""))
@@ -206,6 +206,23 @@ class Repository(
             }
         }
 
+    override fun changePassword(
+        bearer: String,
+        old: String,
+        new: String,
+        confirmation: String
+    ): Flow<Resource<String>> =
+        flow {
+            emit(Resource.Loading())
+            when (val apiResponse = remoteDataSource.changePassword(bearer, old, new, confirmation).first()) {
+                is ApiResponse.Success -> {
+                    emit(Resource.Success(apiResponse.data.message.toString()))
+                }
+                is ApiResponse.Empty -> emit(Resource.Success(""))
+                is ApiResponse.Error -> emit(Resource.Error(apiResponse.errorMessage))
+            }
+        }
+
     override fun setBearer(bearer: String) = localDataSource.setBearer(bearer)
 
     override fun getBearer(): Flow<String?> = flow {
@@ -245,13 +262,9 @@ class Repository(
 
     override fun getMonitoringDataList(): List<MonitoringDataDomain> {
         val domain = arrayListOf<MonitoringDataDomain>()
-        CoroutineScope(Dispatchers.IO).launch {
-            localDataSource.getMonitoringDataList().map { list ->
-                list.map {
-                    domain.add(it.toDomain())
-                }
+            localDataSource.getMonitoringDataList().map {
+                domain.add(it.toDomain())
             }
-        }
         return domain
     }
 

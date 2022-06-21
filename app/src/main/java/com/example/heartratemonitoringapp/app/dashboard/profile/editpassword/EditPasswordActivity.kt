@@ -2,14 +2,23 @@ package com.example.heartratemonitoringapp.app.dashboard.profile.editpassword
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
+import android.view.View
+import android.widget.Toast
 import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.lifecycleScope
 import com.example.heartratemonitoringapp.R
 import com.example.heartratemonitoringapp.app.dashboard.profile.editprofile.EditProfileViewModel
+import com.example.heartratemonitoringapp.data.Resource
 import com.example.heartratemonitoringapp.databinding.ActivityEditPasswordBinding
 import com.example.heartratemonitoringapp.databinding.ActivityEditProfileBinding
+import com.example.heartratemonitoringapp.util.hideSoftKeyboard
+import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 
 class EditPasswordActivity : AppCompatActivity() {
 
@@ -33,6 +42,18 @@ class EditPasswordActivity : AppCompatActivity() {
         }
 
         validateForm()
+
+        binding.layoutEditPassword.submitBtn.setOnClickListener {
+            lifecycleScope.launch {
+                hideSoftKeyboard()
+                val bearer = viewModel.getBearer().first().toString()
+                val old = binding.layoutEditPassword.tidtOldPassword.text.toString()
+                val new = binding.layoutEditPassword.tidtNewPassword.text.toString()
+                val confirmation = binding.layoutEditPassword.tidtRetypePassword.text.toString()
+                viewModel.changePassword(bearer, old, new, confirmation)
+                changePasswordObserver()
+            }
+        }
     }
 
     private fun validateForm() {
@@ -65,7 +86,32 @@ class EditPasswordActivity : AppCompatActivity() {
 
         lifecycleScope.launch {
             viewModel.validateFieldStream.collect {
+                Log.d("validate", it.toString())
                 setButtonEnable(it)
+            }
+        }
+    }
+
+    private fun changePasswordObserver() {
+        lifecycleScope.launch {
+            viewModel.changePassword.collect { res ->
+                when (res) {
+                    is Resource.Loading -> {
+                        binding.layoutLoading.root.z = 10F
+                        binding.layoutLoading.root.visibility = View.VISIBLE
+                        binding.layoutEditPassword.root.visibility = View.INVISIBLE
+                    }
+                    is Resource.Success -> {
+                        binding.layoutEditPassword.root.visibility = View.VISIBLE
+                        binding.layoutLoading.root.visibility = View.GONE
+                        Toast.makeText(this@EditPasswordActivity, res.data.toString(), Toast.LENGTH_SHORT).show()
+                    }
+                    is Resource.Error -> {
+                        binding.layoutEditPassword.root.visibility = View.VISIBLE
+                        binding.layoutLoading.root.visibility = View.GONE
+                        Toast.makeText(this@EditPasswordActivity, res.message.toString(), Toast.LENGTH_SHORT).show()
+                    }
+                }
             }
         }
     }
@@ -110,6 +156,6 @@ class EditPasswordActivity : AppCompatActivity() {
     }
 
     private fun setButtonEnable(isValid: Boolean) {
-        binding.layoutEditPassword.saveBtn.isEnabled = isValid
+        binding.layoutEditPassword.submitBtn.isEnabled = isValid
     }
 }

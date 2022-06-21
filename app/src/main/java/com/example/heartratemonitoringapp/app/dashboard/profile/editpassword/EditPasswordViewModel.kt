@@ -8,24 +8,10 @@ import com.example.heartratemonitoringapp.domain.usecase.model.UserDataDomain
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 class EditPasswordViewModel(private val useCase: IUseCase) : ViewModel() {
-
-    private val _profile = MutableStateFlow<Resource<UserDataDomain>>(Resource.Loading())
-    val profile: StateFlow<Resource<UserDataDomain>> get() = _profile
-    fun getProfile(bearer: String) {
-        _profile.value = Resource.Loading()
-        viewModelScope.launch {
-            useCase.getProfile(bearer).collect { res ->
-                when (res) {
-                    is Resource.Loading -> _profile.emit(Resource.Loading())
-                    is Resource.Success -> _profile.emit(Resource.Success(res.data!!))
-                    is Resource.Error -> _profile.emit(Resource.Error(res.message.toString()))
-                }
-            }
-        }
-    }
 
     fun getBearer() = useCase.getBearer()
 
@@ -68,9 +54,24 @@ class EditPasswordViewModel(private val useCase: IUseCase) : ViewModel() {
             }
         }.combine(validateRepassword) { first, repassword ->
             if (repassword != null) {
-                !first && !repassword
+                first && !repassword
             } else {
                 false
             }
         }
+
+    private val _changePassword = MutableStateFlow<Resource<String>>(Resource.Loading())
+    val changePassword: StateFlow<Resource<String>> get() = _changePassword
+    fun changePassword(bearer: String, old: String, new: String, confirmation: String) {
+        _changePassword.value = Resource.Loading()
+        viewModelScope.launch {
+            useCase.changePassword(bearer, old, new, confirmation).collect { res ->
+                when (res) {
+                    is Resource.Loading -> _changePassword.emit(Resource.Loading())
+                    is Resource.Success -> _changePassword.emit(Resource.Success(res.data.toString()))
+                    is Resource.Error -> _changePassword.emit(Resource.Error(res.message.toString()))
+                }
+            }
+        }
+    }
 }

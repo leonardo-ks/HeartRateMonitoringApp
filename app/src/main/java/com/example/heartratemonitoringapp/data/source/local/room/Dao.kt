@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface Dao {
     @Query("SELECT * FROM monitoring_data")
-    fun getMonitoringDataList(): Flow<List<MonitoringDataEntities>>
+    fun getMonitoringDataList(): List<MonitoringDataEntities>
 
     @Query("DELETE FROM monitoring_data WHERE id = :id")
     fun deleteMonitoringDataById(id: Int)

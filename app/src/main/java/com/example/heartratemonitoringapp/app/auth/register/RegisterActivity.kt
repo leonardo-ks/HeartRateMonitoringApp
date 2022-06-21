@@ -4,6 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.view.WindowManager
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.lifecycleScope
@@ -44,8 +45,7 @@ class RegisterActivity : AppCompatActivity() {
                     is AuthState.Fail -> {
                         binding.layoutLoading.root.visibility = View.GONE
                         window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
-                        Snackbar.make(binding.root, it.message, Snackbar.LENGTH_SHORT)
-                            .show()
+                        Toast.makeText(this@RegisterActivity, it.message, Toast.LENGTH_SHORT).show()
                     }
                     else -> {
                     }

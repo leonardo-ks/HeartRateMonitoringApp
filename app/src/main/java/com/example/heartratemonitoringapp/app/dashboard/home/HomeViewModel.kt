@@ -30,4 +30,22 @@ class HomeViewModel(private val useCase: IUseCase) : ViewModel() {
     }
 
     fun getBearer() = useCase.getBearer()
+
+    private val _sendData = MutableStateFlow<Resource<Boolean>>(Resource.Loading())
+    val sendData: StateFlow<Resource<Boolean>> get() = _sendData
+    fun sendData(bearer: String, avgHeartRate: Int, stepChanges: Int, step: Int, createdAt: String) {
+        _sendData.value = Resource.Loading()
+        viewModelScope.launch {
+            useCase.addData(bearer, avgHeartRate, stepChanges, step, "", createdAt).collect { res ->
+                when (res) {
+                    is Resource.Loading -> _sendData.emit(Resource.Loading())
+                    is Resource.Success -> _sendData.emit(Resource.Success(true))
+                    is Resource.Error -> _sendData.emit(Resource.Error(res.message.toString()))
+                }
+            }
+        }
+    }
+
+    fun deleteData(id: Int) = useCase.deleteMonitoringDataById(id)
+    val localData = useCase.getMonitoringDataList()
 }

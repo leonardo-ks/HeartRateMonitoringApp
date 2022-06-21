@@ -1,15 +1,19 @@
 package com.example.heartratemonitoringapp.app.dashboard.home
 
 import android.annotation.SuppressLint
-import android.bluetooth.BluetoothAdapter
+import android.app.ActivityManager
 import android.bluetooth.BluetoothManager
 import android.bluetooth.BluetoothProfile
 import android.content.Context
+import android.content.Context.ACTIVITY_SERVICE
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.example.heartratemonitoringapp.app.monitoring.background.BackgroundMonitoringService
@@ -17,10 +21,10 @@ import com.example.heartratemonitoringapp.app.monitoring.ble.BLE
 import com.example.heartratemonitoringapp.app.scanner.ScannerActivity
 import com.example.heartratemonitoringapp.data.Resource
 import com.example.heartratemonitoringapp.databinding.FragmentHomeBinding
-import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
+
 
 class HomeFragment : Fragment() {
 
@@ -41,6 +45,23 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        if (viewModel.localData.isNotEmpty()) {
+            lifecycleScope.launch {
+                for (data in viewModel.localData) {
+                    Log.d("sending", "sending")
+                    viewModel.sendData(
+                        viewModel.getBearer().first().toString(),
+                        data.avgHeartRate ?: 0,
+                        data.stepChanges ?: 0,
+                        data.step ?: 0,
+                        data.createdAt.toString()
+                    )
+                    data.id?.let { viewModel.deleteData(it) }
+                }
+            }
+            sendDataObserver()
+        }
+
         val bluetoothManager = requireContext().getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
         val connectedDevices = bluetoothManager.getConnectedDevices(BluetoothProfile.GATT)
 
@@ -60,14 +81,39 @@ class HomeFragment : Fragment() {
             binding.layoutLoading.root.visibility = View.GONE
         }
 
-        lifecycleScope.launch {
-            if (BLE.bluetoothDevice != null && viewModel.backgroundMonitoringState.first()) {
-                activity?.startService(Intent(activity, BackgroundMonitoringService::class.java))
+        if (!BackgroundMonitoringService.isRunning) {
+            lifecycleScope.launch {
+                if (BLE.bluetoothDevice != null && viewModel.backgroundMonitoringState.first()) {
+                    activity?.startService(Intent(activity, BackgroundMonitoringService::class.java))
+                }
             }
         }
 
         binding.layoutNotConnected.btnConnect.setOnClickListener {
             startActivity(Intent(activity, ScannerActivity::class.java))
+        }
+    }
+
+    private fun sendDataObserver() {
+        lifecycleScope.launch {
+            viewModel.sendData.collect { res ->
+                when (res) {
+                    is Resource.Loading -> {
+                        binding.layoutLoading.root.z = 10F
+                        binding.layoutLoading.root.visibility = View.VISIBLE
+                        binding.layoutAverage.root.visibility = View.INVISIBLE
+                    }
+                    is Resource.Success -> {
+                        binding.layoutLoading.root.visibility = View.GONE
+                        binding.layoutAverage.root.visibility = View.VISIBLE
+                    }
+                    is Resource.Error -> {
+                        binding.layoutAverage.root.visibility = View.VISIBLE
+                        binding.layoutLoading.root.visibility = View.GONE
+                        Toast.makeText(activity, res.message.toString(), Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
         }
     }
 
@@ -90,7 +136,7 @@ class HomeFragment : Fragment() {
                     is Resource.Error -> {
                         binding.layoutAverage.root.visibility = View.VISIBLE
                         binding.layoutLoading.root.visibility = View.GONE
-                        Snackbar.make(binding.root, res.message.toString(), Snackbar.LENGTH_SHORT).show()
+                        Toast.makeText(activity, res.message.toString(), Toast.LENGTH_SHORT).show()
                     }
                 }
             }

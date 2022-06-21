@@ -86,6 +86,7 @@ class BackgroundMonitoringService : Service() {
 
     @SuppressLint("MissingPermission")
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        isRunning = true
 
         registerReceiver(gattUpdateReceiver, makeGattUpdateIntentFilter())
         if (bluetoothService != null) {
@@ -110,6 +111,7 @@ class BackgroundMonitoringService : Service() {
             .setContentTitle(resources.getString(R.string.background_monitoring))
             .setSmallIcon(R.drawable.ic_watch)
             .setContentIntent(pendingIntent)
+            .setOnlyAlertOnce(true)
 
         countDownTimer = object : CountDownTimer(60000, 1000) {
             override fun onTick(p0: Long) {
@@ -143,7 +145,7 @@ class BackgroundMonitoringService : Service() {
                 BLEService.ACTION_HR_AVAILABLE -> {
                     if (intent.extras != null) {
                         val heartRate = intent.extras?.getInt("HR")
-                        if (heartRate != null) {
+                        if (heartRate != null && heartRate > 0) {
                             heartList.add(heartRate)
                         }
                     }
@@ -179,8 +181,10 @@ class BackgroundMonitoringService : Service() {
 
     override fun onDestroy() {
         clear()
+        unbindService(serviceConnection)
         unregisterReceiver(gattUpdateReceiver)
         job.cancel()
+        isRunning = false
         super.onDestroy()
     }
 
@@ -230,7 +234,7 @@ class BackgroundMonitoringService : Service() {
                 )
             )
             period = useCase.getMonitoringPeriod().first().toLong()
-            useCase.addData(useCase.getBearer().first().toString(), avgHeart, stepChanges, step,"").collect {
+            useCase.addData(useCase.getBearer().first().toString(), avgHeart, stepChanges, step,"", "").collect {
                 when (it) {
                     is Resource.Success -> {
                         stepList.clear()
@@ -240,7 +244,7 @@ class BackgroundMonitoringService : Service() {
                             countDownTimer.start()
                         }
                     }
-                    else -> {
+                    is Resource.Error -> {
                         stepList.clear()
                         heartList.clear()
                         timer.schedule(period - 60000) {
@@ -248,9 +252,14 @@ class BackgroundMonitoringService : Service() {
                         }
                         Log.d("failed", "failed sending data")
                     }
+                    else -> {}
                 }
             }
         }
+    }
+
+    companion object {
+        var isRunning = false
     }
 
     override fun onBind(p0: Intent?): IBinder? {

@@ -19,6 +19,7 @@ import com.example.heartratemonitoringapp.data.source.local.sharedpref.SharedPre
 import com.example.heartratemonitoringapp.data.source.local.sharedpref.SharedPreferences
 import com.example.heartratemonitoringapp.data.source.remote.RemoteDataSource
 import com.example.heartratemonitoringapp.data.source.remote.network.ApiService
+import com.example.heartratemonitoringapp.data.source.remote.network.FirebaseService
 import com.example.heartratemonitoringapp.domain.repository.IRepository
 import com.example.heartratemonitoringapp.domain.usecase.IUseCase
 import com.example.heartratemonitoringapp.domain.usecase.Interactor
@@ -62,11 +63,20 @@ val networkModule = module {
 
     single {
         val retrofit = Retrofit.Builder()
-            .baseUrl("http://192.168.100.231:8000/api/")
+            .baseUrl("https://hrmonitoring-api.herokuapp.com/api/")
             .addConverterFactory(GsonConverterFactory.create())
             .client(get())
             .build()
         retrofit.create(ApiService::class.java)
+    }
+
+    single {
+        val retrofit = Retrofit.Builder()
+            .baseUrl("https://fcm.googleapis.com/fcm/")
+            .addConverterFactory(GsonConverterFactory.create())
+            .client(get())
+            .build()
+        retrofit.create(FirebaseService::class.java)
     }
 }
 

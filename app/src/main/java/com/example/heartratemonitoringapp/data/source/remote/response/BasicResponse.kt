@@ -2,7 +2,7 @@ package com.example.heartratemonitoringapp.data.source.remote.response
 
 import com.google.gson.annotations.SerializedName
 
-data class LogoutResponse(
+data class BasicResponse(
 
 	@field:SerializedName("success")
 	val success: Boolean? = null,

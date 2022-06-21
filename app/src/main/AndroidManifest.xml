@@ -29,6 +29,7 @@
         <activity
             android:name=".app.splashscreen.SplashActivity"
             android:exported="true"
+            android:noHistory="true"
             android:theme="@style/Theme.HeartRateMonitoringApp.Splash">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -38,7 +39,6 @@
         </activity>
         <activity
             android:name=".app.monitoring.live.LiveMonitoringActivity"
-            android:process=":ble_process"
             android:exported="false" />
         <activity
             android:name=".app.auth.login.LoginActivity"
@@ -55,14 +55,21 @@
         <service
             android:name=".app.monitoring.background.BackgroundMonitoringService"
             android:stopWithTask="false"
-            android:process=":ble_process"
             tools:ignore="Instantiatable" />
         <service
             android:name=".app.monitoring.ble.BLEService"
             android:enabled="true"
             android:exported="true"
-            android:process=":ble_process"
-            tools:ignore="ExportedService" />
+            android:permission="android.permission.BLUETOOTH" />
+        <service
+            android:name=".app.firebase.FirebaseMessagingService"
+            android:permission="com.google.android.c2dm.permission.SEND"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+                <action android:name="com.google.android.c2dm.permission.RECEIVE" />
+            </intent-filter>
+        </service>
     </application>
 
 </manifest>

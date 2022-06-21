@@ -87,7 +87,7 @@ class ProfileFragment : Fragment() {
                     is Resource.Error -> {
                         binding.layoutProfile.root.visibility = View.VISIBLE
                         binding.layoutLoading.root.visibility = View.GONE
-                        Snackbar.make(binding.root, res.message.toString(), Snackbar.LENGTH_SHORT).show()
+                        Toast.makeText(activity, res.message.toString(), Toast.LENGTH_SHORT).show()
                     }
                 }
             }
@@ -103,6 +103,7 @@ class ProfileFragment : Fragment() {
                         val intent = Intent(requireContext(), LoginActivity::class.java)
                         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP)
                         startActivity(intent)
+                        activity?.finish()
                     }
                     is Resource.Error -> {
                         binding.layoutProfile.btnLogout.isEnabled = true

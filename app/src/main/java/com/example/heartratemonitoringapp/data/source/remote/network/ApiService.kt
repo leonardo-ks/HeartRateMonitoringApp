@@ -17,7 +17,7 @@ interface ApiService {
     suspend fun logout(
         @Header("Authorization")
         bearer: String,
-    ): LogoutResponse
+    ): BasicResponse
 
     @FormUrlEncoded
     @POST("register")
@@ -43,6 +43,8 @@ interface ApiService {
         step: Int,
         @Field (value = "label")
         label: String,
+        @Field (value = "created_at")
+        createdAt: String
     ): StoreMonitoringDataResponse
 
     @FormUrlEncoded
@@ -67,7 +69,7 @@ interface ApiService {
         newPassword: String,
         @Field (value = "new_password_confirmation")
         confirmation: String,
-    ): FindDataResponse
+    ): BasicResponse
 
     @GET("profile")
     suspend fun getProfile(
@@ -93,7 +95,7 @@ interface ApiService {
         bearer: String,
         @Path("id")
         id: Int
-    ): DeleteResponse
+    ): BasicResponse
 
     @PUT("data/{id}")
     suspend fun updateMonitoringData(
