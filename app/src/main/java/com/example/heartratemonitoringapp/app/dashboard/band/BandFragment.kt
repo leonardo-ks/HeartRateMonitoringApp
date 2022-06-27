@@ -29,6 +29,7 @@ import com.example.heartratemonitoringapp.data.Resource
 import com.example.heartratemonitoringapp.databinding.FragmentBandBinding
 import com.example.heartratemonitoringapp.util.selected
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -153,6 +154,7 @@ class BandFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        lifecycleScope.cancel()
         _binding = null
     }
 }

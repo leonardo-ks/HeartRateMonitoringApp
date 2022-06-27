@@ -21,6 +21,9 @@
         android:theme="@style/Theme.HeartRateMonitoringApp"
         android:usesCleartextTraffic="true">
         <activity
+            android:name=".app.form.FormActivity"
+            android:exported="false" />
+        <activity
             android:name=".app.dashboard.profile.editpassword.EditPasswordActivity"
             android:exported="false" />
         <activity
@@ -52,6 +55,7 @@
         <activity
             android:name=".app.scanner.ScannerActivity"
             android:exported="false" />
+
         <service
             android:name=".app.monitoring.background.BackgroundMonitoringService"
             android:stopWithTask="false"
@@ -63,8 +67,8 @@
             android:permission="android.permission.BLUETOOTH" />
         <service
             android:name=".app.firebase.FirebaseMessagingService"
-            android:permission="com.google.android.c2dm.permission.SEND"
-            android:exported="false">
+            android:exported="false"
+            android:permission="com.google.android.c2dm.permission.SEND">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
                 <action android:name="com.google.android.c2dm.permission.RECEIVE" />

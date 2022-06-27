@@ -10,6 +10,7 @@ import android.os.IBinder
 import android.util.Log
 import com.example.heartratemonitoringapp.app.monitoring.ble.BLE.bluetoothAdapter
 import com.example.heartratemonitoringapp.app.monitoring.ble.BLE.bluetoothGatt
+import com.example.heartratemonitoringapp.util.toLittleEndian
 
 class BLEService: Service() {
 
@@ -54,7 +55,6 @@ class BLEService: Service() {
             status: Int
         ) {
             if (characteristic.uuid == UUIDs.BASIC_STEP_CHARACTERISTIC) {
-                Log.d("STEP",characteristic.value[1].toString())
                 broadcastUpdate(ACTION_STEP_AVAILABLE, characteristic)
             }
         }
@@ -64,7 +64,6 @@ class BLEService: Service() {
             characteristic: BluetoothGattCharacteristic
         ) {
             if (characteristic.uuid == UUIDs.HEART_RATE_MEASUREMENT_CHARACTERISTIC) {
-                Log.d("HR",characteristic.value[1].toString())
                 broadcastUpdate(ACTION_HR_AVAILABLE, characteristic)
             }
         }
@@ -76,10 +75,16 @@ class BLEService: Service() {
             when (characteristic.uuid) {
                 UUIDs.HEART_RATE_MEASUREMENT_CHARACTERISTIC -> {
                     val heartRate = characteristic.value[1].toInt()
+                    Log.d("HR",heartRate.toString())
                     intent.putExtra("HR", heartRate)
                 }
                 UUIDs.BASIC_STEP_CHARACTERISTIC -> {
-                    val step = characteristic.value[1].toInt()
+                    val data: ByteArray = characteristic.value
+                    val hexString: String = data.joinToString("") {
+                        String.format("%02X", it)
+                    }
+                    val step = toLittleEndian(hexString.slice(2..5))
+                    Log.d("STEP", step.toString())
                     intent.putExtra("step", step)
                 }
             }

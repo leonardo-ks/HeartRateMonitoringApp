@@ -41,3 +41,16 @@ fun Spinner.selected(action: (position:Int) -> Unit) {
 fun findIndex(arr: Array<String>, item: Any): Int {
     return arr.indexOf(item)
 }
+
+fun toLittleEndian(hex: String): Int {
+    var ret = 0
+    var hexLittleEndian = ""
+    if (hex.length % 2 != 0) return ret
+    var i = hex.length - 2
+    while (i >= 0) {
+        hexLittleEndian += hex.substring(i, i + 2)
+        i -= 2
+    }
+    ret = hexLittleEndian.toInt(16)
+    return ret
+}
