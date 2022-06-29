@@ -12,6 +12,9 @@ import android.os.CountDownTimer
 import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
+import com.example.core.data.Resource
+import com.example.core.domain.usecase.IUseCase
+import com.example.core.domain.usecase.model.MonitoringDataDomain
 import com.example.heartratemonitoringapp.R
 import com.example.heartratemonitoringapp.app.MainActivity
 import com.example.heartratemonitoringapp.app.monitoring.ble.BLE
@@ -19,9 +22,6 @@ import com.example.heartratemonitoringapp.app.monitoring.ble.BLEService
 import com.example.heartratemonitoringapp.app.monitoring.ble.BLEService.LocalBinder
 import com.example.heartratemonitoringapp.app.monitoring.ble.UUIDs
 import com.example.heartratemonitoringapp.app.monitoring.live.LiveMonitoringActivity
-import com.example.heartratemonitoringapp.data.Resource
-import com.example.heartratemonitoringapp.domain.usecase.IUseCase
-import com.example.heartratemonitoringapp.domain.usecase.model.MonitoringDataDomain
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -151,8 +151,8 @@ class BackgroundMonitoringService : Service() {
                     }
                 }
                 BLEService.ACTION_STEP_AVAILABLE -> {
+                    scanHeartRate()
                     if (intent.extras != null) {
-                        scanHeartRate()
                         val step = intent.extras?.getInt("step")
                         if (step != null) {
                             stepList.add(step)
@@ -164,10 +164,10 @@ class BackgroundMonitoringService : Service() {
     }
 
     private fun getText(): String {
-        return if (heartList.size > 0 && stepList.size > 0) {
+        return if (heartList.isNotEmpty() && stepList.isNotEmpty()) {
             "Heartrate: ${heartList.last()}, Step: ${stepList.last()}"
         } else {
-            "Menghubungkan"
+            getString(R.string.connecting)
         }
     }
 

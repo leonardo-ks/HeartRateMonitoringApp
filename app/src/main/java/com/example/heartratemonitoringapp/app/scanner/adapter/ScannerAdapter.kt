@@ -1,4 +1,4 @@
-package com.example.heartratemonitoring.ui.scanner.adapter
+package com.example.heartratemonitoringapp.app.scanner.adapter
 
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothDevice

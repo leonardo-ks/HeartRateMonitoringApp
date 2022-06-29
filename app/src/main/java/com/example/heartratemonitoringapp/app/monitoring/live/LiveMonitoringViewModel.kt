@@ -4,8 +4,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.heartratemonitoringapp.data.Resource
-import com.example.heartratemonitoringapp.domain.usecase.IUseCase
+import com.example.core.data.Resource
+import com.example.core.domain.usecase.IUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch

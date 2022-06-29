@@ -13,7 +13,6 @@ import com.example.heartratemonitoringapp.app.auth.AuthState
 import com.example.heartratemonitoringapp.app.auth.login.LoginActivity
 import com.example.heartratemonitoringapp.databinding.ActivityRegisterBinding
 import com.example.heartratemonitoringapp.util.hideSoftKeyboard
-import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 

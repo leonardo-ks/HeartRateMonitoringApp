@@ -2,23 +2,21 @@ package com.example.heartratemonitoringapp.app.dashboard.profile.editprofile
 
 import android.os.Bundle
 import android.view.View
+import android.view.WindowManager
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import com.example.core.data.Resource
 import com.example.heartratemonitoringapp.R
-import com.example.heartratemonitoringapp.data.Resource
 import com.example.heartratemonitoringapp.databinding.ActivityEditProfileBinding
 import com.example.heartratemonitoringapp.util.findIndex
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import java.text.SimpleDateFormat
 import java.time.*
 import java.time.format.DateTimeFormatter
-import java.util.*
 
 
 class EditProfileActivity : AppCompatActivity() {
@@ -86,6 +84,7 @@ class EditProfileActivity : AppCompatActivity() {
                 val dob = localDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
                 val gender = findIndex(gender, binding.layoutEditProfile.tidtGender.text.toString())
                 viewModel.updateProfile(bearer, name, email, dob, gender)
+                updateProfileObserver()
             }
         }
 
@@ -95,7 +94,6 @@ class EditProfileActivity : AppCompatActivity() {
         }
 
         userProfileObserver()
-        updateProfileObserver()
     }
 
     private fun userProfileObserver() {
@@ -132,17 +130,23 @@ class EditProfileActivity : AppCompatActivity() {
                     is Resource.Loading -> {
                         binding.layoutLoading.root.z = 10F
                         binding.layoutLoading.root.visibility = View.VISIBLE
-                        binding.layoutEditProfile.root.visibility = View.INVISIBLE
+                        window.setFlags(
+                            WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                            WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
+                        )
                     }
                     is Resource.Success -> {
                         binding.layoutEditProfile.root.visibility = View.VISIBLE
                         binding.layoutLoading.root.visibility = View.GONE
                         Toast.makeText(baseContext, getString(R.string.success_change_profile), Toast.LENGTH_SHORT).show()
+                        window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
                     }
                     is Resource.Error -> {
                         binding.layoutEditProfile.root.visibility = View.VISIBLE
                         binding.layoutLoading.root.visibility = View.GONE
-                        Toast.makeText(baseContext, res.message.toString(), Toast.LENGTH_SHORT).show()                    }
+                        Toast.makeText(baseContext, res.message.toString(), Toast.LENGTH_SHORT).show()
+                        window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
+                    }
                 }
             }
         }

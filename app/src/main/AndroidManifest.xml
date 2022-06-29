@@ -36,7 +36,6 @@
             android:theme="@style/Theme.HeartRateMonitoringApp.Splash">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -45,17 +44,18 @@
             android:exported="false" />
         <activity
             android:name=".app.auth.login.LoginActivity"
+            android:noHistory="true"
             android:exported="false" />
         <activity
             android:name=".app.MainActivity"
             android:exported="false" />
         <activity
             android:name=".app.auth.register.RegisterActivity"
+            android:noHistory="true"
             android:exported="false" />
         <activity
             android:name=".app.scanner.ScannerActivity"
             android:exported="false" />
-
         <service
             android:name=".app.monitoring.background.BackgroundMonitoringService"
             android:stopWithTask="false"

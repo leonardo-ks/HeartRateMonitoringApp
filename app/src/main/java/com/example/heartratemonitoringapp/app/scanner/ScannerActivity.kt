@@ -10,21 +10,15 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
 import android.view.View
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
-import androidx.core.os.HandlerCompat.postDelayed
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.heartratemonitoring.ui.scanner.adapter.ScannerAdapter
 import com.example.heartratemonitoringapp.R
-import com.example.heartratemonitoringapp.app.MainActivity
 import com.example.heartratemonitoringapp.app.monitoring.ble.BLE
 import com.example.heartratemonitoringapp.app.monitoring.ble.UUIDs
-import com.example.heartratemonitoringapp.app.monitoring.live.LiveMonitoringActivity.Companion.REQUEST_CODE_PERMISSION
-import com.example.heartratemonitoringapp.app.monitoring.live.LiveMonitoringActivity.Companion.REQUIRED_PERMISSIONS
+import com.example.heartratemonitoringapp.app.scanner.adapter.ScannerAdapter
 import com.example.heartratemonitoringapp.databinding.ActivityScannerBinding
 import kotlinx.coroutines.launch
 

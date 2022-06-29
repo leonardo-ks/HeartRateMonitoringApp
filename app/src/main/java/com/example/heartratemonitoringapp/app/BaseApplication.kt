@@ -1,7 +1,12 @@
 package com.example.heartratemonitoringapp.app
 
 import android.app.Application
-import com.example.heartratemonitoringapp.di.*
+import com.example.core.di.databaseModule
+import com.example.core.di.networkModule
+import com.example.core.di.repositoryModule
+import com.example.core.di.sharedPreferencesModule
+import com.example.heartratemonitoringapp.di.useCaseModule
+import com.example.heartratemonitoringapp.di.viewModelModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 

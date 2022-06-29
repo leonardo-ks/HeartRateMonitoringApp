@@ -1,24 +1,20 @@
 package com.example.heartratemonitoringapp.app.dashboard.profile.editpassword
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.view.WindowManager
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.lifecycleScope
+import com.example.core.data.Resource
 import com.example.heartratemonitoringapp.R
-import com.example.heartratemonitoringapp.app.dashboard.profile.editprofile.EditProfileViewModel
-import com.example.heartratemonitoringapp.data.Resource
 import com.example.heartratemonitoringapp.databinding.ActivityEditPasswordBinding
-import com.example.heartratemonitoringapp.databinding.ActivityEditProfileBinding
 import com.example.heartratemonitoringapp.util.hideSoftKeyboard
-import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 
 class EditPasswordActivity : AppCompatActivity() {
 
@@ -99,17 +95,23 @@ class EditPasswordActivity : AppCompatActivity() {
                     is Resource.Loading -> {
                         binding.layoutLoading.root.z = 10F
                         binding.layoutLoading.root.visibility = View.VISIBLE
-                        binding.layoutEditPassword.root.visibility = View.INVISIBLE
+
+                        window.setFlags(
+                            WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
+                            WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
+                        )
                     }
                     is Resource.Success -> {
                         binding.layoutEditPassword.root.visibility = View.VISIBLE
                         binding.layoutLoading.root.visibility = View.GONE
                         Toast.makeText(this@EditPasswordActivity, res.data.toString(), Toast.LENGTH_SHORT).show()
+                        window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
                     }
                     is Resource.Error -> {
                         binding.layoutEditPassword.root.visibility = View.VISIBLE
                         binding.layoutLoading.root.visibility = View.GONE
                         Toast.makeText(this@EditPasswordActivity, res.message.toString(), Toast.LENGTH_SHORT).show()
+                        window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
                     }
                 }
             }

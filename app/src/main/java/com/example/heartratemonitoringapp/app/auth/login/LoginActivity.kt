@@ -1,12 +1,10 @@
 package com.example.heartratemonitoringapp.app.auth.login
 
 import android.content.Intent
-import android.os.Build
 import android.os.Bundle
 import android.view.View
 import android.view.WindowManager
 import android.widget.Toast
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.lifecycleScope
@@ -16,7 +14,6 @@ import com.example.heartratemonitoringapp.app.auth.AuthState
 import com.example.heartratemonitoringapp.app.auth.register.RegisterActivity
 import com.example.heartratemonitoringapp.databinding.ActivityLoginBinding
 import com.example.heartratemonitoringapp.util.hideSoftKeyboard
-import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.time.LocalDateTime

@@ -118,7 +118,7 @@ class LiveMonitoringActivity : AppCompatActivity() {
                     }
                     if (!timer2State) {
                         timer2State = true
-                        timer2.schedule(0, 1000) {
+                        timer2.schedule(0, 2000) {
                             getStep()
                         }
                     }

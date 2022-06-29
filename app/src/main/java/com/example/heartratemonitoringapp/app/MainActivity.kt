@@ -6,9 +6,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.setupWithNavController
 import com.example.heartratemonitoringapp.R
-import com.example.heartratemonitoringapp.data.source.remote.network.FirebaseService
 import com.example.heartratemonitoringapp.databinding.ActivityMainBinding
-import com.google.firebase.iid.internal.FirebaseInstanceIdInternal
 import com.google.firebase.messaging.FirebaseMessaging
 
 class MainActivity : AppCompatActivity() {

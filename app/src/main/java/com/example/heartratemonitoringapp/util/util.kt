@@ -6,21 +6,6 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.AdapterView
 import android.widget.Spinner
 import androidx.core.content.ContextCompat
-import com.google.gson.internal.bind.util.ISO8601Utils.format
-import okhttp3.ResponseBody
-import org.json.JSONObject
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-import java.util.*
-
-fun ResponseBody.getMessage(): String {
-    return try {
-        val jsonObj = JSONObject(this.string())
-        jsonObj.getString("message")
-    } catch (e: Exception) {
-        e.message.toString()
-    }
-}
 
 fun Activity.hideSoftKeyboard() {
     currentFocus?.let {

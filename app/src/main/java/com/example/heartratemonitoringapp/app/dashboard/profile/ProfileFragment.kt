@@ -9,16 +9,12 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
+import com.example.core.data.Resource
 import com.example.heartratemonitoringapp.R
-import com.example.heartratemonitoringapp.app.MainActivity
 import com.example.heartratemonitoringapp.app.auth.login.LoginActivity
 import com.example.heartratemonitoringapp.app.dashboard.profile.editpassword.EditPasswordActivity
-import com.example.heartratemonitoringapp.app.dashboard.profile.editpassword.EditPasswordViewModel
 import com.example.heartratemonitoringapp.app.dashboard.profile.editprofile.EditProfileActivity
-import com.example.heartratemonitoringapp.data.Resource
 import com.example.heartratemonitoringapp.databinding.FragmentProfileBinding
-import com.google.android.material.snackbar.Snackbar
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -42,7 +38,7 @@ class ProfileFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         userProfileObserver()
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             val bearer = viewModel.getBearer().first()
             viewModel.getProfile(bearer.toString())
         }
@@ -56,7 +52,7 @@ class ProfileFragment : Fragment() {
         }
 
         binding.layoutProfile.btnLogout.setOnClickListener {
-            lifecycleScope.launch {
+            viewLifecycleOwner.lifecycleScope.launch {
                 val bearer = viewModel.getBearer().first()
                 if (!bearer.isNullOrBlank()) {
                     logout(viewModel.getBearer().first().toString())
@@ -66,7 +62,7 @@ class ProfileFragment : Fragment() {
     }
 
     private fun userProfileObserver() {
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             viewModel.profile.collect { res ->
                 when (res) {
                     is Resource.Loading -> {
@@ -96,7 +92,7 @@ class ProfileFragment : Fragment() {
     }
 
     private fun logout(bearer: String) {
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             viewModel.logout(bearer).collect {
                 when (it) {
                     is Resource.Loading -> binding.layoutProfile.btnLogout.isEnabled = false
@@ -117,7 +113,6 @@ class ProfileFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        lifecycleScope.cancel()
         _binding = null
     }
 }

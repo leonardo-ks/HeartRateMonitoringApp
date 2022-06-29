@@ -1,23 +1,18 @@
 package com.example.heartratemonitoringapp.app.dashboard.band
 
 import android.annotation.SuppressLint
-import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothManager
 import android.bluetooth.BluetoothProfile
 import android.content.Context
 import android.content.Context.POWER_SERVICE
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.os.PowerManager
 import android.provider.Settings
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
-import android.widget.Toast
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.example.heartratemonitoringapp.R
@@ -25,16 +20,12 @@ import com.example.heartratemonitoringapp.app.monitoring.background.BackgroundMo
 import com.example.heartratemonitoringapp.app.monitoring.ble.BLE
 import com.example.heartratemonitoringapp.app.monitoring.live.LiveMonitoringActivity
 import com.example.heartratemonitoringapp.app.scanner.ScannerActivity
-import com.example.heartratemonitoringapp.data.Resource
 import com.example.heartratemonitoringapp.databinding.FragmentBandBinding
 import com.example.heartratemonitoringapp.util.selected
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import kotlin.math.max
-import kotlin.math.min
 
 
 class BandFragment : Fragment() {
@@ -77,7 +68,7 @@ class BandFragment : Fragment() {
         val adapter = ArrayAdapter.createFromResource(requireActivity(), R.array.periods, android.R.layout.simple_spinner_dropdown_item)
         spinner.adapter = adapter
 
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             when (viewModel.monitoringPeriod.first()) {
                 60000 -> spinner.setSelection(0)
                 300000 -> spinner.setSelection(1)
@@ -109,7 +100,7 @@ class BandFragment : Fragment() {
             binding.layoutBand.layoutBandMenu.tidtUpperLimit.setText("100")
         }
 
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             binding.layoutBand.layoutBandMenu.switchToogleMonitoring.isChecked = viewModel.backgroundMonitoringState.first()
         }
 
@@ -154,7 +145,6 @@ class BandFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
-        lifecycleScope.cancel()
         _binding = null
     }
 }
