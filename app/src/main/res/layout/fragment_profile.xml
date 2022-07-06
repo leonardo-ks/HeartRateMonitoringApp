@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".app.dashboard.band.BandFragment">
+    tools:context=".dashboard.band.BandFragment">
 
     <include
         android:id="@+id/layout_profile"

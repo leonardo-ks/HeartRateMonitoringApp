@@ -13,4 +13,8 @@ class SharedPreferences(private val sharedPref: SharedPref): ISharedPreferences 
     override fun getMonitoringPeriod(): Int = sharedPref.getInt("period")
     override fun setBackgroundMonitoringState(state: Boolean) = sharedPref.setBoolean("background", state)
     override fun getBackgroundMonitoringState(): Boolean = sharedPref.getBoolean("background")
+    override fun setMinHRLimit(min: Int) = sharedPref.setInt("min", min)
+    override fun getMinHRLimit(): Int = sharedPref.getInt("min")
+    override fun setMaxHRLimit(max: Int) = sharedPref.setInt("max", max)
+    override fun getMaxHRLimit(): Int = sharedPref.getInt("max")
 }

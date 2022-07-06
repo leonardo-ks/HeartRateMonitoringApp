@@ -32,6 +32,10 @@ interface IRepository {
     fun getMonitoringPeriod(): Flow<Int>
     fun setBackgroundMonitoringState(state: Boolean)
     fun getBackgroundMonitoringState(): Flow<Boolean>
+    fun setMinHRLimit(min: Int)
+    fun getMinHRLimit(): Flow<Int>
+    fun setMaxHRLimit(max: Int)
+    fun getMaxHRLimit(): Flow<Int>
     fun getMonitoringDataList(): List<MonitoringDataDomain>
     fun deleteMonitoringDataById(id: Int)
     fun deleteMonitoringDataByDate(date: String)

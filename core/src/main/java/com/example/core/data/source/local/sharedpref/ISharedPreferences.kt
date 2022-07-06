@@ -13,4 +13,8 @@ interface ISharedPreferences {
     fun getMonitoringPeriod(): Int
     fun setBackgroundMonitoringState(state : Boolean)
     fun getBackgroundMonitoringState() : Boolean
+    fun setMinHRLimit(min: Int)
+    fun getMinHRLimit(): Int
+    fun setMaxHRLimit(max: Int)
+    fun getMaxHRLimit(): Int
 }

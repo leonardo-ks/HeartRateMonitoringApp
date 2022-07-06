@@ -47,6 +47,14 @@
     <string name="stop">Berhenti</string>
     <string name="live_monitoring_title">Monitoring langsung</string>
     <string name="power_dialog">Agar dapat melakukan monitoring latar belakang aplikasi membutuhkan anda untuk menonaktifkan pengoptimalan daya. Nonaktifkan pengoptimalan daya?</string>
+    <string name="send">Kirim</string>
+    <string name="submit">Kirim</string>
+    <string name="anomaly_detected">Terdeteksi anomali pada detak jantung anda</string>
+    <string name="doing_activities_question">Apakah anda melakukan salah satu dari aktivitas di bawah ini?</string>
+    <string name="select_activities">Pilih semua aktivitas yang anda lakukan</string>
+    <string name="enter_label">Masukan label</string>
+    <string name="add_label_question">Apakah anda ingin menambahkan label pada aktivitas ini?</string>
+    <string name="make_movement_question">Apakah anda bergerak?</string>
 
     <string-array name="periods">
         <item>1 menit</item>

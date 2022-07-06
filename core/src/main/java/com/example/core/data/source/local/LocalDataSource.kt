@@ -17,6 +17,10 @@ class LocalDataSource(private val dao: Dao, private val sharedPreferences: IShar
     fun getMonitoringPeriod() = sharedPreferences.getMonitoringPeriod()
     fun setBackgroundMonitoringState(state: Boolean) = sharedPreferences.setBackgroundMonitoringState(state)
     fun getBackgroundMonitoringState() = sharedPreferences.getBackgroundMonitoringState()
+    fun setMinHRLimit(min: Int) = sharedPreferences.setMinHRLimit(min)
+    fun getMinHRLimit(): Int = sharedPreferences.getMinHRLimit()
+    fun setMaxHRLimit(max: Int) = sharedPreferences.setMaxHRLimit(max)
+    fun getMaxHRLimit(): Int = sharedPreferences.getMaxHRLimit()
 
     fun getMonitoringDataList() = dao.getMonitoringDataList()
     fun deleteMonitoringDataById(id: Int) = dao.deleteMonitoringDataById(id)

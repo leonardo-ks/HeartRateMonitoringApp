@@ -47,6 +47,14 @@
     <string name="stop">Stop</string>
     <string name="live_monitoring_title">Live monitoring</string>
     <string name="power_dialog">In order to be able to perform background monitoring the app requires you to disable power optimization. Disable power optimization?</string>
+    <string name="send">Send</string>
+    <string name="submit">Submit</string>
+    <string name="anomaly_detected">Terdeteksi anomali pada detak jantung anda</string>
+    <string name="doing_activities_question">Did you do any of the activities bellow?</string>
+    <string name="select_activities">Select activities you do</string>
+    <string name="enter_label">Enter label</string>
+    <string name="add_label_question">Do you want to add label to this activity?</string>
+    <string name="make_movement_question">Do you make movement?</string>
 
     <string-array name="periods">
         <item>1 minute</item>

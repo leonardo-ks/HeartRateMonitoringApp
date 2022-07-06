@@ -261,6 +261,18 @@ class Repository(
         emit(localDataSource.getBackgroundMonitoringState())
     }
 
+    override fun setMinHRLimit(min: Int) = localDataSource.setMinHRLimit(min)
+
+    override fun getMinHRLimit(): Flow<Int> = flow {
+        emit(localDataSource.getMinHRLimit())
+    }
+
+    override fun setMaxHRLimit(max: Int) = localDataSource.setMaxHRLimit(max)
+
+    override fun getMaxHRLimit(): Flow<Int> = flow {
+        emit(localDataSource.getMaxHRLimit())
+    }
+
     override fun getMonitoringDataList(): List<MonitoringDataDomain> {
         val domain = arrayListOf<MonitoringDataDomain>()
             localDataSource.getMonitoringDataList().map {

@@ -12,7 +12,7 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
     <application
-        android:name=".app.BaseApplication"
+        android:name=".BaseApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -21,16 +21,16 @@
         android:theme="@style/Theme.HeartRateMonitoringApp"
         android:usesCleartextTraffic="true">
         <activity
-            android:name=".app.form.FormActivity"
+            android:name=".form.FormActivity"
             android:exported="false" />
         <activity
-            android:name=".app.dashboard.profile.editpassword.EditPasswordActivity"
+            android:name=".dashboard.profile.editpassword.EditPasswordActivity"
             android:exported="false" />
         <activity
-            android:name=".app.dashboard.profile.editprofile.EditProfileActivity"
+            android:name=".dashboard.profile.editprofile.EditProfileActivity"
             android:exported="false" />
         <activity
-            android:name=".app.splashscreen.SplashActivity"
+            android:name=".splashscreen.SplashActivity"
             android:exported="true"
             android:noHistory="true"
             android:theme="@style/Theme.HeartRateMonitoringApp.Splash">
@@ -40,33 +40,33 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".app.monitoring.live.LiveMonitoringActivity"
+            android:name=".monitoring.live.LiveMonitoringActivity"
             android:exported="false" />
         <activity
-            android:name=".app.auth.login.LoginActivity"
+            android:name=".auth.login.LoginActivity"
             android:noHistory="true"
             android:exported="false" />
         <activity
-            android:name=".app.MainActivity"
+            android:name=".dashboard.MainActivity"
             android:exported="false" />
         <activity
-            android:name=".app.auth.register.RegisterActivity"
+            android:name=".auth.register.RegisterActivity"
             android:noHistory="true"
             android:exported="false" />
         <activity
-            android:name=".app.scanner.ScannerActivity"
+            android:name=".scanner.ScannerActivity"
             android:exported="false" />
         <service
-            android:name=".app.monitoring.background.BackgroundMonitoringService"
+            android:name=".monitoring.background.BackgroundMonitoringService"
             android:stopWithTask="false"
             tools:ignore="Instantiatable" />
         <service
-            android:name=".app.monitoring.ble.BLEService"
+            android:name=".monitoring.ble.BLEService"
             android:enabled="true"
             android:exported="true"
             android:permission="android.permission.BLUETOOTH" />
         <service
-            android:name=".app.firebase.FirebaseMessagingService"
+            android:name=".firebase.FirebaseMessagingService"
             android:exported="false"
             android:permission="com.google.android.c2dm.permission.SEND">
             <intent-filter>
