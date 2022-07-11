@@ -32,6 +32,7 @@
         <entry key="..\:/Users/Leonardo/AndroidStudioProjects/HeartRateMonitoringApp/app/src/main/res/layout-w936dp/layout_loading.xml" value="0.33" />
         <entry key="..\:/Users/Leonardo/AndroidStudioProjects/HeartRateMonitoringApp/app/src/main/res/layout-w936dp/layout_login_form.xml" value="0.271875" />
         <entry key="..\:/Users/Leonardo/AndroidStudioProjects/HeartRateMonitoringApp/app/src/main/res/layout/activity_background_monitoring.xml" value="0.30526315789473685" />
+        <entry key="..\:/Users/Leonardo/AndroidStudioProjects/HeartRateMonitoringApp/app/src/main/res/layout/activity_form.xml" value="0.22780797101449277" />
         <entry key="..\:/Users/Leonardo/AndroidStudioProjects/HeartRateMonitoringApp/app/src/main/res/layout/activity_heart_rate.xml" value="0.30526315789473685" />
         <entry key="..\:/Users/Leonardo/AndroidStudioProjects/HeartRateMonitoringApp/app/src/main/res/layout/activity_live_monitoring.xml" value="0.18" />
         <entry key="..\:/Users/Leonardo/AndroidStudioProjects/HeartRateMonitoringApp/app/src/main/res/layout/activity_login.xml" value="0.33" />
@@ -51,6 +52,8 @@
         <entry key="..\:/Users/Leonardo/AndroidStudioProjects/HeartRateMonitoringApp/app/src/main/res/layout/layout_band.xml" value="0.2" />
         <entry key="..\:/Users/Leonardo/AndroidStudioProjects/HeartRateMonitoringApp/app/src/main/res/layout/layout_band_menu.xml" value="0.5" />
         <entry key="..\:/Users/Leonardo/AndroidStudioProjects/HeartRateMonitoringApp/app/src/main/res/layout/layout_connected_devices.xml" value="0.30526315789473685" />
+        <entry key="..\:/Users/Leonardo/AndroidStudioProjects/HeartRateMonitoringApp/app/src/main/res/layout/layout_form_questionnaire.xml" value="0.30526315789473685" />
+        <entry key="..\:/Users/Leonardo/AndroidStudioProjects/HeartRateMonitoringApp/app/src/main/res/layout/layout_form_select_activity.xml" value="0.22780797101449277" />
         <entry key="..\:/Users/Leonardo/AndroidStudioProjects/HeartRateMonitoringApp/app/src/main/res/layout/layout_live_monitoring.xml" value="0.15745614035087718" />
         <entry key="..\:/Users/Leonardo/AndroidStudioProjects/HeartRateMonitoringApp/app/src/main/res/layout/layout_loading.xml" value="0.2975630611372381" />
         <entry key="..\:/Users/Leonardo/AndroidStudioProjects/HeartRateMonitoringApp/app/src/main/res/layout/layout_login_form.xml" value="0.2975630611372381" />

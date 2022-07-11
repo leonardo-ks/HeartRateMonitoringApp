@@ -1,6 +1,5 @@
 package com.example.heartratemonitoringapp.monitoring.background
 
-import android.annotation.SuppressLint
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
@@ -91,7 +90,6 @@ class BackgroundMonitoringService : Service() {
         }
     }
 
-    @SuppressLint("MissingPermission")
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         isRunning = true
 
@@ -127,12 +125,14 @@ class BackgroundMonitoringService : Service() {
                     notificationManager.notify(1, notification.build())
                     cancel()
                     onFinish()
-                    val avgHeart = heartList.average().toInt()
-                    val stepChanges = stepList.last() - stepList.first()
-                    val step = stepList.maxOrNull()
-                    notificationIntent.putExtra("avgHeart", avgHeart)
-                    notificationIntent.putExtra("stepChanges", stepChanges)
-                    notificationIntent.putExtra("step", step)
+                    if (stepList.isNotEmpty() && heartList.isNotEmpty()) {
+                        val avgHeart = heartList.average().toInt()
+                        val stepChanges = stepList.last() - stepList.first()
+                        val step = stepList.maxOrNull()
+                        notificationIntent.putExtra("avgHeart", avgHeart)
+                        notificationIntent.putExtra("stepChanges", stepChanges)
+                        notificationIntent.putExtra("step", step)
+                    }
                     useCase.setBackgroundMonitoringState(false)
                 }
                 getStep()
@@ -202,8 +202,7 @@ class BackgroundMonitoringService : Service() {
         super.onDestroy()
     }
 
-    @SuppressLint("MissingPermission")
-    fun clear() {
+    private fun clear() {
         countDownTimer.cancel()
         timer.cancel()
         timer.purge()
@@ -213,7 +212,6 @@ class BackgroundMonitoringService : Service() {
         notificationManager.deleteNotificationChannel(channelId)
     }
 
-    @SuppressLint("MissingPermission")
     private fun scanHeartRate() {
         if (BLE.bluetoothGatt != null) {
             val bluetoothCharacteristic = BLE.bluetoothGatt?.getService(UUIDs.HEART_RATE_SERVICE)?.getCharacteristic(
@@ -225,7 +223,6 @@ class BackgroundMonitoringService : Service() {
         }
     }
 
-    @SuppressLint("MissingPermission")
     fun getStep() {
         val basicService = BLE.bluetoothGatt?.getService(UUIDs.BASIC_SERVICE)
         val stepLevel = basicService?.getCharacteristic(UUIDs.BASIC_STEP_CHARACTERISTIC)
@@ -238,36 +235,78 @@ class BackgroundMonitoringService : Service() {
         scope.launch {
             val format = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
             val date = LocalDateTime.now().format(format)
-            useCase.insertMonitoringData(
-                MonitoringDataDomain(
-                    avgHeartRate = avgHeart,
-                    stepChanges = stepChanges,
-                    createdAt = date.toString(),
-                    label = "",
-                    userId = useCase.getUserId().first(),
-                    step = step
+            val labels = useCase.findData(useCase.getBearer().first().toString(), avgHeart, stepChanges).first().data
+            if (labels != null) {
+                for (label in labels) {
+                    useCase.insertMonitoringData(
+                        MonitoringDataDomain(
+                            avgHeartRate = avgHeart,
+                            stepChanges = stepChanges,
+                            createdAt = date.toString(),
+                            label = label,
+                            userId = useCase.getUserId().first(),
+                            step = step
+                        )
+                    )
+                    period = useCase.getMonitoringPeriod().first().toLong()
+                    useCase.addData(useCase.getBearer().first().toString(), avgHeart, stepChanges, step, label, "").collect {
+                        when (it) {
+                            is Resource.Success -> {
+                                stepList.clear()
+                                heartList.clear()
+                                useCase.deleteMonitoringDataByDate(date)
+                                if (label == labels.last()) {
+                                    timer.schedule(period - 60000) {
+                                        countDownTimer.start()
+                                    }
+                                }
+                            }
+                            is Resource.Error -> {
+                                stepList.clear()
+                                heartList.clear()
+                                if (label == labels.last()) {
+                                    timer.schedule(period - 60000) {
+                                        countDownTimer.start()
+                                    }
+                                }
+                                Log.d("failed", "failed sending data")
+                            }
+                            else -> {}
+                        }
+                    }
+                }
+            } else {
+                useCase.insertMonitoringData(
+                    MonitoringDataDomain(
+                        avgHeartRate = avgHeart,
+                        stepChanges = stepChanges,
+                        createdAt = date.toString(),
+                        label = "",
+                        userId = useCase.getUserId().first(),
+                        step = step
+                    )
                 )
-            )
-            period = useCase.getMonitoringPeriod().first().toLong()
-            useCase.addData(useCase.getBearer().first().toString(), avgHeart, stepChanges, step,"", "").collect {
-                when (it) {
-                    is Resource.Success -> {
-                        stepList.clear()
-                        heartList.clear()
-                        useCase.deleteMonitoringDataByDate(date)
-                        timer.schedule(period - 60000) {
-                            countDownTimer.start()
+                period = useCase.getMonitoringPeriod().first().toLong()
+                useCase.addData(useCase.getBearer().first().toString(), avgHeart, stepChanges, step, "", "").collect {
+                    when (it) {
+                        is Resource.Success -> {
+                            stepList.clear()
+                            heartList.clear()
+                            useCase.deleteMonitoringDataByDate(date)
+                            timer.schedule(period - 60000) {
+                                countDownTimer.start()
+                            }
                         }
-                    }
-                    is Resource.Error -> {
-                        stepList.clear()
-                        heartList.clear()
-                        timer.schedule(period - 60000) {
-                            countDownTimer.start()
+                        is Resource.Error -> {
+                            stepList.clear()
+                            heartList.clear()
+                            timer.schedule(period - 60000) {
+                                countDownTimer.start()
+                            }
+                            Log.d("failed", "failed sending data")
                         }
-                        Log.d("failed", "failed sending data")
+                        else -> {}
                     }
-                    else -> {}
                 }
             }
         }

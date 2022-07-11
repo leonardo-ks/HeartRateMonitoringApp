@@ -147,6 +147,25 @@ class RemoteDataSource(private val apiService: ApiService, ) {
             }
         }.flowOn(Dispatchers.IO)
 
+    suspend fun getUserMonitoringDataByDate(bearer: String, start: String, end: String): Flow<ApiResponse<UserMonitoringDataResponse>> =
+        flow {
+            val response = apiService.getUserDataByDate(bearer, start, end)
+            if (response.success == true) {
+                emit(ApiResponse.Success(response))
+            } else {
+                emit(ApiResponse.Error(response.message.toString()))
+            }
+        }.catch { e ->
+            when (e) {
+                is HttpException -> {
+                    val responseBody = e.response()?.errorBody()
+                    emit(ApiResponse.Error("${e.code()}: ${responseBody?.getMessage()}"))
+                } else -> {
+                emit(ApiResponse.Error(e.message.toString()))
+            }
+            }
+        }.flowOn(Dispatchers.IO)
+
     suspend fun getAverageData(bearer: String): Flow<ApiResponse<AverageResponse>> =
         flow {
             val response = apiService.getAverageData(bearer)
@@ -226,6 +245,44 @@ class RemoteDataSource(private val apiService: ApiService, ) {
     suspend fun changePassword(bearer: String, old: String, new: String, confirmation: String): Flow<ApiResponse<BasicResponse>> =
         flow {
             val response = apiService.changePassword(bearer, old, new, confirmation)
+            if (response.success == true) {
+                emit(ApiResponse.Success(response))
+            } else {
+                emit(ApiResponse.Error(response.message.toString()))
+            }
+        }.catch { e ->
+            when (e) {
+                is HttpException -> {
+                    val responseBody = e.response()?.errorBody()
+                    emit(ApiResponse.Error("${e.code()}: ${responseBody?.getMessage()}"))
+                } else -> {
+                emit(ApiResponse.Error(e.message.toString()))
+            }
+            }
+        }.flowOn(Dispatchers.IO)
+
+    suspend fun addContact(bearer: String, contact: Int): Flow<ApiResponse<BasicResponse>> =
+        flow {
+            val response = apiService.addContact(bearer, contact)
+            if (response.success == true) {
+                emit(ApiResponse.Success(response))
+            } else {
+                emit(ApiResponse.Error(response.message.toString()))
+            }
+        }.catch { e ->
+            when (e) {
+                is HttpException -> {
+                    val responseBody = e.response()?.errorBody()
+                    emit(ApiResponse.Error("${e.code()}: ${responseBody?.getMessage()}"))
+                } else -> {
+                emit(ApiResponse.Error(e.message.toString()))
+            }
+            }
+        }.flowOn(Dispatchers.IO)
+
+    suspend fun sendNotification(bearer: String): Flow<ApiResponse<BasicResponse>> =
+        flow {
+            val response = apiService.sendNotification(bearer)
             if (response.success == true) {
                 emit(ApiResponse.Success(response))
             } else {

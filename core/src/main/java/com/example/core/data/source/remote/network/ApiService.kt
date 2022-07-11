@@ -71,6 +71,22 @@ interface ApiService {
         confirmation: String,
     ): BasicResponse
 
+    @FormUrlEncoded
+    @POST("add-contact")
+    suspend fun addContact(
+        @Header("Authorization")
+        bearer: String,
+        @Field (value = "contact")
+        contact: Int,
+    ): BasicResponse
+
+    @FormUrlEncoded
+    @POST("notification")
+    suspend fun sendNotification(
+        @Header("Authorization")
+        bearer: String,
+    ): BasicResponse
+
     @GET("profile")
     suspend fun getProfile(
         @Header("Authorization")
@@ -81,6 +97,16 @@ interface ApiService {
     suspend fun getUserData(
         @Header("Authorization")
         bearer: String,
+    ): UserMonitoringDataResponse
+
+    @GET("data/{start}/{end}")
+    suspend fun getUserDataByDate(
+        @Header("Authorization")
+        bearer: String,
+        @Path("start")
+        start: String,
+        @Path("end")
+        end: String
     ): UserMonitoringDataResponse
 
     @GET("average")

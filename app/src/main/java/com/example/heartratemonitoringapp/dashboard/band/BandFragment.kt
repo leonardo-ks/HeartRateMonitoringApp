@@ -1,6 +1,5 @@
 package com.example.heartratemonitoringapp.dashboard.band
 
-import android.annotation.SuppressLint
 import android.bluetooth.BluetoothManager
 import android.bluetooth.BluetoothProfile
 import android.content.Context
@@ -17,12 +16,11 @@ import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.example.heartratemonitoringapp.R
+import com.example.heartratemonitoringapp.databinding.FragmentBandBinding
 import com.example.heartratemonitoringapp.monitoring.background.BackgroundMonitoringService
 import com.example.heartratemonitoringapp.monitoring.ble.BLE
 import com.example.heartratemonitoringapp.monitoring.live.LiveMonitoringActivity
 import com.example.heartratemonitoringapp.scanner.ScannerActivity
-import com.example.heartratemonitoringapp.databinding.FragmentBandBinding
-import com.example.heartratemonitoringapp.di.useCaseModule
 import com.example.heartratemonitoringapp.util.selected
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.flow.first
@@ -44,7 +42,6 @@ class BandFragment : Fragment() {
         return binding.root
     }
 
-    @SuppressLint("MissingPermission", "BatteryLife")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -148,7 +145,6 @@ class BandFragment : Fragment() {
         }
     }
 
-    @SuppressLint("BatteryLife")
     private fun openPowerSettings(context: Context) {
         val intent = Intent()
         val pm : PowerManager = context.getSystemService(POWER_SERVICE) as PowerManager

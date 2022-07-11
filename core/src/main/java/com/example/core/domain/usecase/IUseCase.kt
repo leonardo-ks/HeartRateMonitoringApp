@@ -15,11 +15,14 @@ interface IUseCase {
     fun findData(bearer: String, avgHeartRate: Int, avgStep: Int): Flow<Resource<List<String>>>
     fun getProfile(bearer: String): Flow<Resource<UserDataDomain>>
     fun getUserMonitoringData(bearer: String): Flow<Resource<List<MonitoringDataDomain>>>
+    fun getUserMonitoringDataByDate(bearer: String, start: String, end: String): Flow<Resource<List<MonitoringDataDomain>>>
     fun getAverageData(bearer: String): Flow<Resource<AverageDomain>>
     fun deleteData(bearer: String, id: Int): Flow<Resource<String>>
     fun updateMonitoringData(bearer: String, avgHeartRate: Int, avgStep: Int, label: String): Flow<Resource<MonitoringDataDomain>>
     fun updateUser(bearer: String, name: String, email: String, dob: String, gender: Int): Flow<Resource<UserDataDomain>>
     fun changePassword(bearer: String, old: String, new: String, confirmation: String): Flow<Resource<String>>
+    fun addContact(bearer: String, contact: Int): Flow<Resource<String>>
+    fun sendNotification(bearer: String): Flow<Resource<String>>
     fun setBearer(bearer: String)
     fun getBearer(): Flow<String?>
     fun setLoginState(state: Boolean)

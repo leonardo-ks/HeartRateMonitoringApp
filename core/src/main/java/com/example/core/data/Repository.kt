@@ -14,7 +14,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
@@ -146,6 +145,24 @@ class Repository(
             }
         }
 
+    override fun getUserMonitoringDataByDate(bearer: String, start: String, end: String): Flow<Resource<List<MonitoringDataDomain>>> =
+        flow {
+            emit(Resource.Loading())
+            when (val apiResponse = remoteDataSource.getUserMonitoringDataByDate(bearer, start, end).first()) {
+                is ApiResponse.Success -> {
+                    if (apiResponse.data.data != null) {
+                        emit(Resource.Success(apiResponse.data.data.map { data ->
+                            data?.toDomain() ?: MonitoringDataDomain()
+                        }))
+                    } else {
+                        emit(Resource.Success(listOf(MonitoringDataDomain())))
+                    }
+                }
+                is ApiResponse.Empty -> emit(Resource.Success(listOf(MonitoringDataDomain())))
+                is ApiResponse.Error -> emit(Resource.Error(apiResponse.errorMessage))
+            }
+        }
+
     override fun getAverageData(bearer: String): Flow<Resource<AverageDomain>> =
         flow {
             emit(Resource.Loading())
@@ -223,6 +240,28 @@ class Repository(
                 is ApiResponse.Error -> emit(Resource.Error(apiResponse.errorMessage))
             }
         }
+
+    override fun addContact(bearer: String, contact: Int): Flow<Resource<String>> = flow {
+        emit(Resource.Loading())
+        when (val apiResponse = remoteDataSource.addContact(bearer, contact).first()) {
+            is ApiResponse.Success -> {
+                emit(Resource.Success(apiResponse.data.message.toString()))
+            }
+            is ApiResponse.Empty -> emit(Resource.Success(""))
+            is ApiResponse.Error -> emit(Resource.Error(apiResponse.errorMessage))
+        }
+    }
+
+    override fun sendNotification(bearer: String): Flow<Resource<String>> = flow {
+        emit(Resource.Loading())
+        when (val apiResponse = remoteDataSource.sendNotification(bearer).first()) {
+            is ApiResponse.Success -> {
+                emit(Resource.Success(apiResponse.data.message.toString()))
+            }
+            is ApiResponse.Empty -> emit(Resource.Success(""))
+            is ApiResponse.Error -> emit(Resource.Error(apiResponse.errorMessage))
+        }
+    }
 
     override fun setBearer(bearer: String) = localDataSource.setBearer(bearer)
 

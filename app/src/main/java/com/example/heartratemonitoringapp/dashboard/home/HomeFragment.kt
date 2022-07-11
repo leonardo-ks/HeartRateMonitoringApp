@@ -1,26 +1,34 @@
 package com.example.heartratemonitoringapp.dashboard.home
 
-import android.annotation.SuppressLint
 import android.bluetooth.BluetoothManager
 import android.bluetooth.BluetoothProfile
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.example.core.data.Resource
+import com.example.heartratemonitoringapp.R
+import com.example.heartratemonitoringapp.databinding.FragmentHomeBinding
 import com.example.heartratemonitoringapp.monitoring.background.BackgroundMonitoringService
 import com.example.heartratemonitoringapp.monitoring.ble.BLE
 import com.example.heartratemonitoringapp.scanner.ScannerActivity
-import com.example.heartratemonitoringapp.databinding.FragmentHomeBinding
+import com.example.heartratemonitoringapp.util.HourValueFormatter
+import com.github.mikephil.charting.components.XAxis
+import com.github.mikephil.charting.data.Entry
+import com.github.mikephil.charting.data.LineData
+import com.github.mikephil.charting.data.LineDataSet
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import kotlin.random.Random
 
 
 class HomeFragment : Fragment() {
@@ -28,6 +36,10 @@ class HomeFragment : Fragment() {
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
     private val viewModel: HomeViewModel by viewModel()
+
+    private lateinit var lineList: ArrayList<Entry>
+    private lateinit var lineDataSet: LineDataSet
+    private lateinit var lineData: LineData
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -38,7 +50,6 @@ class HomeFragment : Fragment() {
         return binding.root
     }
 
-    @SuppressLint("MissingPermission")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -108,6 +119,31 @@ class HomeFragment : Fragment() {
             }
             binding.swipeRefreshLayout.isRefreshing = false
         }
+
+        val lineChart = binding.layoutAverage.lineChartHeartRate
+        lineList = ArrayList()
+        for (i in 0..24) {
+            lineList.add(Entry(i.toFloat(), Random.nextFloat().times(100)))
+        }
+        lineDataSet = LineDataSet(lineList, "test")
+        lineData = LineData(lineDataSet)
+        lineChart.xAxis.position = XAxis.XAxisPosition.BOTTOM
+        lineChart.xAxis.valueFormatter = HourValueFormatter()
+        lineChart.xAxis.setLabelCount(4, true)
+        lineChart.xAxis.axisMinimum = 0F
+        lineChart.xAxis.axisMaximum = 23.59F
+        lineChart.data = lineData
+        lineChart.legend.isEnabled = false
+        lineChart.description.isEnabled = false
+        lineChart.axisRight.isEnabled = false
+        lineChart.setTouchEnabled(false)
+        lineDataSet.setColor(ContextCompat.getColor(activity!!.applicationContext, R.color.primary_dark_color), 250)
+        lineDataSet.fillColor = ContextCompat.getColor(activity!!.applicationContext, R.color.primary_dark_color)
+        lineDataSet.valueTextColor = Color.BLACK
+        lineDataSet.mode = LineDataSet.Mode.HORIZONTAL_BEZIER
+        lineDataSet.setDrawFilled(true)
+        lineDataSet.setDrawValues(false)
+        lineDataSet.setDrawHighlightIndicators(true)
     }
 
     private fun sendDataObserver() {
@@ -133,7 +169,6 @@ class HomeFragment : Fragment() {
         }
     }
 
-    @SuppressLint("MissingPermission")
     private fun averageDataObserver() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.average.collect { res ->
@@ -146,7 +181,7 @@ class HomeFragment : Fragment() {
                     is Resource.Success -> {
                         binding.layoutLoading.root.visibility = View.GONE
                         binding.layoutAverage.root.visibility = View.VISIBLE
-                        binding.layoutAverage.tvAvgHeartValue.text = res.data?.avgHeartRate.toString()
+                        binding.layoutAverage.tvAvgHeartText.text = getString(R.string.today_average_heart_rate, res.data?.avgHeartRate)
                         binding.layoutAverage.tvTodayStepsValue.text = res.data?.todaySteps.toString()
                     }
                     is Resource.Error -> {

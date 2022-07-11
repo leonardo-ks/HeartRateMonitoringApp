@@ -10,6 +10,7 @@ class FormAdapter : RecyclerView.Adapter<FormAdapter.ViewHolder>() {
 
     private val itemList: ArrayList<String> = ArrayList()
     private var checkBoxState = false
+    var onItemClick: ((String, Boolean) -> Unit)? = null
 
     fun setData(list: List<String>) {
         this.itemList.clear()
@@ -41,6 +42,11 @@ class FormAdapter : RecyclerView.Adapter<FormAdapter.ViewHolder>() {
             } else {
                 binding.checkBox.visibility = View.INVISIBLE
                 binding.checkBox.isEnabled = checkBoxState
+            }
+        }
+        init {
+            binding.checkBox.setOnClickListener {
+                onItemClick?.invoke(itemList[adapterPosition], binding.checkBox.isChecked)
             }
         }
     }
