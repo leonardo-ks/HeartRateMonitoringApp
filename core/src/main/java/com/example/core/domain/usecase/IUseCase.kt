@@ -1,10 +1,7 @@
 package com.example.core.domain.usecase
 
 import com.example.core.data.Resource
-import com.example.core.domain.usecase.model.AverageDomain
-import com.example.core.domain.usecase.model.LoginDomain
-import com.example.core.domain.usecase.model.MonitoringDataDomain
-import com.example.core.domain.usecase.model.UserDataDomain
+import com.example.core.domain.usecase.model.*
 import kotlinx.coroutines.flow.Flow
 
 interface IUseCase {
@@ -19,9 +16,13 @@ interface IUseCase {
     fun getAverageData(bearer: String): Flow<Resource<AverageDomain>>
     fun deleteData(bearer: String, id: Int): Flow<Resource<String>>
     fun updateMonitoringData(bearer: String, avgHeartRate: Int, avgStep: Int, label: String): Flow<Resource<MonitoringDataDomain>>
-    fun updateUser(bearer: String, name: String, email: String, dob: String, gender: Int): Flow<Resource<UserDataDomain>>
+    fun updateUser(bearer: String, name: String, email: String, dob: String, gender: Int, height: Int, weight: Int): Flow<Resource<UserDataDomain>>
     fun changePassword(bearer: String, old: String, new: String, confirmation: String): Flow<Resource<String>>
     fun addContact(bearer: String, contact: Int): Flow<Resource<String>>
+    fun deleteContact(bearer: String, contact: Int): Flow<Resource<String>>
+    fun getContacts(bearer: String): Flow<Resource<List<UserDataDomain>>>
+    fun getLimitByDate(bearer: String, start: String, end: String): Flow<Resource<LimitDomain>>
+    fun search(bearer: String, param: String): Flow<Resource<List<UserDataDomain>>>
     fun sendNotification(bearer: String): Flow<Resource<String>>
     fun setBearer(bearer: String)
     fun getBearer(): Flow<String?>
@@ -39,6 +40,10 @@ interface IUseCase {
     fun getMinHRLimit(): Flow<Int>
     fun setMaxHRLimit(max: Int)
     fun getMaxHRLimit(): Flow<Int>
+    fun setAnomalyDetectedTimes(times: Int)
+    fun getAnomalyDetectedTimes(): Flow<Int>
+    fun setLatestAnomalyDate(date : String)
+    fun getLatestAnomalyDate(): Flow<String?>
     fun getMonitoringDataList(): List<MonitoringDataDomain>
     fun deleteMonitoringDataById(id: Int)
     fun deleteMonitoringDataByDate(date: String)

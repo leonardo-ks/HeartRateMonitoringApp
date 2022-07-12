@@ -102,6 +102,54 @@
             android:textAppearance="@style/FormTextAppearance" />
     </com.google.android.material.textfield.TextInputLayout>
 
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/til_height"
+        style="@style/OutlinedEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/til_dob">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/tidt_height"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:drawableStart="@drawable/ic_height"
+            android:drawablePadding="16dp"
+            android:gravity="center_vertical"
+            android:hint="@string/height"
+            android:inputType="number"
+            android:textAppearance="@style/FormTextAppearance" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/til_weight"
+        style="@style/OutlinedEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/til_height">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/tidt_weight"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:drawableStart="@drawable/ic_boy"
+            android:drawablePadding="16dp"
+            android:gravity="center_vertical"
+            android:hint="@string/weight"
+            android:inputType="number"
+            android:textAppearance="@style/FormTextAppearance" />
+    </com.google.android.material.textfield.TextInputLayout>
+
     <com.google.android.material.button.MaterialButton
         android:id="@+id/submit_btn"
         android:layout_width="match_parent"
@@ -116,6 +164,6 @@
         app:backgroundTint="@null"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/til_dob" />
+        app:layout_constraintTop_toBottomOf="@+id/til_weight" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -7,7 +7,7 @@ class SharedPreferences(private val sharedPref: SharedPref): ISharedPreferences 
     override fun getLoginState(): Boolean = sharedPref.getBoolean("login")
     override fun setUserId(id: Int) = sharedPref.setInt("id", id)
     override fun getUserId(): Int = sharedPref.getInt("id")
-    override fun setLatestLoginDate(date : String?) = sharedPref.setString("date", date)
+    override fun setLatestLoginDate(date : String) = sharedPref.setString("date", date)
     override fun getLatestLoginDate(): String = sharedPref.getString("date")
     override fun setMonitoringPeriod(period: Int) = sharedPref.setInt("period", period)
     override fun getMonitoringPeriod(): Int = sharedPref.getInt("period")
@@ -17,4 +17,8 @@ class SharedPreferences(private val sharedPref: SharedPref): ISharedPreferences 
     override fun getMinHRLimit(): Int = sharedPref.getInt("min")
     override fun setMaxHRLimit(max: Int) = sharedPref.setInt("max", max)
     override fun getMaxHRLimit(): Int = sharedPref.getInt("max")
+    override fun setAnomalyDetectedTimes(times: Int) = sharedPref.setInt("anomaly", times)
+    override fun getAnomalyDetectedTimes(): Int = sharedPref.getInt("anomaly")
+    override fun setLatestAnomalyDate(date : String) = sharedPref.setString("anomalyDate", date)
+    override fun getLatestAnomalyDate(): String = sharedPref.getString("anomalyDate")
 }

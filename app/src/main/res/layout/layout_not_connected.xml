@@ -19,7 +19,7 @@
     <TextView
         android:id="@+id/tv_not_connected"
         style="@style/TextRegular"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:layout_marginTop="8dp"
@@ -30,21 +30,21 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/icon" />
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/btn_connect"
-        style="@style/TextRegular"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:background="@drawable/bg_button"
-        android:text="@string/connect"
-        android:textAllCaps="false"
-        android:textColor="@color/primary_text_color"
-        app:backgroundTint="@color/primary_color"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tv_not_connected" />
+<!--    <com.google.android.material.button.MaterialButton-->
+<!--        android:id="@+id/btn_connect"-->
+<!--        style="@style/TextRegular"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_marginStart="8dp"-->
+<!--        android:layout_marginTop="8dp"-->
+<!--        android:layout_marginEnd="8dp"-->
+<!--        android:background="@drawable/bg_button"-->
+<!--        android:text="@string/connect"-->
+<!--        android:textAllCaps="false"-->
+<!--        android:textColor="@color/primary_text_color"-->
+<!--        app:backgroundTint="@color/primary_color"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toBottomOf="@+id/tv_not_connected" />-->
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -14,6 +14,7 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import com.bumptech.glide.Glide
 import com.example.core.data.Resource
 import com.example.heartratemonitoringapp.R
 import com.example.heartratemonitoringapp.databinding.FragmentHomeBinding
@@ -25,9 +26,18 @@ import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
+import com.github.mikephil.charting.utils.EntryXComparator
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import java.text.DateFormat
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.Period
+import java.time.format.DateTimeFormatter
+import java.time.format.DateTimeFormatterBuilder
+import java.util.*
+import kotlin.collections.ArrayList
 import kotlin.random.Random
 
 
@@ -40,6 +50,9 @@ class HomeFragment : Fragment() {
     private lateinit var lineList: ArrayList<Entry>
     private lateinit var lineDataSet: LineDataSet
     private lateinit var lineData: LineData
+
+    var upper = 0
+    var lower = 0
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -97,9 +110,18 @@ class HomeFragment : Fragment() {
             }
         }
 
-        binding.layoutNotConnected.btnConnect.setOnClickListener {
-            startActivity(Intent(activity, ScannerActivity::class.java))
+        viewLifecycleOwner.lifecycleScope.launch {
+            val startFormat = DateTimeFormatter.ofPattern("yyyy-MM-d 00:00:00")
+            val endFormat = DateTimeFormatter.ofPattern("yyyy-MM-d 23:59:59")
+            val start = LocalDateTime.now().minusDays(1).format(startFormat)
+            val end = LocalDateTime.now().minusDays(1).format(endFormat)
+            viewModel.getLimit(viewModel.getBearer().first().toString(), start, end)
+            getLimitObserver()
         }
+
+//        binding.layoutNotConnected.btnConnect.setOnClickListener {
+//            startActivity(Intent(activity, ScannerActivity::class.java))
+//        }
 
         binding.swipeRefreshLayout.setOnRefreshListener {
             if (connectedDevices.isNotEmpty()) {
@@ -120,30 +142,19 @@ class HomeFragment : Fragment() {
             binding.swipeRefreshLayout.isRefreshing = false
         }
 
-        val lineChart = binding.layoutAverage.lineChartHeartRate
-        lineList = ArrayList()
-        for (i in 0..24) {
-            lineList.add(Entry(i.toFloat(), Random.nextFloat().times(100)))
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.getProfile(viewModel.getBearer().first().toString())
+            getProfileObserver()
         }
-        lineDataSet = LineDataSet(lineList, "test")
-        lineData = LineData(lineDataSet)
-        lineChart.xAxis.position = XAxis.XAxisPosition.BOTTOM
-        lineChart.xAxis.valueFormatter = HourValueFormatter()
-        lineChart.xAxis.setLabelCount(4, true)
-        lineChart.xAxis.axisMinimum = 0F
-        lineChart.xAxis.axisMaximum = 23.59F
-        lineChart.data = lineData
-        lineChart.legend.isEnabled = false
-        lineChart.description.isEnabled = false
-        lineChart.axisRight.isEnabled = false
-        lineChart.setTouchEnabled(false)
-        lineDataSet.setColor(ContextCompat.getColor(activity!!.applicationContext, R.color.primary_dark_color), 250)
-        lineDataSet.fillColor = ContextCompat.getColor(activity!!.applicationContext, R.color.primary_dark_color)
-        lineDataSet.valueTextColor = Color.BLACK
-        lineDataSet.mode = LineDataSet.Mode.HORIZONTAL_BEZIER
-        lineDataSet.setDrawFilled(true)
-        lineDataSet.setDrawValues(false)
-        lineDataSet.setDrawHighlightIndicators(true)
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            val format = DateTimeFormatter.ofPattern("yyyy-MM-d H:mm:ss")
+            val startFormat = DateTimeFormatter.ofPattern("yyyy-MM-d 00:00:00")
+            val start = LocalDate.now().format(startFormat)
+            val end = LocalDateTime.now().format(format)
+            viewModel.getDataByDate(viewModel.getBearer().first().toString(), start, end)
+            getDataObserver()
+        }
     }
 
     private fun sendDataObserver() {
@@ -158,6 +169,108 @@ class HomeFragment : Fragment() {
                     is Resource.Success -> {
                         binding.layoutLoading.root.visibility = View.GONE
                         binding.layoutAverage.root.visibility = View.VISIBLE
+                    }
+                    is Resource.Error -> {
+                        binding.layoutAverage.root.visibility = View.VISIBLE
+                        binding.layoutLoading.root.visibility = View.GONE
+                        Toast.makeText(activity, res.message.toString(), Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        }
+    }
+
+    private fun getProfileObserver() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.profile.collect { res ->
+                when (res) {
+                    is Resource.Success -> {
+                        val dob = res.data?.dob
+                        val format = DateTimeFormatter.ofPattern("d-MM-yyyy")
+                        val formatted = LocalDate.parse(dob).format(format)
+                        val now = LocalDate.now()
+                        val upper = ((220 - Period.between(LocalDate.parse(formatted, format), now).years) * 0.85).toInt()
+                        upper.let { viewModel.setMaxHRLimit(maxOf(it, upper)) }
+                        if (lower != 0) {
+                            lower.let { viewModel.setMinHRLimit(minOf(it, 60)) }
+                        } else {
+                            lower.let { viewModel.setMinHRLimit(60) }
+                        }
+                    }
+                    else -> {}
+                }
+            }
+        }
+    }
+
+    private fun getLimitObserver() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.getLimit.collect { res ->
+                when (res) {
+                    is Resource.Loading -> {
+                        binding.layoutLoading.root.z = 10F
+                        binding.layoutLoading.root.visibility = View.VISIBLE
+                        binding.layoutAverage.root.visibility = View.INVISIBLE
+                    }
+                    is Resource.Success -> {
+                        binding.layoutLoading.root.visibility = View.GONE
+                        binding.layoutAverage.root.visibility = View.VISIBLE
+                        upper = res.data?.upper!!
+                        lower = res.data?.lower!!
+                    }
+                    is Resource.Error -> {
+                        binding.layoutAverage.root.visibility = View.VISIBLE
+                        binding.layoutLoading.root.visibility = View.GONE
+                        Toast.makeText(activity, res.message.toString(), Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+        }
+    }
+
+    private fun getDataObserver() {
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.data.collect { res ->
+                when (res) {
+                    is Resource.Loading -> {
+                        binding.layoutLoading.root.z = 10F
+                        binding.layoutLoading.root.visibility = View.VISIBLE
+                        binding.layoutAverage.root.visibility = View.INVISIBLE
+                    }
+                    is Resource.Success -> {
+                        binding.layoutLoading.root.visibility = View.GONE
+                        binding.layoutAverage.root.visibility = View.VISIBLE
+                        val lineChart = binding.layoutAverage.lineChartHeartRate
+                        lineList = ArrayList()
+                        if (!res.data.isNullOrEmpty()) {
+                            for (data in res.data!!) {
+                                val format = DateTimeFormatter.ofPattern("d-MM-yyyy H:mm:ss")
+                                val time = LocalDateTime.parse(data.createdAt.toString(), format)
+                                val x = "${time.hour}.${time.minute}".toFloat()
+                                val y = data.avgHeartRate!!.toFloat()
+                                lineList.add(Entry(x, y))
+                            }
+                            lineDataSet = LineDataSet(lineList, "test")
+                            lineData = LineData(lineDataSet)
+                            lineChart.data = lineData
+                            lineChart.xAxis.position = XAxis.XAxisPosition.BOTTOM
+                            lineChart.xAxis.valueFormatter = HourValueFormatter()
+                            lineChart.xAxis.setLabelCount(4, true)
+                            lineChart.xAxis.axisMinimum = 0F
+                            lineChart.xAxis.axisMaximum = 23.59F
+                            lineChart.legend.isEnabled = false
+                            lineChart.description.isEnabled = false
+                            lineChart.axisRight.isEnabled = false
+                            lineChart.isDoubleTapToZoomEnabled = false
+                            lineDataSet.setColor(ContextCompat.getColor(activity!!.applicationContext, R.color.primary_dark_color), 250)
+                            lineDataSet.fillColor = ContextCompat.getColor(activity!!.applicationContext, R.color.primary_dark_color)
+                            lineDataSet.valueTextColor = Color.BLACK
+                            lineDataSet.mode = LineDataSet.Mode.HORIZONTAL_BEZIER
+                            lineDataSet.setDrawFilled(true)
+                            lineDataSet.setDrawValues(false)
+                            lineDataSet.setDrawHighlightIndicators(true)
+                            Collections.sort(lineList, EntryXComparator())
+                        }
                     }
                     is Resource.Error -> {
                         binding.layoutAverage.root.visibility = View.VISIBLE

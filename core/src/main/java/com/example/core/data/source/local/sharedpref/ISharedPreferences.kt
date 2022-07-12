@@ -7,7 +7,7 @@ interface ISharedPreferences {
     fun getLoginState() : Boolean
     fun setUserId(id: Int)
     fun getUserId(): Int
-    fun setLatestLoginDate(date : String?)
+    fun setLatestLoginDate(date : String)
     fun getLatestLoginDate(): String?
     fun setMonitoringPeriod(period: Int)
     fun getMonitoringPeriod(): Int
@@ -17,4 +17,8 @@ interface ISharedPreferences {
     fun getMinHRLimit(): Int
     fun setMaxHRLimit(max: Int)
     fun getMaxHRLimit(): Int
+    fun setAnomalyDetectedTimes(times: Int)
+    fun getAnomalyDetectedTimes(): Int
+    fun setLatestAnomalyDate(date : String)
+    fun getLatestAnomalyDate(): String?
 }

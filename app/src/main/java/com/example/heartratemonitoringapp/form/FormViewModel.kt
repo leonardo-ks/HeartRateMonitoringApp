@@ -40,4 +40,10 @@ class FormViewModel(private val useCase: IUseCase): ViewModel() {
     }
 
     fun getBearer() = useCase.getBearer()
+    fun getAnomalyDetectedTimes() = useCase.getAnomalyDetectedTimes()
+    fun setAnomalyDetectedTimes(times: Int) {
+        useCase.setAnomalyDetectedTimes(times)
+    }
+    fun getLatestAnomalyDate() = useCase.getLatestAnomalyDate()
+    fun setLatestAnomalyDate(date: String) = useCase.setLatestAnomalyDate(date)
 }

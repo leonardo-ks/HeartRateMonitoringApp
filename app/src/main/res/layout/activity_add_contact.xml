@@ -5,25 +5,28 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white_grey"
-    tools:context=".dashboard.profile.editprofile.EditProfileActivity">
+    tools:context=".dashboard.profile.contact.add.AddContactActivity">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?actionBarSize"
         style="@style/TextRegular"
-        app:title="@string/title_profile"
+        app:title="@string/add_contact"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <include
-        android:id="@+id/layout_edit_profile"
-        layout="@layout/layout_edit_profile"
+        android:id="@+id/layout_add_contact"
+        layout="@layout/layout_add_contact"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_marginTop="16dp"
         android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/toolbar" />
 
     <include

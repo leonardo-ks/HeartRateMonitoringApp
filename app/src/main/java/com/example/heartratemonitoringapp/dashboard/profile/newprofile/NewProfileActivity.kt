@@ -1,5 +1,6 @@
-package com.example.heartratemonitoringapp.dashboard.profile.editprofile
+package com.example.heartratemonitoringapp.dashboard.profile.newprofile
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.view.WindowManager
@@ -8,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.example.core.data.Resource
 import com.example.heartratemonitoringapp.R
+import com.example.heartratemonitoringapp.dashboard.MainActivity
 import com.example.heartratemonitoringapp.dashboard.profile.editprofile.EditProfileViewModel
 import com.example.heartratemonitoringapp.databinding.ActivityEditProfileBinding
 import com.example.heartratemonitoringapp.util.findIndex
@@ -19,11 +21,11 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.time.*
 import java.time.format.DateTimeFormatter
 
-class EditProfileActivity : AppCompatActivity() {
+class NewProfileActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityEditProfileBinding
     private lateinit var gender: Array<String>
-    private val viewModel: EditProfileViewModel by viewModel()
+    private val viewModel: NewProfileViewModel by viewModel()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,6 +43,13 @@ class EditProfileActivity : AppCompatActivity() {
 
         binding.toolbar.setNavigationOnClickListener {
             finish()
+        }
+
+        if (intent.extras != null) {
+            val email = intent.extras?.getString("email") ?: ""
+            val name = intent.extras?.getString("name") ?: ""
+            binding.layoutEditProfile.tidtEmail.setText(email)
+            binding.layoutEditProfile.tidtName.setText(name)
         }
 
         binding.layoutEditProfile.tidtGender.setOnClickListener {
@@ -103,50 +112,6 @@ class EditProfileActivity : AppCompatActivity() {
                 updateProfileObserver()
             }
         }
-
-        lifecycleScope.launch {
-            val bearer = viewModel.getBearer().first().toString()
-            viewModel.getProfile(bearer)
-        }
-
-        userProfileObserver()
-    }
-
-    private fun userProfileObserver() {
-        lifecycleScope.launch {
-            viewModel.profile.collect { res ->
-                when (res) {
-                    is Resource.Loading -> {
-                        binding.layoutLoading.root.z = 10F
-                        binding.layoutLoading.root.visibility = View.VISIBLE
-                        binding.layoutEditProfile.root.visibility = View.INVISIBLE
-                    }
-                    is Resource.Success -> {
-                        binding.layoutEditProfile.root.visibility = View.VISIBLE
-                        binding.layoutLoading.root.visibility = View.GONE
-                        binding.layoutEditProfile.tidtEmail.setText(res.data?.email.toString())
-                        binding.layoutEditProfile.tidtName.setText(res.data?.name.toString())
-                        binding.layoutEditProfile.tidtGender.setText(gender[res.data?.gender ?: 0])
-                        val format = DateTimeFormatter.ofPattern("d-MM-yyyy")
-                        binding.layoutEditProfile.tidtDob.setText(
-                            LocalDate.parse(
-                                res.data?.dob ?: LocalDateTime.now().format(format).toString()
-                            ).format(format))
-                        binding.layoutEditProfile.tidtHeight.setText(res.data?.height.toString())
-                        binding.layoutEditProfile.tidtWeight.setText(res.data?.weight.toString())
-                    }
-                    is Resource.Error -> {
-                        binding.layoutEditProfile.root.visibility = View.VISIBLE
-                        binding.layoutLoading.root.visibility = View.GONE
-                        Toast.makeText(
-                            this@EditProfileActivity,
-                            res.message.toString(),
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
-                }
-            }
-        }
     }
 
     private fun updateProfileObserver() {
@@ -170,6 +135,7 @@ class EditProfileActivity : AppCompatActivity() {
                             Toast.LENGTH_SHORT
                         ).show()
                         window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
+                        startActivity(Intent(baseContext, MainActivity::class.java))
                     }
                     is Resource.Error -> {
                         binding.layoutEditProfile.root.visibility = View.VISIBLE

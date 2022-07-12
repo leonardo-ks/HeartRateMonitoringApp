@@ -87,11 +87,34 @@ interface ApiService {
         bearer: String,
     ): BasicResponse
 
+    @FormUrlEncoded
+    @POST("delete-contact")
+    suspend fun deleteContact(
+        @Header("Authorization")
+        bearer: String,
+        @Field (value = "contact")
+        contact: Int,
+    ): BasicResponse
+
     @GET("profile")
     suspend fun getProfile(
         @Header("Authorization")
         bearer: String,
     ): ProfileResponse
+
+    @GET("contact")
+    suspend fun getContacts(
+        @Header("Authorization")
+        bearer: String,
+    ): ListUserResponse
+
+    @GET("search/{param}")
+    suspend fun search(
+        @Header("Authorization")
+        bearer: String,
+        @Path("param")
+        param: String,
+    ): ListUserResponse
 
     @GET("data")
     suspend fun getUserData(
@@ -114,6 +137,16 @@ interface ApiService {
         @Header("Authorization")
         bearer: String,
     ): AverageResponse
+
+    @GET("limit/{start}/{end}")
+    suspend fun getLimitByDate(
+        @Header("Authorization")
+        bearer: String,
+        @Path("start")
+        start: String,
+        @Path("end")
+        end: String
+    ): LimitResponse
 
     @DELETE("data/{id}")
     suspend fun deleteData(
@@ -146,6 +179,10 @@ interface ApiService {
         @Query("dob")
         dob: String,
         @Query("gender")
-        gender: Int
+        gender: Int,
+        @Query("height")
+        height: Int,
+        @Query("weight")
+        weight: Int
     ): UserDataUpdateResponse
 }

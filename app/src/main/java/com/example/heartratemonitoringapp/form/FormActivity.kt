@@ -1,14 +1,18 @@
 package com.example.heartratemonitoringapp.form
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.NotificationCompat
+import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.core.data.Resource
 import com.example.heartratemonitoringapp.R
 import com.example.heartratemonitoringapp.databinding.ActivityFormBinding
+import com.example.heartratemonitoringapp.dashboard.profile.contact.adapter.ContactAdapter
 import com.example.heartratemonitoringapp.form.adapter.FormAdapter
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
@@ -23,27 +27,22 @@ class FormActivity : AppCompatActivity() {
     private var mAdapter = FormAdapter()
     private val viewModel: FormViewModel by viewModel()
     private val labelList: ArrayList<String> = ArrayList()
+    private var isAnomaly = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityFormBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        var avgHeartRate: Int? = null
-        var stepChanges: Int? = null
-        var step: Int? = null
+        val avgHeartRate = intent.extras?.getInt("avgHeartRate")
+        val stepChanges = intent.extras?.getInt("stepChanges")
+        val step = intent.extras?.getInt("step")
 
-        showRecycleView()
-
-        if (intent.extras != null) {
-            avgHeartRate = intent.extras?.getInt("avgHeart")
-            stepChanges = intent.extras?.getInt("stepChanges")
-            step = intent.extras?.getInt("step")
-            if (avgHeartRate != null && stepChanges != null) {
-                lifecycleScope.launch {
-                    viewModel.findData(viewModel.getBearer().first().toString(), avgHeartRate, stepChanges)
-                    getLabelObserver()
-                }
+        Log.d("extras", "HR: $avgHeartRate, SC: $stepChanges, S: $step")
+        if (avgHeartRate != null && stepChanges != null) {
+            lifecycleScope.launch {
+                viewModel.findData(viewModel.getBearer().first().toString(), avgHeartRate, stepChanges)
+                getLabelObserver()
             }
         } else {
             binding.layoutFormQuestionnaire.root.visibility = View.VISIBLE
@@ -80,11 +79,16 @@ class FormActivity : AppCompatActivity() {
             }
         }
 
+        binding.layoutFormQuestionnaire.rgMovement.setOnCheckedChangeListener { _, checkedId ->
+            isAnomaly = checkedId != R.id.rb_movement_yes
+        }
+
         binding.layoutFormQuestionnaire.rgAddLabel.setOnCheckedChangeListener { _, checkedId ->
             if (checkedId == R.id.rb_add_label_yes) {
                 binding.layoutFormQuestionnaire.tilLabel.visibility = View.VISIBLE
-            } else {
+            } else if (checkedId == R.id.rb_add_label_no) {
                 binding.layoutFormQuestionnaire.tilLabel.visibility = View.GONE
+                binding.layoutFormQuestionnaire.btnSend.isEnabled = true
             }
         }
 
@@ -102,6 +106,29 @@ class FormActivity : AppCompatActivity() {
             if (avgHeartRate != null && stepChanges != null && step != null) {
                 sendData(avgHeartRate, stepChanges, step, binding.layoutFormQuestionnaire.tidtLabel.text.toString())
             }
+            if (isAnomaly) {
+                lifecycleScope.launch {
+                    if (viewModel.getAnomalyDetectedTimes().first() > 3) {
+                        NotificationCompat.Builder(this@FormActivity, "anomaly")
+                            .setContentTitle("Perhatian")
+                            .setSmallIcon(R.drawable.ic_watch)
+                            .setContentText("Anda terdeteksi mendapatkan anomali melebihi 3 kali dalam sehari.")
+                            .build()
+                    } else {
+                        val latestAnomalyDate = LocalDateTime.parse(viewModel.getLatestAnomalyDate().first())
+                        if (latestAnomalyDate.isBefore(LocalDateTime.now().minusDays(1))) {
+                            viewModel.setAnomalyDetectedTimes(1)
+                        } else {
+                            viewModel.setAnomalyDetectedTimes(viewModel.getAnomalyDetectedTimes().first() + 1)
+                        }
+                    }
+
+                }
+            }
+        }
+
+        binding.layoutFormQuestionnaire.tidtLabel.addTextChangedListener {
+            binding.layoutFormQuestionnaire.btnSend.isEnabled = !it.isNullOrBlank()
         }
 
         mAdapter.onItemClick = {label, state ->
@@ -169,6 +196,7 @@ class FormActivity : AppCompatActivity() {
                             showRecycleView()
                         } else {
                             binding.layoutFormQuestionnaire.root.visibility = View.VISIBLE
+                            binding.layoutFormSelectActivity.root.visibility = View.GONE
                         }
                     }
                     is Resource.Error -> {

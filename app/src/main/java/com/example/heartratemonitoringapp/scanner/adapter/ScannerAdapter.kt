@@ -6,7 +6,6 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.heartratemonitoringapp.databinding.ItemDeviceListBinding
-import com.example.heartratemonitoringapp.form.adapter.FormAdapter
 
 class ScannerAdapter : RecyclerView.Adapter<ScannerAdapter.ViewHolder>() {
 

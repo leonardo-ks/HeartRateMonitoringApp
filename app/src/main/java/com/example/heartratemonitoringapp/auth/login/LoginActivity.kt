@@ -9,11 +9,13 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.lifecycleScope
 import com.example.heartratemonitoringapp.R
-import com.example.heartratemonitoringapp.dashboard.MainActivity
 import com.example.heartratemonitoringapp.auth.AuthState
 import com.example.heartratemonitoringapp.auth.register.RegisterActivity
+import com.example.heartratemonitoringapp.dashboard.MainActivity
+import com.example.heartratemonitoringapp.dashboard.profile.newprofile.NewProfileActivity
 import com.example.heartratemonitoringapp.databinding.ActivityLoginBinding
 import com.example.heartratemonitoringapp.util.hideSoftKeyboard
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.time.LocalDateTime
@@ -21,6 +23,7 @@ import java.time.LocalDateTime
 class LoginActivity : AppCompatActivity() {
     private lateinit var binding: ActivityLoginBinding
     private val viewModel: LoginViewModel by viewModel()
+    var name: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,6 +33,7 @@ class LoginActivity : AppCompatActivity() {
 
         if (intent.extras != null) {
             val email = intent.extras?.getString("email") ?: ""
+            name = intent.extras?.getString("name") ?: ""
             binding.loginForm.loginTidtEmail.setText(email)
             viewModel.setEmailValue(email)
         }
@@ -46,7 +50,14 @@ class LoginActivity : AppCompatActivity() {
                     }
                     is AuthState.Success -> {
                         viewModel.setLatestLoginDate(LocalDateTime.now().toString())
-                        startActivity(Intent(baseContext, MainActivity::class.java))
+                        if (viewModel.getProfile(viewModel.getBearer().first().toString()).first().data?.dob != null) {
+                            val intent = Intent(baseContext, MainActivity::class.java)
+                            intent.putExtra("email", binding.loginForm.loginTidtEmail.text.toString())
+                            intent.putExtra("name", name)
+                            startActivity(intent)
+                        } else {
+                            startActivity(Intent(baseContext, NewProfileActivity::class.java))
+                        }
                     }
                     is AuthState.Fail -> {
                         binding.layoutLoading.root.visibility = View.GONE

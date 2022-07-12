@@ -39,7 +39,7 @@
     <string name="date_of_birth">Tanggal lahir</string>
     <string name="loading">Memuat</string>
     <string name="password">Password</string>
-    <string name="band_not_detected">Tidak terdeteksi smartband yang terhubung</string>
+    <string name="band_not_detected">Tidak terdeteksi smartband yang terhubung. Silahkan menghubungkan smartband melalui aplikasi Mi Fit atau Zepp Life</string>
     <string name="connect">Hubungkan</string>
     <string name="logout">Keluar</string>
     <string name="detected_devices">Perangkat Tersedia</string>
@@ -57,6 +57,13 @@
     <string name="make_movement_question">Apakah anda bergerak?</string>
     <string name="today_average_heart_rate">Rata - rata hari ini: %1$s BPM</string>
     <string name="today_step">Total langkah hari ini:</string>
+    <string name="contact">Kontak</string>
+    <string name="contact_title">Kontak anda</string>
+    <string name="add_contact">Tambah kontak</string>
+    <string name="enter_name">Masukkan nama</string>
+    <string name="contact_empty">Anda belum menambahkan kontak</string>
+    <string name="height">Tinggi badan</string>
+    <string name="weight">Berat badan</string>
 
     <string-array name="periods">
         <item>1 menit</item>

@@ -18,7 +18,9 @@ fun UserData.toDomain(): UserDataDomain = UserDataDomain(
     dob = dob,
     id = id,
     gender = gender,
-    profile = profile
+    profile = profile,
+    height = height,
+    weight = weight
 )
 
 fun MonitoringData.toDomain(): MonitoringDataDomain = MonitoringDataDomain(

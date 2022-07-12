@@ -1,5 +1,6 @@
 package com.example.core.data.source.remote
 
+import android.util.Log
 import com.example.core.data.source.remote.network.ApiResponse
 import com.example.core.data.source.remote.network.ApiService
 import com.example.core.data.source.remote.response.*
@@ -162,7 +163,83 @@ class RemoteDataSource(private val apiService: ApiService, ) {
                     emit(ApiResponse.Error("${e.code()}: ${responseBody?.getMessage()}"))
                 } else -> {
                 emit(ApiResponse.Error(e.message.toString()))
+                }
             }
+        }.flowOn(Dispatchers.IO)
+
+    suspend fun getLimitByDate(bearer: String, start: String, end: String): Flow<ApiResponse<LimitResponse>> =
+        flow {
+            val response = apiService.getLimitByDate(bearer, start, end)
+            if (response.success == true) {
+                emit(ApiResponse.Success(response))
+            } else {
+                emit(ApiResponse.Error(response.message.toString()))
+            }
+        }.catch { e ->
+            when (e) {
+                is HttpException -> {
+                    val responseBody = e.response()?.errorBody()
+                    emit(ApiResponse.Error("${e.code()}: ${responseBody?.getMessage()}"))
+                } else -> {
+                emit(ApiResponse.Error(e.message.toString()))
+                }
+            }
+        }.flowOn(Dispatchers.IO)
+
+    suspend fun getContacts(bearer: String): Flow<ApiResponse<ListUserResponse>> =
+        flow {
+            val response = apiService.getContacts(bearer)
+            if (response.success == true) {
+                emit(ApiResponse.Success(response))
+            } else {
+                emit(ApiResponse.Error(response.message.toString()))
+            }
+        }.catch { e ->
+            when (e) {
+                is HttpException -> {
+                    val responseBody = e.response()?.errorBody()
+                    emit(ApiResponse.Error("${e.code()}: ${responseBody?.getMessage()}"))
+                } else -> {
+                emit(ApiResponse.Error(e.message.toString()))
+                }
+            }
+        }.flowOn(Dispatchers.IO)
+
+    suspend fun search(bearer: String, param: String): Flow<ApiResponse<ListUserResponse>> =
+        flow {
+            val response = apiService.search(bearer, param)
+            if (response.success == true) {
+                emit(ApiResponse.Success(response))
+            } else {
+                emit(ApiResponse.Error(response.message.toString()))
+            }
+        }.catch { e ->
+            when (e) {
+                is HttpException -> {
+                    val responseBody = e.response()?.errorBody()
+                    emit(ApiResponse.Error("${e.code()}: ${responseBody?.getMessage()}"))
+                } else -> {
+                emit(ApiResponse.Error(e.message.toString()))
+                }
+            }
+        }.flowOn(Dispatchers.IO)
+
+    suspend fun deleteContact(bearer: String, contact: Int): Flow<ApiResponse<BasicResponse>> =
+        flow {
+            val response = apiService.deleteContact(bearer, contact)
+            if (response.success == true) {
+                emit(ApiResponse.Success(response))
+            } else {
+                emit(ApiResponse.Error(response.message.toString()))
+            }
+        }.catch { e ->
+            when (e) {
+                is HttpException -> {
+                    val responseBody = e.response()?.errorBody()
+                    emit(ApiResponse.Error("${e.code()}: ${responseBody?.getMessage()}"))
+                } else -> {
+                emit(ApiResponse.Error(e.message.toString()))
+                }
             }
         }.flowOn(Dispatchers.IO)
 
@@ -223,9 +300,9 @@ class RemoteDataSource(private val apiService: ApiService, ) {
             }
         }.flowOn(Dispatchers.IO)
 
-    suspend fun updateUser(bearer: String, name: String, email: String, dob: String, gender: Int): Flow<ApiResponse<UserDataUpdateResponse>> =
+    suspend fun updateUser(bearer: String, name: String, email: String, dob: String, gender: Int, height: Int, weight: Int): Flow<ApiResponse<UserDataUpdateResponse>> =
         flow {
-            val response = apiService.updateUser(bearer, name, email, dob, gender)
+            val response = apiService.updateUser(bearer, name, email, dob, gender, height, weight)
             if (response.success == true) {
                 emit(ApiResponse.Success(response))
             } else {

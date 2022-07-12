@@ -12,10 +12,10 @@ import com.bumptech.glide.Glide
 import com.example.core.data.Resource
 import com.example.heartratemonitoringapp.R
 import com.example.heartratemonitoringapp.auth.login.LoginActivity
+import com.example.heartratemonitoringapp.dashboard.profile.contact.ContactActivity
 import com.example.heartratemonitoringapp.dashboard.profile.editpassword.EditPasswordActivity
 import com.example.heartratemonitoringapp.dashboard.profile.editprofile.EditProfileActivity
 import com.example.heartratemonitoringapp.databinding.FragmentProfileBinding
-import com.example.heartratemonitoringapp.form.FormActivity
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -52,8 +52,8 @@ class ProfileFragment : Fragment() {
             startActivity(Intent(context, EditPasswordActivity::class.java))
         }
 
-        binding.layoutProfile.btnChange.setOnClickListener {
-            startActivity(Intent(context, FormActivity::class.java))
+        binding.layoutProfile.btnContacts.setOnClickListener {
+            startActivity(Intent(context, ContactActivity::class.java))
         }
 
         binding.layoutProfile.btnLogout.setOnClickListener {

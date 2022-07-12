@@ -3,6 +3,7 @@ package com.example.heartratemonitoringapp.monitoring.background
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.PendingIntent
+import android.app.PendingIntent.FLAG_UPDATE_CURRENT
 import android.app.Service
 import android.bluetooth.BluetoothManager
 import android.bluetooth.BluetoothProfile
@@ -109,31 +110,32 @@ class BackgroundMonitoringService : Service() {
             }
         }
 
-        val notificationIntent = Intent(this, FormActivity::class.java)
-        val pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, flags)
-
         val notification = NotificationCompat.Builder(this, channelId)
             .setContentTitle(resources.getString(R.string.background_monitoring))
             .setSmallIcon(R.drawable.ic_watch)
-            .setContentIntent(pendingIntent)
             .setOnlyAlertOnce(true)
             .setContentText(getString(R.string.anomaly_detected))
 
         countDownTimer = object : CountDownTimer(60000, 1000) {
             override fun onTick(p0: Long) {
+                val notificationIntent = Intent(this@BackgroundMonitoringService, FormActivity::class.java)
+                isAnomalyDetected = false
                 if (isAnomalyDetected) {
-                    notificationManager.notify(1, notification.build())
-                    cancel()
-                    onFinish()
                     if (stepList.isNotEmpty() && heartList.isNotEmpty()) {
                         val avgHeart = heartList.average().toInt()
                         val stepChanges = stepList.last() - stepList.first()
                         val step = stepList.maxOrNull()
-                        notificationIntent.putExtra("avgHeart", avgHeart)
+                        Log.d("tick", "HR: $avgHeart, SC: $stepChanges, S: $step")
+                        notificationIntent.putExtra("avgHeartRate", avgHeart)
                         notificationIntent.putExtra("stepChanges", stepChanges)
                         notificationIntent.putExtra("step", step)
+                        val pendingIntent = PendingIntent.getActivity(this@BackgroundMonitoringService, 0, notificationIntent, FLAG_UPDATE_CURRENT)
+                        notification.setContentIntent(pendingIntent)
                     }
                     useCase.setBackgroundMonitoringState(false)
+                    notificationManager.notify(1, notification.build())
+                    cancel()
+                    onFinish()
                 }
                 getStep()
             }

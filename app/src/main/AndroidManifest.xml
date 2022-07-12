@@ -21,6 +21,12 @@
         android:theme="@style/Theme.HeartRateMonitoringApp"
         android:usesCleartextTraffic="true">
         <activity
+            android:name=".dashboard.profile.contact.add.AddContactActivity"
+            android:exported="false" />
+        <activity
+            android:name=".dashboard.profile.contact.ContactActivity"
+            android:exported="false" />
+        <activity
             android:name=".form.FormActivity"
             android:exported="false" />
         <activity
@@ -30,12 +36,16 @@
             android:name=".dashboard.profile.editprofile.EditProfileActivity"
             android:exported="false" />
         <activity
+            android:name=".dashboard.profile.newprofile.NewProfileActivity"
+            android:exported="false" />
+        <activity
             android:name=".splashscreen.SplashActivity"
             android:exported="true"
             android:noHistory="true"
             android:theme="@style/Theme.HeartRateMonitoringApp.Splash">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -44,18 +54,19 @@
             android:exported="false" />
         <activity
             android:name=".auth.login.LoginActivity"
-            android:noHistory="true"
-            android:exported="false" />
+            android:exported="false"
+            android:noHistory="true" />
         <activity
             android:name=".dashboard.MainActivity"
             android:exported="false" />
         <activity
             android:name=".auth.register.RegisterActivity"
-            android:noHistory="true"
-            android:exported="false" />
+            android:exported="false"
+            android:noHistory="true" />
         <activity
             android:name=".scanner.ScannerActivity"
             android:exported="false" />
+
         <service
             android:name=".monitoring.background.BackgroundMonitoringService"
             android:stopWithTask="false"

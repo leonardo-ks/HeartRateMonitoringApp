@@ -16,6 +16,9 @@ class LoginViewModel(private val useCase: IUseCase) : ViewModel() {
     private val _loginState = MutableStateFlow<AuthState>(AuthState.First)
     val loginState: StateFlow<AuthState> get() = _loginState
 
+    fun getProfile(bearer: String) = useCase.getProfile(bearer)
+    fun getBearer() = useCase.getBearer()
+
     fun signIn(email: String, password: String) {
         viewModelScope.launch {
             useCase.login(email, password).collect {

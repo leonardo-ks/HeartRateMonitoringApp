@@ -68,6 +68,7 @@
                     android:id="@+id/tv_today_steps_value"
                     style="@style/TextRegular"
                     android:layout_width="wrap_content"
+                    android:minWidth="70dp"
                     android:layout_height="70dp"
                     android:layout_marginTop="8dp"
                     android:layout_marginBottom="8dp"

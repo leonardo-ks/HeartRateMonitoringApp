@@ -8,8 +8,11 @@ import com.example.heartratemonitoringapp.dashboard.MainViewModel
 import com.example.heartratemonitoringapp.dashboard.band.BandViewModel
 import com.example.heartratemonitoringapp.dashboard.home.HomeViewModel
 import com.example.heartratemonitoringapp.dashboard.profile.ProfileViewModel
+import com.example.heartratemonitoringapp.dashboard.profile.contact.ContactViewModel
+import com.example.heartratemonitoringapp.dashboard.profile.contact.add.AddContactViewModel
 import com.example.heartratemonitoringapp.dashboard.profile.editpassword.EditPasswordViewModel
 import com.example.heartratemonitoringapp.dashboard.profile.editprofile.EditProfileViewModel
+import com.example.heartratemonitoringapp.dashboard.profile.newprofile.NewProfileViewModel
 import com.example.heartratemonitoringapp.form.FormViewModel
 import com.example.heartratemonitoringapp.monitoring.live.LiveMonitoringViewModel
 import com.example.heartratemonitoringapp.splashscreen.SplashViewModel
@@ -32,4 +35,7 @@ val viewModelModule = module {
     viewModel { EditProfileViewModel(get()) }
     viewModel { EditPasswordViewModel(get()) }
     viewModel { FormViewModel(get()) }
+    viewModel { ContactViewModel(get()) }
+    viewModel { AddContactViewModel(get()) }
+    viewModel { NewProfileViewModel(get()) }
 }

@@ -1,14 +1,12 @@
 package com.example.core.data
 
 import android.annotation.SuppressLint
+import android.util.Log
 import com.example.core.data.source.local.LocalDataSource
 import com.example.core.data.source.remote.RemoteDataSource
 import com.example.core.data.source.remote.network.ApiResponse
 import com.example.core.domain.repository.IRepository
-import com.example.core.domain.usecase.model.AverageDomain
-import com.example.core.domain.usecase.model.LoginDomain
-import com.example.core.domain.usecase.model.MonitoringDataDomain
-import com.example.core.domain.usecase.model.UserDataDomain
+import com.example.core.domain.usecase.model.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -127,6 +125,18 @@ class Repository(
             }
         }
 
+    override fun getLimitByDate(bearer: String, start: String, end: String): Flow<Resource<LimitDomain>> =
+        flow {
+            emit(Resource.Loading())
+            when (val apiResponse = remoteDataSource.getLimitByDate(bearer, start, end).first()) {
+                is ApiResponse.Success -> {
+                    emit(Resource.Success(LimitDomain(apiResponse.data.lower, apiResponse.data.upper)))
+                }
+                is ApiResponse.Empty -> emit(Resource.Success(LimitDomain()))
+                is ApiResponse.Error -> emit(Resource.Error(apiResponse.errorMessage))
+            }
+        }
+
     override fun getUserMonitoringData(bearer: String): Flow<Resource<List<MonitoringDataDomain>>> =
         flow {
             emit(Resource.Loading())
@@ -162,6 +172,53 @@ class Repository(
                 is ApiResponse.Error -> emit(Resource.Error(apiResponse.errorMessage))
             }
         }
+
+    override fun getContacts(bearer: String): Flow<Resource<List<UserDataDomain>>> =
+        flow {
+            emit(Resource.Loading())
+            when (val apiResponse = remoteDataSource.getContacts(bearer).first()) {
+                is ApiResponse.Success -> {
+                    if (apiResponse.data.data != null) {
+                        emit(Resource.Success(apiResponse.data.data.map { data ->
+                            data?.toDomain() ?: UserDataDomain()
+                        }))
+                    } else {
+                        emit(Resource.Success(listOf(UserDataDomain())))
+                    }
+                }
+                is ApiResponse.Empty -> emit(Resource.Success(listOf(UserDataDomain())))
+                is ApiResponse.Error -> emit(Resource.Error(apiResponse.errorMessage))
+            }
+        }
+
+    override fun search(bearer: String, param: String): Flow<Resource<List<UserDataDomain>>> =
+        flow {
+            emit(Resource.Loading())
+            when (val apiResponse = remoteDataSource.search(bearer, param).first()) {
+                is ApiResponse.Success -> {
+                    if (apiResponse.data.data != null) {
+                        emit(Resource.Success(apiResponse.data.data.map { data ->
+                            data?.toDomain() ?: UserDataDomain()
+                        }))
+                    } else {
+                        emit(Resource.Success(listOf(UserDataDomain())))
+                    }
+                }
+                is ApiResponse.Empty -> emit(Resource.Success(listOf(UserDataDomain())))
+                is ApiResponse.Error -> emit(Resource.Error(apiResponse.errorMessage))
+            }
+        }
+
+    override fun deleteContact(bearer: String, contact: Int): Flow<Resource<String>> = flow {
+        emit(Resource.Loading())
+        when (val apiResponse = remoteDataSource.deleteContact(bearer, contact).first()) {
+            is ApiResponse.Success -> {
+                emit(Resource.Success(apiResponse.data.message.toString()))
+            }
+            is ApiResponse.Empty -> emit(Resource.Success(""))
+            is ApiResponse.Error -> emit(Resource.Error(apiResponse.errorMessage))
+        }
+    }
 
     override fun getAverageData(bearer: String): Flow<Resource<AverageDomain>> =
         flow {
@@ -208,10 +265,10 @@ class Repository(
             }
         }
 
-    override fun updateUser(bearer: String, name: String, email: String, dob: String, gender: Int): Flow<Resource<UserDataDomain>> =
+    override fun updateUser(bearer: String, name: String, email: String, dob: String, gender: Int, height: Int, weight: Int): Flow<Resource<UserDataDomain>> =
         flow {
             emit(Resource.Loading())
-            when (val apiResponse = remoteDataSource.updateUser(bearer, name, email, dob, gender).first()) {
+            when (val apiResponse = remoteDataSource.updateUser(bearer, name, email, dob, gender, height, weight).first()) {
                 is ApiResponse.Success -> {
                     if (apiResponse.data.data != null) {
                         emit(Resource.Success(apiResponse.data.data.toDomain()))
@@ -310,6 +367,18 @@ class Repository(
 
     override fun getMaxHRLimit(): Flow<Int> = flow {
         emit(localDataSource.getMaxHRLimit())
+    }
+
+    override fun setAnomalyDetectedTimes(times: Int) = localDataSource.setAnomalyDetectedTimes(times)
+
+    override fun getAnomalyDetectedTimes(): Flow<Int> = flow {
+        emit(localDataSource.getAnomalyDetectedTimes())
+    }
+
+    override fun setLatestAnomalyDate(date: String) = localDataSource.setLatestLoginDate(date)
+
+    override fun getLatestAnomalyDate(): Flow<String?> = flow {
+        emit(localDataSource.getLatestLoginDate())
     }
 
     override fun getMonitoringDataList(): List<MonitoringDataDomain> {

@@ -39,6 +39,7 @@ class RegisterActivity : AppCompatActivity() {
                     is AuthState.Success -> {
                         val intent = Intent(baseContext, LoginActivity::class.java)
                         intent.putExtra("email", binding.registerForm.registerTidtEmail.text.toString())
+                        intent.putExtra("name", binding.registerForm.registerTidtName.text.toString())
                         startActivity(intent)
                     }
                     is AuthState.Fail -> {

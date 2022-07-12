@@ -2,10 +2,7 @@ package com.example.core.domain.usecase
 
 import com.example.core.data.Resource
 import com.example.core.domain.repository.IRepository
-import com.example.core.domain.usecase.model.AverageDomain
-import com.example.core.domain.usecase.model.LoginDomain
-import com.example.core.domain.usecase.model.MonitoringDataDomain
-import com.example.core.domain.usecase.model.UserDataDomain
+import com.example.core.domain.usecase.model.*
 import kotlinx.coroutines.flow.Flow
 
 class Interactor(private val repository: IRepository): IUseCase {
@@ -20,10 +17,14 @@ class Interactor(private val repository: IRepository): IUseCase {
     override fun getAverageData(bearer: String): Flow<Resource<AverageDomain>> = repository.getAverageData(bearer)
     override fun deleteData(bearer: String, id: Int): Flow<Resource<String>> = repository.deleteData(bearer, id)
     override fun updateMonitoringData(bearer: String, avgHeartRate: Int, avgStep: Int, label: String): Flow<Resource<MonitoringDataDomain>> = repository.updateMonitoringData(bearer, avgHeartRate, avgStep, label)
-    override fun updateUser(bearer: String, name: String, email: String, dob: String, gender: Int): Flow<Resource<UserDataDomain>> = repository.updateUser(bearer, name, email, dob, gender)
+    override fun updateUser(bearer: String, name: String, email: String, dob: String, gender: Int, height: Int, weight: Int): Flow<Resource<UserDataDomain>> = repository.updateUser(bearer, name, email, dob, gender, height, weight)
     override fun changePassword(bearer: String, old: String, new: String, confirmation: String): Flow<Resource<String>> = repository.changePassword(bearer, old, new, confirmation)
     override fun sendNotification(bearer: String): Flow<Resource<String>> = repository.sendNotification(bearer)
     override fun addContact(bearer: String, contact: Int): Flow<Resource<String>> = repository.addContact(bearer, contact)
+    override fun getContacts(bearer: String): Flow<Resource<List<UserDataDomain>>> = repository.getContacts(bearer)
+    override fun getLimitByDate(bearer: String, start: String, end: String): Flow<Resource<LimitDomain>> = repository.getLimitByDate(bearer, start, end)
+    override fun search(bearer: String, param: String): Flow<Resource<List<UserDataDomain>>> = repository.search(bearer, param)
+    override fun deleteContact(bearer: String, contact: Int): Flow<Resource<String>> = repository.deleteContact(bearer, contact)
     override fun setBearer(bearer: String) = repository.setBearer(bearer)
     override fun getBearer(): Flow<String?> = repository.getBearer()
     override fun setLoginState(state: Boolean) = repository.setLoginState(state)
@@ -38,6 +39,10 @@ class Interactor(private val repository: IRepository): IUseCase {
     override fun getMinHRLimit(): Flow<Int> = repository.getMinHRLimit()
     override fun setMaxHRLimit(max: Int) = repository.setMaxHRLimit(max)
     override fun getMaxHRLimit(): Flow<Int> = repository.getMaxHRLimit()
+    override fun setAnomalyDetectedTimes(times: Int) = repository.setAnomalyDetectedTimes(times)
+    override fun getAnomalyDetectedTimes(): Flow<Int> = repository.getAnomalyDetectedTimes()
+    override fun setLatestAnomalyDate(date: String) = repository.setLatestAnomalyDate(date)
+    override fun getLatestAnomalyDate(): Flow<String?> = repository.getLatestAnomalyDate()
     override fun setBackgroundMonitoringState(state: Boolean) = repository.setBackgroundMonitoringState(state)
     override fun getBackgroundMonitoringState(): Flow<Boolean> = repository.getBackgroundMonitoringState()
     override fun getMonitoringDataList(): List<MonitoringDataDomain> = repository.getMonitoringDataList()

@@ -18,7 +18,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.heartratemonitoringapp.R
 import com.example.heartratemonitoringapp.monitoring.ble.BLE
 import com.example.heartratemonitoringapp.monitoring.ble.UUIDs
-import com.example.heartratemonitoringapp.form.adapter.FormAdapter
 import com.example.heartratemonitoringapp.databinding.ActivityScannerBinding
 import com.example.heartratemonitoringapp.scanner.adapter.ScannerAdapter
 import kotlinx.coroutines.launch

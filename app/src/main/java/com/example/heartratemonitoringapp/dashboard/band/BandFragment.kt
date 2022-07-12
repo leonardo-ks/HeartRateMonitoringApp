@@ -5,6 +5,7 @@ import android.bluetooth.BluetoothProfile
 import android.content.Context
 import android.content.Context.POWER_SERVICE
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.os.PowerManager
 import android.provider.Settings
@@ -12,20 +13,34 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
+import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import com.example.core.data.Resource
 import com.example.heartratemonitoringapp.R
 import com.example.heartratemonitoringapp.databinding.FragmentBandBinding
 import com.example.heartratemonitoringapp.monitoring.background.BackgroundMonitoringService
 import com.example.heartratemonitoringapp.monitoring.ble.BLE
 import com.example.heartratemonitoringapp.monitoring.live.LiveMonitoringActivity
 import com.example.heartratemonitoringapp.scanner.ScannerActivity
+import com.example.heartratemonitoringapp.util.HourValueFormatter
 import com.example.heartratemonitoringapp.util.selected
+import com.github.mikephil.charting.components.XAxis
+import com.github.mikephil.charting.data.Entry
+import com.github.mikephil.charting.data.LineData
+import com.github.mikephil.charting.data.LineDataSet
+import com.github.mikephil.charting.utils.EntryXComparator
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.util.*
+import kotlin.collections.ArrayList
 
 
 class BandFragment : Fragment() {
@@ -85,49 +100,14 @@ class BandFragment : Fragment() {
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
-            val minHRLimit = viewModel.minHRLimit.first()
-            val maxHRLimit = viewModel.maxHRLimit.first()
-
-            if (minHRLimit != 0) {
-                binding.layoutBand.layoutBandMenu.tidtLowerLimit.setText(minHRLimit.toString())
-            } else {
-                binding.layoutBand.layoutBandMenu.tidtLowerLimit.setText("60")
-            }
-
-            if (maxHRLimit != 0) {
-                binding.layoutBand.layoutBandMenu.tidtUpperLimit.setText(maxHRLimit.toString())
-            } else {
-                binding.layoutBand.layoutBandMenu.tidtUpperLimit.setText("100")
-            }
-        }
-
-        viewLifecycleOwner.lifecycleScope.launch {
             binding.layoutBand.layoutBandMenu.switchToogleMonitoring.isChecked = viewModel.backgroundMonitoringState.first()
+            binding.layoutBand.layoutBandMenu.tidtUpperLimit.setText(viewModel.getUpper().first().toString())
+            binding.layoutBand.layoutBandMenu.tidtLowerLimit.setText(viewModel.getLower().first().toString())
         }
 
-        binding.layoutBand.layoutBandMenu.tidtUpperLimit.addTextChangedListener {
-            viewLifecycleOwner.lifecycleScope.launch {
-                if (binding.layoutBand.layoutBandMenu.tidtUpperLimit.text.toString().isNotEmpty()) {
-                    viewModel.setMaxHRLimit(
-                        binding.layoutBand.layoutBandMenu.tidtUpperLimit.text.toString().toInt()
-                    )
-                }
-            }
-        }
-
-        binding.layoutBand.layoutBandMenu.tidtLowerLimit.addTextChangedListener {
-            viewLifecycleOwner.lifecycleScope.launch {
-                if (binding.layoutBand.layoutBandMenu.tidtLowerLimit.text.toString().isNotEmpty()) {
-                    viewModel.setMinHRLimit(
-                        binding.layoutBand.layoutBandMenu.tidtLowerLimit.text.toString().toInt()
-                    )
-                }
-            }
-        }
-
-        binding.layoutNotConnected.btnConnect.setOnClickListener {
-            startActivity(Intent(activity, ScannerActivity::class.java))
-        }
+//        binding.layoutNotConnected.btnConnect.setOnClickListener {
+//            startActivity(Intent(activity, ScannerActivity::class.java))
+//        }
 
         binding.layoutBand.layoutBandMenu.cardLiveMonitoring.setOnClickListener {
             startActivity(Intent(activity, LiveMonitoringActivity::class.java))

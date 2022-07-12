@@ -39,3 +39,7 @@ fun toLittleEndian(hex: String): Int {
     ret = hexLittleEndian.toInt(16)
     return ret
 }
+
+fun getHourMinute() {
+
+}

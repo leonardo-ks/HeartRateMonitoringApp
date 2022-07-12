@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.example.heartratemonitoringapp.dashboard.profile.contact.adapter.ContactAdapter
 import com.example.heartratemonitoringapp.databinding.ItemLabelsBinding
 
 class FormAdapter : RecyclerView.Adapter<FormAdapter.ViewHolder>() {
