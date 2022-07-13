@@ -8,7 +8,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import com.example.core.data.Resource
 import com.example.heartratemonitoringapp.R
-import com.example.heartratemonitoringapp.dashboard.profile.editprofile.EditProfileViewModel
 import com.example.heartratemonitoringapp.databinding.ActivityEditProfileBinding
 import com.example.heartratemonitoringapp.util.findIndex
 import com.google.android.material.datepicker.MaterialDatePicker
@@ -76,7 +75,7 @@ class EditProfileActivity : AppCompatActivity() {
 
             datePicker.addOnPositiveButtonClickListener {
                 val unformattedDate = Instant.ofEpochMilli(it).atZone(ZoneId.of("Asia/Jakarta")).toLocalDate()
-                val date = unformattedDate.format(DateTimeFormatter.ofPattern("d-MM-yyyy"))
+                val date = unformattedDate.format(DateTimeFormatter.ofPattern("dd-MM-yyyy"))
                 binding.layoutEditProfile.tidtDob.setText(date)
             }
         }
@@ -95,7 +94,7 @@ class EditProfileActivity : AppCompatActivity() {
                     0,
                     0
                 )
-                val dob = localDate.format(DateTimeFormatter.ofPattern("yyyy-MM-d"))
+                val dob = localDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))
                 val gender = findIndex(gender, binding.layoutEditProfile.tidtGender.text.toString())
                 val height = binding.layoutEditProfile.tidtHeight.text.toString().toInt()
                 val weight = binding.layoutEditProfile.tidtWeight.text.toString().toInt()
@@ -107,12 +106,12 @@ class EditProfileActivity : AppCompatActivity() {
         lifecycleScope.launch {
             val bearer = viewModel.getBearer().first().toString()
             viewModel.getProfile(bearer)
+            getProfileObserver()
         }
 
-        userProfileObserver()
     }
 
-    private fun userProfileObserver() {
+    private fun getProfileObserver() {
         lifecycleScope.launch {
             viewModel.profile.collect { res ->
                 when (res) {
@@ -127,22 +126,15 @@ class EditProfileActivity : AppCompatActivity() {
                         binding.layoutEditProfile.tidtEmail.setText(res.data?.email.toString())
                         binding.layoutEditProfile.tidtName.setText(res.data?.name.toString())
                         binding.layoutEditProfile.tidtGender.setText(gender[res.data?.gender ?: 0])
-                        val format = DateTimeFormatter.ofPattern("d-MM-yyyy")
-                        binding.layoutEditProfile.tidtDob.setText(
-                            LocalDate.parse(
-                                res.data?.dob ?: LocalDateTime.now().format(format).toString()
-                            ).format(format))
+                        val format = DateTimeFormatter.ofPattern("dd-MM-yyyy")
+                        binding.layoutEditProfile.tidtDob.setText(LocalDate.parse(res.data?.dob ?: LocalDateTime.now().format(format).toString()).format(format))
                         binding.layoutEditProfile.tidtHeight.setText(res.data?.height.toString())
                         binding.layoutEditProfile.tidtWeight.setText(res.data?.weight.toString())
                     }
                     is Resource.Error -> {
                         binding.layoutEditProfile.root.visibility = View.VISIBLE
                         binding.layoutLoading.root.visibility = View.GONE
-                        Toast.makeText(
-                            this@EditProfileActivity,
-                            res.message.toString(),
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        Toast.makeText(this@EditProfileActivity, res.message.toString(), Toast.LENGTH_SHORT).show()
                     }
                 }
             }
@@ -164,11 +156,7 @@ class EditProfileActivity : AppCompatActivity() {
                     is Resource.Success -> {
                         binding.layoutEditProfile.root.visibility = View.VISIBLE
                         binding.layoutLoading.root.visibility = View.GONE
-                        Toast.makeText(
-                            baseContext,
-                            getString(R.string.success_change_profile),
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        Toast.makeText(baseContext, getString(R.string.success_change_profile), Toast.LENGTH_SHORT).show()
                         window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
                     }
                     is Resource.Error -> {

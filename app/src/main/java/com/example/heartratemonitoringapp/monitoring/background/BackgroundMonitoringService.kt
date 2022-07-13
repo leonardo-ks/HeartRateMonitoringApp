@@ -119,7 +119,6 @@ class BackgroundMonitoringService : Service() {
         countDownTimer = object : CountDownTimer(60000, 1000) {
             override fun onTick(p0: Long) {
                 val notificationIntent = Intent(this@BackgroundMonitoringService, FormActivity::class.java)
-                isAnomalyDetected = false
                 if (isAnomalyDetected) {
                     if (stepList.isNotEmpty() && heartList.isNotEmpty()) {
                         val avgHeart = heartList.average().toInt()

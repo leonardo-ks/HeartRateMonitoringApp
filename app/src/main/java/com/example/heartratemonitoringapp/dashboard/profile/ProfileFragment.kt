@@ -38,10 +38,10 @@ class ProfileFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        userProfileObserver()
         viewLifecycleOwner.lifecycleScope.launch {
             val bearer = viewModel.getBearer().first()
             viewModel.getProfile(bearer.toString())
+            getProfileObserver()
         }
 
         binding.layoutProfile.btnChangeProfile.setOnClickListener {
@@ -66,7 +66,7 @@ class ProfileFragment : Fragment() {
         }
     }
 
-    private fun userProfileObserver() {
+    private fun getProfileObserver() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.profile.collect { res ->
                 when (res) {

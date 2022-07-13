@@ -64,6 +64,7 @@
     <string name="contact_empty">Anda belum menambahkan kontak</string>
     <string name="height">Tinggi badan</string>
     <string name="weight">Berat badan</string>
+    <string name="delete_contact_promp">Apakah anda yakin ingin menghapus kontak?</string>
 
     <string-array name="periods">
         <item>1 menit</item>

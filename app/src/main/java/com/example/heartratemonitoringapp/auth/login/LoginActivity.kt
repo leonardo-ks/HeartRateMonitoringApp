@@ -8,6 +8,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.lifecycleScope
+import com.example.core.data.Resource
 import com.example.heartratemonitoringapp.R
 import com.example.heartratemonitoringapp.auth.AuthState
 import com.example.heartratemonitoringapp.auth.register.RegisterActivity
@@ -50,22 +51,15 @@ class LoginActivity : AppCompatActivity() {
                     }
                     is AuthState.Success -> {
                         viewModel.setLatestLoginDate(LocalDateTime.now().toString())
-                        if (viewModel.getProfile(viewModel.getBearer().first().toString()).first().data?.dob != null) {
-                            val intent = Intent(baseContext, MainActivity::class.java)
-                            intent.putExtra("email", binding.loginForm.loginTidtEmail.text.toString())
-                            intent.putExtra("name", name)
-                            startActivity(intent)
-                        } else {
-                            startActivity(Intent(baseContext, NewProfileActivity::class.java))
-                        }
+                        viewModel.getProfile(viewModel.getBearer().first().toString())
+                        getProfileObserver()
                     }
                     is AuthState.Fail -> {
                         binding.layoutLoading.root.visibility = View.GONE
                         window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
                         Toast.makeText(this@LoginActivity, it.message, Toast.LENGTH_SHORT).show()
                     }
-                    else -> {
-                    }
+                    else -> {}
                 }
             }
         }
@@ -76,7 +70,7 @@ class LoginActivity : AppCompatActivity() {
             this.hideSoftKeyboard()
             val email = binding.loginForm.loginTidtEmail.text.toString()
             val password = binding.loginForm.loginTidtPassword.text.toString()
-            viewModel.signIn(email, password)
+            viewModel.login(email, password)
         }
 
         binding.tvRegister.setOnClickListener {
@@ -84,7 +78,29 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
-
+    private fun getProfileObserver() {
+        lifecycleScope.launch {
+            viewModel.profile.collect { res ->
+                when (res) {
+                    is Resource.Success -> {
+                        val dob = res.data?.dob
+                        val gender = res.data?.gender
+                        val height = res.data?.height
+                        val weight = res.data?.weight
+                        if (dob != null || gender != null || height != null || weight != null) {
+                            startActivity(Intent(baseContext, MainActivity::class.java))
+                        } else {
+                            val intent = Intent(baseContext, NewProfileActivity::class.java)
+                            intent.putExtra("email", res.data?.email)
+                            intent.putExtra("name", res.data?.name)
+                            startActivity(intent)
+                        }
+                    }
+                    else -> {}
+                }
+            }
+        }
+    }
 
     private fun validateForm() {
         binding.loginForm.loginTidtEmail.addTextChangedListener {

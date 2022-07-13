@@ -10,7 +10,6 @@ import androidx.lifecycle.lifecycleScope
 import com.example.core.data.Resource
 import com.example.heartratemonitoringapp.R
 import com.example.heartratemonitoringapp.dashboard.MainActivity
-import com.example.heartratemonitoringapp.dashboard.profile.editprofile.EditProfileViewModel
 import com.example.heartratemonitoringapp.databinding.ActivityEditProfileBinding
 import com.example.heartratemonitoringapp.util.findIndex
 import com.google.android.material.datepicker.MaterialDatePicker
@@ -18,7 +17,10 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import java.time.*
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 
 class NewProfileActivity : AppCompatActivity() {
@@ -31,19 +33,8 @@ class NewProfileActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityEditProfileBinding.inflate(layoutInflater)
         setContentView(binding.root)
-
         setSupportActionBar(binding.toolbar)
-
         gender = resources.getStringArray(R.array.genders)
-
-        if (supportActionBar != null) {
-            this.supportActionBar?.setDisplayHomeAsUpEnabled(true)
-            this.supportActionBar?.setDisplayShowHomeEnabled(true)
-        }
-
-        binding.toolbar.setNavigationOnClickListener {
-            finish()
-        }
 
         if (intent.extras != null) {
             val email = intent.extras?.getString("email") ?: ""

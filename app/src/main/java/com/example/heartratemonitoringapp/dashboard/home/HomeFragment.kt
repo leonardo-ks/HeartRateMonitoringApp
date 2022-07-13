@@ -14,13 +14,12 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import com.bumptech.glide.Glide
 import com.example.core.data.Resource
+import com.example.core.domain.usecase.model.MonitoringDataDomain
 import com.example.heartratemonitoringapp.R
 import com.example.heartratemonitoringapp.databinding.FragmentHomeBinding
 import com.example.heartratemonitoringapp.monitoring.background.BackgroundMonitoringService
 import com.example.heartratemonitoringapp.monitoring.ble.BLE
-import com.example.heartratemonitoringapp.scanner.ScannerActivity
 import com.example.heartratemonitoringapp.util.HourValueFormatter
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.Entry
@@ -30,15 +29,11 @@ import com.github.mikephil.charting.utils.EntryXComparator
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import java.text.DateFormat
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.Period
 import java.time.format.DateTimeFormatter
-import java.time.format.DateTimeFormatterBuilder
 import java.util.*
-import kotlin.collections.ArrayList
-import kotlin.random.Random
 
 
 class HomeFragment : Fragment() {
@@ -80,7 +75,6 @@ class HomeFragment : Fragment() {
                     data.id?.let  { viewModel.deleteData(it) }
                 }
             }
-            sendDataObserver()
         }
 
         val bluetoothManager = requireContext().getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
@@ -157,29 +151,6 @@ class HomeFragment : Fragment() {
         }
     }
 
-    private fun sendDataObserver() {
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.sendData.collect { res ->
-                when (res) {
-                    is Resource.Loading -> {
-                        binding.layoutLoading.root.z = 10F
-                        binding.layoutLoading.root.visibility = View.VISIBLE
-                        binding.layoutAverage.root.visibility = View.INVISIBLE
-                    }
-                    is Resource.Success -> {
-                        binding.layoutLoading.root.visibility = View.GONE
-                        binding.layoutAverage.root.visibility = View.VISIBLE
-                    }
-                    is Resource.Error -> {
-                        binding.layoutAverage.root.visibility = View.VISIBLE
-                        binding.layoutLoading.root.visibility = View.GONE
-                        Toast.makeText(activity, res.message.toString(), Toast.LENGTH_SHORT).show()
-                    }
-                }
-            }
-        }
-    }
-
     private fun getProfileObserver() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.profile.collect { res ->
@@ -191,10 +162,12 @@ class HomeFragment : Fragment() {
                         val now = LocalDate.now()
                         val upper = ((220 - Period.between(LocalDate.parse(formatted, format), now).years) * 0.85).toInt()
                         upper.let { viewModel.setMaxHRLimit(maxOf(it, upper)) }
-                        if (lower != 0) {
+                        if (lower in 0..59) {
                             lower.let { viewModel.setMinHRLimit(minOf(it, 60)) }
+                        } else if (lower > 60){
+                            lower.let { viewModel.setMinHRLimit(it) }
                         } else {
-                            lower.let { viewModel.setMinHRLimit(60) }
+                            lower.let { viewModel.setMinHRLimit(it) }
                         }
                     }
                     else -> {}
@@ -207,20 +180,12 @@ class HomeFragment : Fragment() {
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.getLimit.collect { res ->
                 when (res) {
-                    is Resource.Loading -> {
-                        binding.layoutLoading.root.z = 10F
-                        binding.layoutLoading.root.visibility = View.VISIBLE
-                        binding.layoutAverage.root.visibility = View.INVISIBLE
-                    }
+                    is Resource.Loading -> {}
                     is Resource.Success -> {
-                        binding.layoutLoading.root.visibility = View.GONE
-                        binding.layoutAverage.root.visibility = View.VISIBLE
                         upper = res.data?.upper!!
                         lower = res.data?.lower!!
                     }
                     is Resource.Error -> {
-                        binding.layoutAverage.root.visibility = View.VISIBLE
-                        binding.layoutLoading.root.visibility = View.GONE
                         Toast.makeText(activity, res.message.toString(), Toast.LENGTH_SHORT).show()
                     }
                 }
@@ -240,37 +205,7 @@ class HomeFragment : Fragment() {
                     is Resource.Success -> {
                         binding.layoutLoading.root.visibility = View.GONE
                         binding.layoutAverage.root.visibility = View.VISIBLE
-                        val lineChart = binding.layoutAverage.lineChartHeartRate
-                        lineList = ArrayList()
-                        if (!res.data.isNullOrEmpty()) {
-                            for (data in res.data!!) {
-                                val format = DateTimeFormatter.ofPattern("d-MM-yyyy H:mm:ss")
-                                val time = LocalDateTime.parse(data.createdAt.toString(), format)
-                                val x = "${time.hour}.${time.minute}".toFloat()
-                                val y = data.avgHeartRate!!.toFloat()
-                                lineList.add(Entry(x, y))
-                            }
-                            lineDataSet = LineDataSet(lineList, "test")
-                            lineData = LineData(lineDataSet)
-                            lineChart.data = lineData
-                            lineChart.xAxis.position = XAxis.XAxisPosition.BOTTOM
-                            lineChart.xAxis.valueFormatter = HourValueFormatter()
-                            lineChart.xAxis.setLabelCount(4, true)
-                            lineChart.xAxis.axisMinimum = 0F
-                            lineChart.xAxis.axisMaximum = 23.59F
-                            lineChart.legend.isEnabled = false
-                            lineChart.description.isEnabled = false
-                            lineChart.axisRight.isEnabled = false
-                            lineChart.isDoubleTapToZoomEnabled = false
-                            lineDataSet.setColor(ContextCompat.getColor(activity!!.applicationContext, R.color.primary_dark_color), 250)
-                            lineDataSet.fillColor = ContextCompat.getColor(activity!!.applicationContext, R.color.primary_dark_color)
-                            lineDataSet.valueTextColor = Color.BLACK
-                            lineDataSet.mode = LineDataSet.Mode.HORIZONTAL_BEZIER
-                            lineDataSet.setDrawFilled(true)
-                            lineDataSet.setDrawValues(false)
-                            lineDataSet.setDrawHighlightIndicators(true)
-                            Collections.sort(lineList, EntryXComparator())
-                        }
+                        res.data?.let { showChart(it) }
                     }
                     is Resource.Error -> {
                         binding.layoutAverage.root.visibility = View.VISIBLE
@@ -279,6 +214,40 @@ class HomeFragment : Fragment() {
                     }
                 }
             }
+        }
+    }
+
+    private fun showChart(list: List<MonitoringDataDomain>) {
+        val lineChart = binding.layoutAverage.lineChartHeartRate
+        lineList = ArrayList()
+        if (list.isNotEmpty()) {
+            for (data in list) {
+                val format = DateTimeFormatter.ofPattern("d-MM-yyyy H:mm:ss")
+                val time = LocalDateTime.parse(data.createdAt.toString(), format)
+                val x = "${time.hour}.${time.minute}".toFloat()
+                val y = data.avgHeartRate!!.toFloat()
+                lineList.add(Entry(x, y))
+            }
+            lineDataSet = LineDataSet(lineList, "test")
+            lineData = LineData(lineDataSet)
+            lineChart.data = lineData
+            lineChart.xAxis.position = XAxis.XAxisPosition.BOTTOM
+            lineChart.xAxis.valueFormatter = HourValueFormatter()
+            lineChart.xAxis.setLabelCount(4, true)
+            lineChart.xAxis.axisMinimum = 0F
+            lineChart.xAxis.axisMaximum = 23.59F
+            lineChart.legend.isEnabled = false
+            lineChart.description.isEnabled = false
+            lineChart.axisRight.isEnabled = false
+            lineChart.isDoubleTapToZoomEnabled = false
+            lineDataSet.setColor(ContextCompat.getColor(activity!!.applicationContext, R.color.primary_dark_color), 250)
+            lineDataSet.fillColor = ContextCompat.getColor(activity!!.applicationContext, R.color.primary_dark_color)
+            lineDataSet.valueTextColor = Color.BLACK
+            lineDataSet.mode = LineDataSet.Mode.HORIZONTAL_BEZIER
+            lineDataSet.setDrawFilled(true)
+            lineDataSet.setDrawValues(false)
+            lineDataSet.setDrawHighlightIndicators(true)
+            Collections.sort(lineList, EntryXComparator())
         }
     }
 

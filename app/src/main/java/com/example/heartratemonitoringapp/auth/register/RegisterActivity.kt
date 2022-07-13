@@ -47,8 +47,7 @@ class RegisterActivity : AppCompatActivity() {
                         window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
                         Toast.makeText(this@RegisterActivity, it.message, Toast.LENGTH_SHORT).show()
                     }
-                    else -> {
-                    }
+                    else -> {}
                 }
             }
         }

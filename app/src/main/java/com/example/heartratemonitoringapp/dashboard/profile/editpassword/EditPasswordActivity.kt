@@ -95,7 +95,6 @@ class EditPasswordActivity : AppCompatActivity() {
                     is Resource.Loading -> {
                         binding.layoutLoading.root.z = 10F
                         binding.layoutLoading.root.visibility = View.VISIBLE
-
                         window.setFlags(
                             WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
                             WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE

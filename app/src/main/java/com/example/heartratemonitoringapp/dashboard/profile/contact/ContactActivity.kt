@@ -1,26 +1,19 @@
 package com.example.heartratemonitoringapp.dashboard.profile.contact
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.view.WindowManager
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.core.data.Resource
-import com.example.core.domain.usecase.model.UserDataDomain
 import com.example.heartratemonitoringapp.R
 import com.example.heartratemonitoringapp.dashboard.profile.contact.adapter.ContactAdapter
 import com.example.heartratemonitoringapp.dashboard.profile.contact.add.AddContactActivity
-import com.example.heartratemonitoringapp.dashboard.profile.editpassword.EditPasswordActivity
-import com.example.heartratemonitoringapp.dashboard.profile.editpassword.EditPasswordViewModel
 import com.example.heartratemonitoringapp.databinding.ActivityContactBinding
-import com.example.heartratemonitoringapp.databinding.ActivityEditPasswordBinding
-import com.example.heartratemonitoringapp.databinding.ActivityEditProfileBinding
-import com.example.heartratemonitoringapp.form.adapter.FormAdapter
-import com.example.heartratemonitoringapp.monitoring.ble.BLE
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -64,10 +57,18 @@ class ContactActivity : AppCompatActivity() {
         }
 
         mAdapter.onDeleteClick = {
-            lifecycleScope.launch {
-                viewModel.deleteContact(viewModel.getBearer().first().toString(), it)
-                deleteContactObserver()
-            }
+            val requestDialog = MaterialAlertDialogBuilder(this@ContactActivity)
+                .setMessage(getString(R.string.delete_contact_promp))
+                .setNegativeButton(getString(R.string.no)) { _, _ ->
+
+                }
+                .setPositiveButton(getString(R.string.yes)) { _, _ ->
+                    lifecycleScope.launch {
+                        viewModel.deleteContact(viewModel.getBearer().first().toString(), it)
+                        deleteContactObserver()
+                    }
+                }
+            requestDialog.show()
         }
     }
 

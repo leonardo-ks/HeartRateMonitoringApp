@@ -1,7 +1,6 @@
 package com.example.heartratemonitoringapp.dashboard.profile.contact.add
 
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.view.WindowManager
 import android.view.inputmethod.EditorInfo
@@ -72,7 +71,6 @@ class AddContactActivity : AppCompatActivity() {
                     is Resource.Loading -> {
                         binding.layoutLoading.root.z = 10F
                         binding.layoutLoading.root.visibility = View.VISIBLE
-
                         window.setFlags(
                             WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE,
                             WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
