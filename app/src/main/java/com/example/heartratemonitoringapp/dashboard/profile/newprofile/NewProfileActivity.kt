@@ -120,11 +120,7 @@ class NewProfileActivity : AppCompatActivity() {
                     is Resource.Success -> {
                         binding.layoutEditProfile.root.visibility = View.VISIBLE
                         binding.layoutLoading.root.visibility = View.GONE
-                        Toast.makeText(
-                            baseContext,
-                            getString(R.string.success_change_profile),
-                            Toast.LENGTH_SHORT
-                        ).show()
+                        Toast.makeText(baseContext, getString(R.string.success_change_profile), Toast.LENGTH_SHORT).show()
                         window.clearFlags(WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE)
                         startActivity(Intent(baseContext, MainActivity::class.java))
                     }

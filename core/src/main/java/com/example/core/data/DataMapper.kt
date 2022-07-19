@@ -1,14 +1,8 @@
 package com.example.core.data
 
 import com.example.core.data.source.local.entities.MonitoringDataEntities
-import com.example.core.data.source.remote.response.AverageResponse
-import com.example.core.data.source.remote.response.LoginResponse
-import com.example.core.data.source.remote.response.MonitoringData
-import com.example.core.data.source.remote.response.UserData
-import com.example.core.domain.usecase.model.AverageDomain
-import com.example.core.domain.usecase.model.LoginDomain
-import com.example.core.domain.usecase.model.MonitoringDataDomain
-import com.example.core.domain.usecase.model.UserDataDomain
+import com.example.core.data.source.remote.response.*
+import com.example.core.domain.usecase.model.*
 
 fun LoginResponse.toDomain(): LoginDomain = LoginDomain(accessToken)
 
@@ -31,6 +25,10 @@ fun MonitoringData.toDomain(): MonitoringDataDomain = MonitoringDataDomain(
     label = label,
     stepChanges = stepChanges,
     step = step
+)
+
+fun LimitResponse.toDomain(): LimitDomain = LimitDomain(
+    lower, upperStill, upperWalk
 )
 
 fun AverageResponse.toDomain(): AverageDomain = AverageDomain(

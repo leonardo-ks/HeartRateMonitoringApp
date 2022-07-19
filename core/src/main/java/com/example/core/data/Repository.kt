@@ -125,12 +125,12 @@ class Repository(
             }
         }
 
-    override fun getLimitByDate(bearer: String, start: String, end: String): Flow<Resource<LimitDomain>> =
+    override fun getLimit(bearer: String): Flow<Resource<LimitDomain>> =
         flow {
             emit(Resource.Loading())
-            when (val apiResponse = remoteDataSource.getLimitByDate(bearer, start, end).first()) {
+            when (val apiResponse = remoteDataSource.getLimit(bearer).first()) {
                 is ApiResponse.Success -> {
-                    emit(Resource.Success(LimitDomain(apiResponse.data.lower, apiResponse.data.upper)))
+                    emit(Resource.Success(apiResponse.data.toDomain()))
                 }
                 is ApiResponse.Empty -> emit(Resource.Success(LimitDomain()))
                 is ApiResponse.Error -> emit(Resource.Error(apiResponse.errorMessage))
@@ -309,9 +309,9 @@ class Repository(
         }
     }
 
-    override fun sendNotification(bearer: String): Flow<Resource<String>> = flow {
+    override fun sendNotification(bearer: String, status: Int): Flow<Resource<String>> = flow {
         emit(Resource.Loading())
-        when (val apiResponse = remoteDataSource.sendNotification(bearer).first()) {
+        when (val apiResponse = remoteDataSource.sendNotification(bearer, status).first()) {
             is ApiResponse.Success -> {
                 emit(Resource.Success(apiResponse.data.message.toString()))
             }

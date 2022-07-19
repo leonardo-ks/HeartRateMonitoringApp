@@ -167,9 +167,9 @@ class RemoteDataSource(private val apiService: ApiService, ) {
             }
         }.flowOn(Dispatchers.IO)
 
-    suspend fun getLimitByDate(bearer: String, start: String, end: String): Flow<ApiResponse<LimitResponse>> =
+    suspend fun getLimit(bearer: String): Flow<ApiResponse<LimitResponse>> =
         flow {
-            val response = apiService.getLimitByDate(bearer, start, end)
+            val response = apiService.getLimit(bearer)
             if (response.success == true) {
                 emit(ApiResponse.Success(response))
             } else {
@@ -357,9 +357,9 @@ class RemoteDataSource(private val apiService: ApiService, ) {
             }
         }.flowOn(Dispatchers.IO)
 
-    suspend fun sendNotification(bearer: String): Flow<ApiResponse<BasicResponse>> =
+    suspend fun sendNotification(bearer: String, status: Int): Flow<ApiResponse<BasicResponse>> =
         flow {
-            val response = apiService.sendNotification(bearer)
+            val response = apiService.sendNotification(bearer, status)
             if (response.success == true) {
                 emit(ApiResponse.Success(response))
             } else {

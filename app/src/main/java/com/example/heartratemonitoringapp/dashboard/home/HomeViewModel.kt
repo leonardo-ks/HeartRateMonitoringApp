@@ -33,20 +33,7 @@ class HomeViewModel(private val useCase: IUseCase) : ViewModel() {
 
     fun getBearer() = useCase.getBearer()
 
-    private val _sendData = MutableStateFlow<Resource<Boolean>>(Resource.Loading())
-    val sendData: StateFlow<Resource<Boolean>> get() = _sendData
-    fun sendData(bearer: String, avgHeartRate: Int, stepChanges: Int, step: Int, createdAt: String) {
-        _sendData.value = Resource.Loading()
-        viewModelScope.launch {
-            useCase.addData(bearer, avgHeartRate, stepChanges, step, "", createdAt).collect { res ->
-                when (res) {
-                    is Resource.Loading -> _sendData.emit(Resource.Loading())
-                    is Resource.Success -> _sendData.emit(Resource.Success(true))
-                    is Resource.Error -> _sendData.emit(Resource.Error(res.message.toString()))
-                }
-            }
-        }
-    }
+    fun sendData(bearer: String, avgHeartRate: Int, stepChanges: Int, step: Int, label: String, createdAt: String) = useCase.addData(bearer, avgHeartRate, stepChanges, step, label, createdAt)
 
     fun deleteData(id: Int) = useCase.deleteMonitoringDataById(id)
     val localData = useCase.getMonitoringDataList()
@@ -66,33 +53,16 @@ class HomeViewModel(private val useCase: IUseCase) : ViewModel() {
         }
     }
 
-    private val _getLimit = MutableStateFlow<Resource<LimitDomain>>(Resource.Loading())
-    val getLimit: StateFlow<Resource<LimitDomain>> get() = _getLimit
-    fun getLimit(bearer: String, start: String, end: String) {
-        _getLimit.value = Resource.Loading()
+    private val _sendNotification = MutableStateFlow<Resource<String>>(Resource.Loading())
+    val sendNotification: StateFlow<Resource<String>> get() = _sendNotification
+    fun sendNotification(bearer: String, status: Int) {
+        _sendNotification.value = Resource.Loading()
         viewModelScope.launch {
-            useCase.getLimitByDate(bearer, start, end).collect { res ->
+            useCase.sendNotification(bearer, status).collect { res ->
                 when (res) {
-                    is Resource.Loading -> _getLimit.emit(Resource.Loading())
-                    is Resource.Success -> _getLimit.emit(Resource.Success(res.data!!))
-                    is Resource.Error -> _getLimit.emit(Resource.Error(res.message.toString()))
-                }
-            }
-        }
-    }
-
-    fun setMinHRLimit(min: Int) = useCase.setMinHRLimit(min)
-    fun setMaxHRLimit(max: Int) = useCase.setMaxHRLimit(max)
-    private val _profile = MutableStateFlow<Resource<UserDataDomain>>(Resource.Loading())
-    val profile: StateFlow<Resource<UserDataDomain>> get() = _profile
-    fun getProfile(bearer: String) {
-        _profile.value = Resource.Loading()
-        viewModelScope.launch {
-            useCase.getProfile(bearer).collect { res ->
-                when (res) {
-                    is Resource.Loading -> _profile.emit(Resource.Loading())
-                    is Resource.Success -> _profile.emit(Resource.Success(res.data!!))
-                    is Resource.Error -> _profile.emit(Resource.Error(res.message.toString()))
+                    is Resource.Loading -> _sendNotification.emit(Resource.Loading())
+                    is Resource.Success -> _sendNotification.emit(Resource.Success(res.data!!))
+                    is Resource.Error -> _sendNotification.emit(Resource.Error(res.message.toString()))
                 }
             }
         }

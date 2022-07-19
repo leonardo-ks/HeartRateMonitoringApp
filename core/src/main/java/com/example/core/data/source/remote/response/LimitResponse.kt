@@ -10,8 +10,11 @@ data class LimitResponse(
 	@field:SerializedName("lower")
 	val lower: Int? = null,
 
-	@field:SerializedName("upper")
-	val upper: Int? = null,
+	@field:SerializedName("upperStill")
+	val upperStill: Int? = null,
+
+	@field:SerializedName("upperWalk")
+	val upperWalk: Int? = null,
 
 	@field:SerializedName("message")
 	val message: String? = null

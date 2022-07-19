@@ -10,12 +10,14 @@ import android.bluetooth.BluetoothProfile
 import android.content.*
 import android.os.CountDownTimer
 import android.os.IBinder
+import android.text.method.TextKeyListener.clear
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.example.core.data.Resource
 import com.example.core.domain.usecase.IUseCase
 import com.example.core.domain.usecase.model.MonitoringDataDomain
 import com.example.heartratemonitoringapp.R
+import com.example.heartratemonitoringapp.dashboard.MainActivity
 import com.example.heartratemonitoringapp.form.FormActivity
 import com.example.heartratemonitoringapp.monitoring.ble.BLE
 import com.example.heartratemonitoringapp.monitoring.ble.BLEService
@@ -25,10 +27,13 @@ import com.example.heartratemonitoringapp.monitoring.live.LiveMonitoringActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject
+import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.Period
 import java.time.format.DateTimeFormatter
 import java.util.*
 import kotlin.concurrent.schedule
@@ -44,10 +49,11 @@ class BackgroundMonitoringService : Service() {
     private val channelId = "Background Monitoring"
     private val useCase: IUseCase by inject()
     private var bluetoothService : BLEService? = null
-    private var period: Long = 60000
+    private var period: Long = 0
     private var minLimit = 0
-    private var maxLimit = 0
-    private var isAnomalyDetected = false
+    private var maxStillLimit = 0
+    private var maxWalkLimit = 0
+    private var maxLimitByAge = 0
     private val job = SupervisorJob()
     private val scope = CoroutineScope(Dispatchers.IO + job)
 
@@ -61,9 +67,31 @@ class BackgroundMonitoringService : Service() {
                 NotificationManager.IMPORTANCE_DEFAULT
             )
         notificationManager.createNotificationChannel(channel)
+
         scope.launch {
-            minLimit = useCase.getMinHRLimit().first()
-            maxLimit = useCase.getMaxHRLimit().first()
+            useCase.getLimit(useCase.getBearer().first().toString()).collect {
+                when (it) {
+                    is Resource.Success -> {
+                        minLimit = it.data?.lower!!
+                        maxWalkLimit = it.data?.upperWalk!!
+                        maxStillLimit = it.data?.upperStill!!
+                    }
+                    else -> {}
+                }
+            }
+            useCase.getProfile(useCase.getBearer().first().toString()).collect {
+                when (it) {
+                    is Resource.Success -> {
+                        val dob = it.data?.dob.toString()
+                        val format = DateTimeFormatter.ofPattern("d-MM-yyyy")
+                        val formatted = LocalDate.parse(dob).format(format)
+                        val now = LocalDate.now()
+                        maxLimitByAge = ((220 - Period.between(LocalDate.parse(formatted, format), now).years) * 0.85).toInt()
+                    }
+                    else -> {}
+                }
+            }
+            period = useCase.getMonitoringPeriod().first().toLong()
         }
 
         val bindIntent = Intent(this, BLEService::class.java)
@@ -110,46 +138,77 @@ class BackgroundMonitoringService : Service() {
             }
         }
 
+        val notificationIntent = Intent(this@BackgroundMonitoringService, FormActivity::class.java)
         val notification = NotificationCompat.Builder(this, channelId)
-            .setContentTitle(resources.getString(R.string.background_monitoring))
             .setSmallIcon(R.drawable.ic_watch)
             .setOnlyAlertOnce(true)
-            .setContentText(getString(R.string.anomaly_detected))
 
         countDownTimer = object : CountDownTimer(60000, 1000) {
             override fun onTick(p0: Long) {
-                val notificationIntent = Intent(this@BackgroundMonitoringService, FormActivity::class.java)
-                if (isAnomalyDetected) {
-                    if (stepList.isNotEmpty() && heartList.isNotEmpty()) {
-                        val avgHeart = heartList.average().toInt()
-                        val stepChanges = stepList.last() - stepList.first()
-                        val step = stepList.maxOrNull()
-                        Log.d("tick", "HR: $avgHeart, SC: $stepChanges, S: $step")
-                        notificationIntent.putExtra("avgHeartRate", avgHeart)
-                        notificationIntent.putExtra("stepChanges", stepChanges)
-                        notificationIntent.putExtra("step", step)
-                        val pendingIntent = PendingIntent.getActivity(this@BackgroundMonitoringService, 0, notificationIntent, FLAG_UPDATE_CURRENT)
-                        notification.setContentIntent(pendingIntent)
-                    }
-                    useCase.setBackgroundMonitoringState(false)
-                    notificationManager.notify(1, notification.build())
-                    cancel()
-                    onFinish()
-                }
                 getStep()
+                notification.setContentTitle(getString(R.string.background_monitoring_undergoing))
+                if (heartList.size > 0 && stepList.size > 0) {
+                    notification.setContentText(getString(R.string.background_monitoring_content, heartList.last(), stepList.last()))
+                } else {
+                    notification.setContentText(getString(R.string.connecting))
+                }
+                notificationManager.notify(1, notification.build())
             }
 
             override fun onFinish() {
                 if (heartList.isNotEmpty() && stepList.isNotEmpty()) {
+                    notificationManager.cancel(1)
                     val avgHeart = heartList.average().toInt()
                     val stepChanges = stepList.last() - stepList.first()
-                    val step = stepList.maxOrNull()
-                    Log.d("average", "HR: $avgHeart, Step: $stepChanges")
-                    sendData(avgHeart, stepChanges, step ?: 0)
+                    val step = stepList.max()
+                    var labels = listOf<String>()
+                    scope.launch {
+                        val data = useCase.findData(useCase.getBearer().toString().first().toString(), avgHeart, stepChanges).first().data
+                        if (data != null) labels = data
+                    }
+                    val status = getStatus(avgHeart, stepChanges)
+                    if (status != 0) {
+                        val pendingIntent = PendingIntent.getActivity(this@BackgroundMonitoringService, 0, notificationIntent, FLAG_UPDATE_CURRENT)
+                        notification.setContentIntent(pendingIntent)
+                        notification.setContentTitle(resources.getString(R.string.background_monitoring))
+                        notification.setContentText(getString(R.string.anomaly_detected))
+                        notificationManager.notify(1, notification.build())
+                        scope.launch {
+                            useCase.sendNotification(useCase.getBearer().first().toString(), status)
+                        }
+                    }
+                    timer.schedule(period - 60000) {
+                        countDownTimer.start()
+                    }
+                    if (labels.isNotEmpty()) {
+                        for (label in labels) {
+                            sendData(avgHeart, stepChanges, step, label)
+                        }
+                    } else {
+                        sendData(avgHeart, stepChanges, step, "")
+                    }
                 }
             }
         }
         return START_STICKY
+    }
+
+    fun getStatus(avgHeart: Int, stepChanges: Int): Int {
+        var status = 0
+        if (stepChanges == 0) {
+            if (avgHeart < minLimit) {
+                status = 3
+            } else if (avgHeart > maxStillLimit){
+                status = 1
+            }
+        } else {
+            if (avgHeart < minLimit) {
+                status =  4
+            } else if (avgHeart > maxWalkLimit){
+                status =  2
+            }
+        }
+        return status
     }
 
     private val gattUpdateReceiver: BroadcastReceiver = object : BroadcastReceiver() {
@@ -165,11 +224,8 @@ class BackgroundMonitoringService : Service() {
                 BLEService.ACTION_HR_AVAILABLE -> {
                     if (intent.extras != null) {
                         val heartRate = intent.extras?.getInt("HR")
-                        if (heartRate != null) {
+                        if (heartRate != null && heartRate > 0) {
                             heartList.add(heartRate)
-                            if (heartRate < minLimit || heartRate > maxLimit) {
-                                isAnomalyDetected = true
-                            }
                         }
                     }
                 }
@@ -224,7 +280,7 @@ class BackgroundMonitoringService : Service() {
         }
     }
 
-    fun getStep() {
+    private fun getStep() {
         val basicService = BLE.bluetoothGatt?.getService(UUIDs.BASIC_SERVICE)
         val stepLevel = basicService?.getCharacteristic(UUIDs.BASIC_STEP_CHARACTERISTIC)
         if (stepLevel != null) {
@@ -232,82 +288,29 @@ class BackgroundMonitoringService : Service() {
         }
     }
 
-    private fun sendData(avgHeart: Int, stepChanges: Int, step: Int) {
+    private fun sendData(avgHeart: Int, stepChanges: Int, step: Int, label: String) {
+        stepList.clear()
+        heartList.clear()
         scope.launch {
             val format = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
             val date = LocalDateTime.now().format(format)
-            val labels = useCase.findData(useCase.getBearer().first().toString(), avgHeart, stepChanges).first().data
-            if (labels != null) {
-                for (label in labels) {
-                    useCase.insertMonitoringData(
-                        MonitoringDataDomain(
-                            avgHeartRate = avgHeart,
-                            stepChanges = stepChanges,
-                            createdAt = date.toString(),
-                            label = label,
-                            userId = useCase.getUserId().first(),
-                            step = step
-                        )
-                    )
-                    period = useCase.getMonitoringPeriod().first().toLong()
-                    useCase.addData(useCase.getBearer().first().toString(), avgHeart, stepChanges, step, label, "").collect {
-                        when (it) {
-                            is Resource.Success -> {
-                                stepList.clear()
-                                heartList.clear()
-                                useCase.deleteMonitoringDataByDate(date)
-                                if (label == labels.last()) {
-                                    timer.schedule(period - 60000) {
-                                        countDownTimer.start()
-                                    }
-                                }
-                            }
-                            is Resource.Error -> {
-                                stepList.clear()
-                                heartList.clear()
-                                if (label == labels.last()) {
-                                    timer.schedule(period - 60000) {
-                                        countDownTimer.start()
-                                    }
-                                }
-                                Log.d("failed", "failed sending data")
-                            }
-                            else -> {}
-                        }
-                    }
-                }
-            } else {
-                useCase.insertMonitoringData(
-                    MonitoringDataDomain(
-                        avgHeartRate = avgHeart,
-                        stepChanges = stepChanges,
-                        createdAt = date.toString(),
-                        label = "",
-                        userId = useCase.getUserId().first(),
-                        step = step
-                    )
+            useCase.insertMonitoringData(
+                MonitoringDataDomain(
+                    avgHeartRate = avgHeart,
+                    stepChanges = stepChanges,
+                    createdAt = date.toString(),
+                    label = label,
+                    userId = useCase.getUserId().first(),
+                    step = step
                 )
-                period = useCase.getMonitoringPeriod().first().toLong()
-                useCase.addData(useCase.getBearer().first().toString(), avgHeart, stepChanges, step, "", "").collect {
-                    when (it) {
-                        is Resource.Success -> {
-                            stepList.clear()
-                            heartList.clear()
-                            useCase.deleteMonitoringDataByDate(date)
-                            timer.schedule(period - 60000) {
-                                countDownTimer.start()
-                            }
-                        }
-                        is Resource.Error -> {
-                            stepList.clear()
-                            heartList.clear()
-                            timer.schedule(period - 60000) {
-                                countDownTimer.start()
-                            }
-                            Log.d("failed", "failed sending data")
-                        }
-                        else -> {}
+            )
+            period = useCase.getMonitoringPeriod().first().toLong()
+            useCase.addData(useCase.getBearer().first().toString(), avgHeart, stepChanges, step, label, date).collect {
+                when (it) {
+                    is Resource.Success -> {
+                        useCase.deleteMonitoringDataByDate(date)
                     }
+                    else -> {}
                 }
             }
         }

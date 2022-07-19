@@ -85,6 +85,8 @@ interface ApiService {
     suspend fun sendNotification(
         @Header("Authorization")
         bearer: String,
+        @Field (value = "status")
+        contact: Int,
     ): BasicResponse
 
     @FormUrlEncoded
@@ -138,14 +140,10 @@ interface ApiService {
         bearer: String,
     ): AverageResponse
 
-    @GET("limit/{start}/{end}")
-    suspend fun getLimitByDate(
+    @GET("limit")
+    suspend fun getLimit(
         @Header("Authorization")
-        bearer: String,
-        @Path("start")
-        start: String,
-        @Path("end")
-        end: String
+        bearer: String
     ): LimitResponse
 
     @DELETE("data/{id}")

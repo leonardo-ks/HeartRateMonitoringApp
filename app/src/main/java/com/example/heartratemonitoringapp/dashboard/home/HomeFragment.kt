@@ -46,9 +46,6 @@ class HomeFragment : Fragment() {
     private lateinit var lineDataSet: LineDataSet
     private lateinit var lineData: LineData
 
-    var upper = 0
-    var lower = 0
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -70,6 +67,7 @@ class HomeFragment : Fragment() {
                         data.avgHeartRate ?: 0,
                         data.stepChanges ?: 0,
                         data.step ?: 0,
+                        data.label.toString(),
                         data.createdAt.toString()
                     )
                     data.id?.let  { viewModel.deleteData(it) }
@@ -104,19 +102,6 @@ class HomeFragment : Fragment() {
             }
         }
 
-        viewLifecycleOwner.lifecycleScope.launch {
-            val startFormat = DateTimeFormatter.ofPattern("yyyy-MM-d 00:00:00")
-            val endFormat = DateTimeFormatter.ofPattern("yyyy-MM-d 23:59:59")
-            val start = LocalDateTime.now().minusDays(1).format(startFormat)
-            val end = LocalDateTime.now().minusDays(1).format(endFormat)
-            viewModel.getLimit(viewModel.getBearer().first().toString(), start, end)
-            getLimitObserver()
-        }
-
-//        binding.layoutNotConnected.btnConnect.setOnClickListener {
-//            startActivity(Intent(activity, ScannerActivity::class.java))
-//        }
-
         binding.swipeRefreshLayout.setOnRefreshListener {
             if (connectedDevices.isNotEmpty()) {
                 if (BLE.bluetoothDevice == null) {
@@ -137,11 +122,6 @@ class HomeFragment : Fragment() {
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.getProfile(viewModel.getBearer().first().toString())
-            getProfileObserver()
-        }
-
-        viewLifecycleOwner.lifecycleScope.launch {
             val format = DateTimeFormatter.ofPattern("yyyy-MM-d H:mm:ss")
             val startFormat = DateTimeFormatter.ofPattern("yyyy-MM-d 00:00:00")
             val start = LocalDate.now().format(startFormat)
@@ -149,45 +129,26 @@ class HomeFragment : Fragment() {
             viewModel.getDataByDate(viewModel.getBearer().first().toString(), start, end)
             getDataObserver()
         }
-    }
 
-    private fun getProfileObserver() {
-        viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.profile.collect { res ->
-                when (res) {
-                    is Resource.Success -> {
-                        val dob = res.data?.dob
-                        val format = DateTimeFormatter.ofPattern("d-MM-yyyy")
-                        val formatted = LocalDate.parse(dob).format(format)
-                        val now = LocalDate.now()
-                        val upper = ((220 - Period.between(LocalDate.parse(formatted, format), now).years) * 0.85).toInt()
-                        upper.let { viewModel.setMaxHRLimit(maxOf(it, upper)) }
-                        if (lower in 0..59) {
-                            lower.let { viewModel.setMinHRLimit(minOf(it, 60)) }
-                        } else if (lower > 60){
-                            lower.let { viewModel.setMinHRLimit(it) }
-                        } else {
-                            lower.let { viewModel.setMinHRLimit(it) }
-                        }
-                    }
-                    else -> {}
-                }
+        binding.layoutEmergencyButton.btnEmergency.setOnClickListener {
+            viewLifecycleOwner.lifecycleScope.launch {
+                viewModel.sendNotification(viewModel.getBearer().first().toString(), 4)
+                sendNotificationObserver()
             }
         }
     }
 
-    private fun getLimitObserver() {
+    private fun sendNotificationObserver() {
         viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.getLimit.collect { res ->
+            viewModel.data.collect { res ->
                 when (res) {
-                    is Resource.Loading -> {}
                     is Resource.Success -> {
-                        upper = res.data?.upper!!
-                        lower = res.data?.lower!!
+                        Toast.makeText(activity, res.data.toString(), Toast.LENGTH_SHORT).show()
                     }
                     is Resource.Error -> {
                         Toast.makeText(activity, res.message.toString(), Toast.LENGTH_SHORT).show()
                     }
+                    else -> {}
                 }
             }
         }
@@ -203,9 +164,7 @@ class HomeFragment : Fragment() {
                         binding.layoutAverage.root.visibility = View.INVISIBLE
                     }
                     is Resource.Success -> {
-                        binding.layoutLoading.root.visibility = View.GONE
-                        binding.layoutAverage.root.visibility = View.VISIBLE
-                        res.data?.let { showChart(it) }
+                        res.data?.let { populateChart(it) }
                     }
                     is Resource.Error -> {
                         binding.layoutAverage.root.visibility = View.VISIBLE
@@ -217,7 +176,7 @@ class HomeFragment : Fragment() {
         }
     }
 
-    private fun showChart(list: List<MonitoringDataDomain>) {
+    private fun populateChart(list: List<MonitoringDataDomain>) {
         val lineChart = binding.layoutAverage.lineChartHeartRate
         lineList = ArrayList()
         if (list.isNotEmpty()) {
@@ -261,10 +220,15 @@ class HomeFragment : Fragment() {
                         binding.layoutAverage.root.visibility = View.INVISIBLE
                     }
                     is Resource.Success -> {
-                        binding.layoutLoading.root.visibility = View.GONE
-                        binding.layoutAverage.root.visibility = View.VISIBLE
-                        binding.layoutAverage.tvAvgHeartText.text = getString(R.string.today_average_heart_rate, res.data?.avgHeartRate)
-                        binding.layoutAverage.tvTodayStepsValue.text = res.data?.todaySteps.toString()
+                        if (viewModel.backgroundMonitoringState.first()) {
+                            binding.layoutLoading.root.visibility = View.GONE
+                            binding.layoutEmergencyButton.root.visibility = View.VISIBLE
+                        } else {
+                            binding.layoutLoading.root.visibility = View.GONE
+                            binding.layoutAverage.root.visibility = View.VISIBLE
+                            binding.layoutAverage.tvAvgHeartText.text = getString(R.string.today_average_heart_rate, res.data?.avgHeartRate)
+                            binding.layoutAverage.tvTodayStepsValue.text = res.data?.todaySteps.toString()
+                        }
                     }
                     is Resource.Error -> {
                         binding.layoutAverage.root.visibility = View.VISIBLE

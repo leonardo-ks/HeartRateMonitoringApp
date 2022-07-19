@@ -20,9 +20,9 @@ interface IRepository {
     fun changePassword(bearer: String, old: String, new: String, confirmation: String): Flow<Resource<String>>
     fun addContact(bearer: String, contact: Int): Flow<Resource<String>>
     fun deleteContact(bearer: String, contact: Int): Flow<Resource<String>>
-    fun sendNotification(bearer: String): Flow<Resource<String>>
+    fun sendNotification(bearer: String, status: Int): Flow<Resource<String>>
     fun getContacts(bearer: String): Flow<Resource<List<UserDataDomain>>>
-    fun getLimitByDate(bearer: String, start: String, end: String): Flow<Resource<LimitDomain>>
+    fun getLimit(bearer: String): Flow<Resource<LimitDomain>>
     fun search(bearer: String, param: String): Flow<Resource<List<UserDataDomain>>>
     fun setBearer(bearer: String)
     fun getBearer(): Flow<String?>

@@ -65,6 +65,16 @@
     <string name="height">Tinggi badan</string>
     <string name="weight">Berat badan</string>
     <string name="delete_contact_promp">Apakah anda yakin ingin menghapus kontak?</string>
+    <string name="calibrate_heart_rate">Kalibrasi detak jantung</string>
+    <string name="disclaimer_calibrate">Anda akan melakukan kalibrasi detak jantung. Hal ini dilakukan agar kami dapat mendapatkan baseline aktivitas detak jantung anda. Kalibrasi dulakukan dengan melakukan dua aktivitas yaitu duduk dan berjalan.</string>
+    <string name="start">Mulai</string>
+    <string name="start_calibration_activity">Mulai kalibrasi aktivitas %1$s?</string>
+    <string name="start_calibration">Mulai kalibrasi?</string>
+    <string name="calibration_detail">Anda diharap untuk melakukan %1$s selama %2$s menit. Selama melakukan kalibrasi anda diharapkan untuk tidak melakukan aktivitas lainya.</string>
+    <string name="calibration_title">Kalibrasi aktivitas %1$s</string>
+    <string name="background_monitoring_undergoing">Monitoring latar belakang sedang berjalan</string>
+    <string name="background_monitoring_content">Detak jantung: %1s, Langkah: %2s</string>
+    <string name="emergency_button_hint">Tekan tombol untuk kondisi darurat</string>
 
     <string-array name="periods">
         <item>1 menit</item>
