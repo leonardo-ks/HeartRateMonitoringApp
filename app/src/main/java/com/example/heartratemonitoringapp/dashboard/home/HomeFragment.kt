@@ -31,7 +31,6 @@ import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.time.Period
 import java.time.format.DateTimeFormatter
 import java.util.*
 
@@ -81,53 +80,42 @@ class HomeFragment : Fragment() {
         if (connectedDevices.isNotEmpty()) {
             if (BLE.bluetoothDevice == null) {
                 BLE.bluetoothDevice = connectedDevices.first()
-            }
-            bluetoothManager.adapter.getRemoteDevice(BLE.bluetoothDevice?.address)
-            averageDataObserver()
-            viewLifecycleOwner.lifecycleScope.launch {
-                val bearer = viewModel.getBearer().first()
-                viewModel.getAverage(bearer.toString())
-            }
-        } else {
-            binding.layoutNotConnected.root.visibility = View.VISIBLE
-            binding.layoutAverage.root.visibility = View.GONE
-            binding.layoutLoading.root.visibility = View.GONE
-        }
-
-        if (!BackgroundMonitoringService.isRunning) {
-            viewLifecycleOwner.lifecycleScope.launch {
-                if (BLE.bluetoothDevice != null && viewModel.backgroundMonitoringState.first()) {
-                    activity?.startService(Intent(activity, BackgroundMonitoringService::class.java))
-                }
-            }
-        }
-
-        binding.swipeRefreshLayout.setOnRefreshListener {
-            if (connectedDevices.isNotEmpty()) {
-                if (BLE.bluetoothDevice == null) {
-                    BLE.bluetoothDevice = connectedDevices.first()
-                }
                 bluetoothManager.adapter.getRemoteDevice(BLE.bluetoothDevice?.address)
-                averageDataObserver()
-                viewLifecycleOwner.lifecycleScope.launch {
-                    val bearer = viewModel.getBearer().first()
-                    viewModel.getAverage(bearer.toString())
+                if (!BackgroundMonitoringService.isRunning) {
+                    viewLifecycleOwner.lifecycleScope.launch {
+                        if (BLE.bluetoothDevice != null && viewModel.backgroundMonitoringState.first()) {
+                            activity?.startService(Intent(activity, BackgroundMonitoringService::class.java))
+                        }
+                    }
                 }
-            } else {
-                binding.layoutNotConnected.root.visibility = View.VISIBLE
-                binding.layoutAverage.root.visibility = View.GONE
-                binding.layoutLoading.root.visibility = View.GONE
             }
-            binding.swipeRefreshLayout.isRefreshing = false
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
+            val bearer = viewModel.getBearer().first().toString()
             val format = DateTimeFormatter.ofPattern("yyyy-MM-d H:mm:ss")
             val startFormat = DateTimeFormatter.ofPattern("yyyy-MM-d 00:00:00")
             val start = LocalDate.now().format(startFormat)
             val end = LocalDateTime.now().format(format)
+            viewModel.getAverage(bearer)
             viewModel.getDataByDate(viewModel.getBearer().first().toString(), start, end)
             getDataObserver()
+            averageDataObserver()
+        }
+
+        binding.swipeRefreshLayout.setOnRefreshListener {
+            viewLifecycleOwner.lifecycleScope.launch {
+                val bearer = viewModel.getBearer().first().toString()
+                val format = DateTimeFormatter.ofPattern("yyyy-MM-d H:mm:ss")
+                val startFormat = DateTimeFormatter.ofPattern("yyyy-MM-d 00:00:00")
+                val start = LocalDate.now().format(startFormat)
+                val end = LocalDateTime.now().format(format)
+                viewModel.getAverage(bearer)
+                viewModel.getDataByDate(viewModel.getBearer().first().toString(), start, end)
+                getDataObserver()
+                averageDataObserver()
+            }
+            binding.swipeRefreshLayout.isRefreshing = false
         }
 
         binding.layoutEmergencyButton.btnEmergency.setOnClickListener {
@@ -164,7 +152,19 @@ class HomeFragment : Fragment() {
                         binding.layoutAverage.root.visibility = View.INVISIBLE
                     }
                     is Resource.Success -> {
-                        res.data?.let { populateChart(it) }
+                        if (!res.data.isNullOrEmpty()) {
+                            binding.tvNotFound.visibility = View.GONE
+                            res.data?.let { populateChart(it) }
+                            val label = res.data?.first()?.label
+                            if (label != null) {
+                                binding.layoutAverage.tvHeartCondition.text = getString(R.string.heart_condition, label)
+                            } else {
+                                binding.layoutAverage.tvHeartCondition.visibility = View.INVISIBLE
+                            }
+                        } else {
+                            binding.layoutAverage.root.visibility = View.GONE
+                            binding.tvNotFound.visibility = View.VISIBLE
+                        }
                     }
                     is Resource.Error -> {
                         binding.layoutAverage.root.visibility = View.VISIBLE

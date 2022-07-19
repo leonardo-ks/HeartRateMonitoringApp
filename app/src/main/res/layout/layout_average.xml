@@ -9,7 +9,7 @@
         android:id="@+id/linearLayout2"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="8dp"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -145,6 +145,20 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/tv_avg_heart_title" />
 
+                <TextView
+                    android:id="@+id/tv_heart_condition"
+                    style="@style/TextMedium"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:autoSizeTextType="uniform"
+                    android:text="@string/heart_condition"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/tv_avg_heart_text" />
+
                 <com.github.mikephil.charting.charts.LineChart
                     android:id="@+id/line_chart_heart_rate"
                     android:layout_width="match_parent"
@@ -156,7 +170,7 @@
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/tv_avg_heart_text" />
+                    app:layout_constraintTop_toBottomOf="@+id/tv_heart_condition" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 

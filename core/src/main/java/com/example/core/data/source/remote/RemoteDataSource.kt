@@ -1,6 +1,5 @@
 package com.example.core.data.source.remote
 
-import android.util.Log
 import com.example.core.data.source.remote.network.ApiResponse
 import com.example.core.data.source.remote.network.ApiService
 import com.example.core.data.source.remote.response.*
@@ -167,6 +166,25 @@ class RemoteDataSource(private val apiService: ApiService, ) {
             }
         }.flowOn(Dispatchers.IO)
 
+    suspend fun getUserMonitoringDataByDateById(bearer: String, id: Int, start: String, end: String): Flow<ApiResponse<UserMonitoringDataResponse>> =
+        flow {
+            val response = apiService.getUserDataByDateById(bearer, id, start, end)
+            if (response.success == true) {
+                emit(ApiResponse.Success(response))
+            } else {
+                emit(ApiResponse.Error(response.message.toString()))
+            }
+        }.catch { e ->
+            when (e) {
+                is HttpException -> {
+                    val responseBody = e.response()?.errorBody()
+                    emit(ApiResponse.Error("${e.code()}: ${responseBody?.getMessage()}"))
+                } else -> {
+                emit(ApiResponse.Error(e.message.toString()))
+            }
+            }
+        }.flowOn(Dispatchers.IO)
+
     suspend fun getLimit(bearer: String): Flow<ApiResponse<LimitResponse>> =
         flow {
             val response = apiService.getLimit(bearer)
@@ -246,6 +264,25 @@ class RemoteDataSource(private val apiService: ApiService, ) {
     suspend fun getAverageData(bearer: String): Flow<ApiResponse<AverageResponse>> =
         flow {
             val response = apiService.getAverageData(bearer)
+            if (response.success == true) {
+                emit(ApiResponse.Success(response))
+            } else {
+                emit(ApiResponse.Error(response.message.toString()))
+            }
+        }.catch { e ->
+            when (e) {
+                is HttpException -> {
+                    val responseBody = e.response()?.errorBody()
+                    emit(ApiResponse.Error("${e.code()}: ${responseBody?.getMessage()}"))
+                } else -> {
+                emit(ApiResponse.Error(e.message.toString()))
+            }
+            }
+        }.flowOn(Dispatchers.IO)
+
+    suspend fun getAverageDataById(bearer: String, id: Int): Flow<ApiResponse<AverageResponse>> =
+        flow {
+            val response = apiService.getAverageDataById(bearer, id)
             if (response.success == true) {
                 emit(ApiResponse.Success(response))
             } else {

@@ -12,6 +12,7 @@ import com.example.core.data.Resource
 import com.example.heartratemonitoringapp.R
 import com.example.heartratemonitoringapp.dashboard.profile.contact.adapter.ContactAdapter
 import com.example.heartratemonitoringapp.dashboard.profile.contact.add.AddContactActivity
+import com.example.heartratemonitoringapp.dashboard.profile.contact.data.ShowDataActivity
 import com.example.heartratemonitoringapp.databinding.ActivityContactBinding
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import kotlinx.coroutines.flow.first
@@ -69,6 +70,13 @@ class ContactActivity : AppCompatActivity() {
                     }
                 }
             requestDialog.show()
+        }
+
+        mAdapter.onItemClick = {
+            val intent = Intent(this@ContactActivity, ShowDataActivity::class.java)
+            intent.putExtra("id", it.id)
+            intent.putExtra("name", it.name)
+            startActivity(intent)
         }
     }
 

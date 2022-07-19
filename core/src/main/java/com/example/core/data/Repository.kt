@@ -1,7 +1,6 @@
 package com.example.core.data
 
 import android.annotation.SuppressLint
-import android.util.Log
 import com.example.core.data.source.local.LocalDataSource
 import com.example.core.data.source.remote.RemoteDataSource
 import com.example.core.data.source.remote.network.ApiResponse
@@ -173,6 +172,24 @@ class Repository(
             }
         }
 
+    override fun getUserMonitoringDataByDateById(bearer: String, id: Int, start: String, end: String): Flow<Resource<List<MonitoringDataDomain>>> =
+        flow {
+            emit(Resource.Loading())
+            when (val apiResponse = remoteDataSource.getUserMonitoringDataByDateById(bearer, id, start, end).first()) {
+                is ApiResponse.Success -> {
+                    if (apiResponse.data.data != null) {
+                        emit(Resource.Success(apiResponse.data.data.map { data ->
+                            data?.toDomain() ?: MonitoringDataDomain()
+                        }))
+                    } else {
+                        emit(Resource.Success(listOf(MonitoringDataDomain())))
+                    }
+                }
+                is ApiResponse.Empty -> emit(Resource.Success(listOf(MonitoringDataDomain())))
+                is ApiResponse.Error -> emit(Resource.Error(apiResponse.errorMessage))
+            }
+        }
+
     override fun getContacts(bearer: String): Flow<Resource<List<UserDataDomain>>> =
         flow {
             emit(Resource.Loading())
@@ -224,6 +241,18 @@ class Repository(
         flow {
             emit(Resource.Loading())
             when (val apiResponse = remoteDataSource.getAverageData(bearer).first()) {
+                is ApiResponse.Success -> {
+                    emit(Resource.Success(apiResponse.data.toDomain()))
+                }
+                is ApiResponse.Empty -> emit(Resource.Success(AverageDomain()))
+                is ApiResponse.Error -> emit(Resource.Error(apiResponse.errorMessage))
+            }
+        }
+
+    override fun getAverageDataById(bearer: String, id: Int): Flow<Resource<AverageDomain>> =
+        flow {
+            emit(Resource.Loading())
+            when (val apiResponse = remoteDataSource.getAverageDataById(bearer, id).first()) {
                 is ApiResponse.Success -> {
                     emit(Resource.Success(apiResponse.data.toDomain()))
                 }

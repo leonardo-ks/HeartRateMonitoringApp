@@ -6,21 +6,21 @@
 
     <TextView
         android:id="@+id/tv_btn_hint"
+        style="@style/TextMedium"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
+        android:layout_marginBottom="16dp"
         android:text="@string/emergency_button_hint"
-        android:textSize="24sp"
         android:textAlignment="center"
-        style="@style/TextMedium"
+        android:textSize="20sp"
         app:layout_constraintBottom_toTopOf="@+id/btn_emergency"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btn_emergency"
-        android:layout_width="300dp"
-        android:layout_height="300dp"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
         android:background="@drawable/circle_button"
         android:backgroundTint="@null"
         app:layout_constraintBottom_toBottomOf="parent"
