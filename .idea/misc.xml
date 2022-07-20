@@ -107,6 +107,7 @@
         <entry key="..\:/Users/Leonardo/Documents/GitHub/HeartRateMonitoringApp/app/src/main/res/layout/activity_new_profile.xml" value="0.1576923076923077" />
         <entry key="..\:/Users/Leonardo/Documents/GitHub/HeartRateMonitoringApp/app/src/main/res/layout/activity_register.xml" value="0.30512820512820515" />
         <entry key="..\:/Users/Leonardo/Documents/GitHub/HeartRateMonitoringApp/app/src/main/res/layout/activity_scanner.xml" value="0.15726495726495726" />
+        <entry key="..\:/Users/Leonardo/Documents/GitHub/HeartRateMonitoringApp/app/src/main/res/layout/activity_show_contact_data.xml" value="0.1576923076923077" />
         <entry key="..\:/Users/Leonardo/Documents/GitHub/HeartRateMonitoringApp/app/src/main/res/layout/activity_splash.xml" value="0.30512820512820515" />
         <entry key="..\:/Users/Leonardo/Documents/GitHub/HeartRateMonitoringApp/app/src/main/res/layout/fragment_band.xml" value="0.30512820512820515" />
         <entry key="..\:/Users/Leonardo/Documents/GitHub/HeartRateMonitoringApp/app/src/main/res/layout/fragment_home.xml" value="0.30512820512820515" />
@@ -123,7 +124,7 @@
         <entry key="..\:/Users/Leonardo/Documents/GitHub/HeartRateMonitoringApp/app/src/main/res/layout/layout_contacts.xml" value="0.30512820512820515" />
         <entry key="..\:/Users/Leonardo/Documents/GitHub/HeartRateMonitoringApp/app/src/main/res/layout/layout_edit_password.xml" value="0.30512820512820515" />
         <entry key="..\:/Users/Leonardo/Documents/GitHub/HeartRateMonitoringApp/app/src/main/res/layout/layout_edit_profile.xml" value="0.2613981762917933" />
-        <entry key="..\:/Users/Leonardo/Documents/GitHub/HeartRateMonitoringApp/app/src/main/res/layout/layout_emergency_button.xml" value="0.1" />
+        <entry key="..\:/Users/Leonardo/Documents/GitHub/HeartRateMonitoringApp/app/src/main/res/layout/layout_emergency_button.xml" value="0.22" />
         <entry key="..\:/Users/Leonardo/Documents/GitHub/HeartRateMonitoringApp/app/src/main/res/layout/layout_empty_contact.xml" value="0.30512820512820515" />
         <entry key="..\:/Users/Leonardo/Documents/GitHub/HeartRateMonitoringApp/app/src/main/res/layout/layout_form_activity.xml" value="0.30427350427350425" />
         <entry key="..\:/Users/Leonardo/Documents/GitHub/HeartRateMonitoringApp/app/src/main/res/layout/layout_form_questionaire.xml" value="0.30512820512820515" />

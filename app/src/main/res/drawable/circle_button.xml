@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:state_enabled="true">
-        <ripple android:color="@color/white">
+        <ripple android:color="@color/dark_grey">
             <item android:id="@android:id/mask">
                 <shape android:shape="oval">
-                    <solid android:color="@color/dark_red" />
+                    <solid android:color="@color/dark_grey" />
                     <corners android:radius="10dp" />
                 </shape>
             </item>
@@ -13,7 +13,7 @@
                     <solid android:color="@color/red" />
                     <corners android:radius="10dp" />
                     <stroke android:width="0.5dp"
-                        android:color="@color/dark_grey"
+                        android:color="@color/primary_dark_color"
                         />
                 </shape>
             </item>
@@ -21,10 +21,10 @@
     </item>
     <item android:state_enabled="false">
         <shape android:shape="oval">
-            <solid android:color="@color/dark_red" />
+            <solid android:color="@color/light_grey" />
             <corners android:radius="10dp" />
             <stroke android:width="0.5dp"
-                android:color="@color/white"
+                android:color="@color/dark_red"
                 />
         </shape>
     </item>

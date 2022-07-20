@@ -13,7 +13,9 @@ interface IUseCase {
     fun getProfile(bearer: String): Flow<Resource<UserDataDomain>>
     fun getUserMonitoringData(bearer: String): Flow<Resource<List<MonitoringDataDomain>>>
     fun getUserMonitoringDataByDate(bearer: String, start: String, end: String): Flow<Resource<List<MonitoringDataDomain>>>
+    fun getUserMonitoringDataByDateById(bearer: String, id:Int, start: String, end: String): Flow<Resource<List<MonitoringDataDomain>>>
     fun getAverageData(bearer: String): Flow<Resource<AverageDomain>>
+    fun getAverageDataById(bearer: String, id: Int): Flow<Resource<AverageDomain>>
     fun deleteData(bearer: String, id: Int): Flow<Resource<String>>
     fun updateMonitoringData(bearer: String, avgHeartRate: Int, avgStep: Int, label: String): Flow<Resource<MonitoringDataDomain>>
     fun updateUser(bearer: String, name: String, email: String, dob: String, gender: Int, height: Int, weight: Int): Flow<Resource<UserDataDomain>>
@@ -23,7 +25,7 @@ interface IUseCase {
     fun getContacts(bearer: String): Flow<Resource<List<UserDataDomain>>>
     fun getLimit(bearer: String): Flow<Resource<LimitDomain>>
     fun search(bearer: String, param: String): Flow<Resource<List<UserDataDomain>>>
-    fun sendNotification(bearer: String, status: Int): Flow<Resource<String>>
+    fun sendNotification(bearer: String, status: Int, vibrate: Boolean): Flow<Resource<String>>
     fun setBearer(bearer: String)
     fun getBearer(): Flow<String?>
     fun setLoginState(state: Boolean)

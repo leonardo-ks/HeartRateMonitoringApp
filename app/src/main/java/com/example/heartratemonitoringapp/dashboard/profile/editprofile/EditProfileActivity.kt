@@ -125,11 +125,13 @@ class EditProfileActivity : AppCompatActivity() {
                         binding.layoutLoading.root.visibility = View.GONE
                         binding.layoutEditProfile.tidtEmail.setText(res.data?.email.toString())
                         binding.layoutEditProfile.tidtName.setText(res.data?.name.toString())
-                        binding.layoutEditProfile.tidtGender.setText(gender[res.data?.gender ?: 0])
-                        val format = DateTimeFormatter.ofPattern("dd-MM-yyyy")
-                        binding.layoutEditProfile.tidtDob.setText(LocalDate.parse(res.data?.dob ?: LocalDateTime.now().format(format).toString()).format(format))
-                        binding.layoutEditProfile.tidtHeight.setText(res.data?.height.toString())
-                        binding.layoutEditProfile.tidtWeight.setText(res.data?.weight.toString())
+                        if (res.data?.dob != null) {
+                            binding.layoutEditProfile.tidtGender.setText(gender[res.data?.gender ?: 0])
+                            val format = DateTimeFormatter.ofPattern("dd-MM-yyyy")
+                            binding.layoutEditProfile.tidtDob.setText(LocalDate.parse(res.data?.dob ?: LocalDateTime.now().format(format).toString()).format(format))
+                            binding.layoutEditProfile.tidtHeight.setText(res.data?.height.toString())
+                            binding.layoutEditProfile.tidtWeight.setText(res.data?.weight.toString())
+                        }
                     }
                     is Resource.Error -> {
                         binding.layoutEditProfile.root.visibility = View.VISIBLE

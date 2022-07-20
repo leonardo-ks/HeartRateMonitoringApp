@@ -87,6 +87,8 @@ interface ApiService {
         bearer: String,
         @Field (value = "status")
         contact: Int,
+        @Field (value = "vibrate")
+        vibrate: Boolean
     ): BasicResponse
 
     @FormUrlEncoded
@@ -134,10 +136,28 @@ interface ApiService {
         end: String
     ): UserMonitoringDataResponse
 
+    @GET("data/{id}/{start}/{end}")
+    suspend fun getUserDataByDateById(
+        @Header("Authorization")
+        bearer: String,
+        @Path("start")
+        start: String,
+        @Path("end")
+        end: String
+    ): UserMonitoringDataResponse
+
     @GET("average")
     suspend fun getAverageData(
         @Header("Authorization")
         bearer: String,
+    ): AverageResponse
+
+    @GET("average/{id}")
+    suspend fun getAverageDataById(
+        @Header("Authorization")
+        bearer: String,
+        @Path("id")
+        id: Int
     ): AverageResponse
 
     @GET("limit")

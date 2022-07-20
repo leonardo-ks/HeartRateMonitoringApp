@@ -1,4 +1,4 @@
-package com.example.heartratemonitoringapp.dashboard.home
+package com.example.heartratemonitoringapp.dashboard.profile.contact.showcontactdata
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -12,16 +12,14 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-class HomeViewModel(private val useCase: IUseCase) : ViewModel() {
-
-    val backgroundMonitoringState = useCase.getBackgroundMonitoringState()
+class ShowContactViewModel(private val useCase: IUseCase) : ViewModel() {
 
     private val _average = MutableStateFlow<Resource<AverageDomain>>(Resource.Loading())
     val average: StateFlow<Resource<AverageDomain>> get() = _average
-    fun getAverage(bearer: String) {
+    fun getAverageById(bearer: String, id: Int) {
         _average.value = Resource.Loading()
         viewModelScope.launch {
-            useCase.getAverageData(bearer).collect { res ->
+            useCase.getAverageDataById(bearer, id).collect { res ->
                 when (res) {
                     is Resource.Loading -> _average.emit(Resource.Loading())
                     is Resource.Success -> _average.emit(Resource.Success(res.data!!))
@@ -33,36 +31,16 @@ class HomeViewModel(private val useCase: IUseCase) : ViewModel() {
 
     fun getBearer() = useCase.getBearer()
 
-    fun sendData(bearer: String, avgHeartRate: Int, stepChanges: Int, step: Int, label: String, createdAt: String) = useCase.addData(bearer, avgHeartRate, stepChanges, step, label, createdAt)
-
-    fun deleteData(id: Int) = useCase.deleteMonitoringDataById(id)
-    val localData = useCase.getMonitoringDataList()
-
     private val _data = MutableStateFlow<Resource<List<MonitoringDataDomain>>>(Resource.Loading())
     val data: StateFlow<Resource<List<MonitoringDataDomain>>> get() = _data
-    fun getDataByDate(bearer: String, start: String, end: String) {
+    fun getDataByDateById(bearer: String, id: Int, start: String, end: String) {
         _data.value = Resource.Loading()
         viewModelScope.launch {
-            useCase.getUserMonitoringDataByDate(bearer, start, end).collect { res ->
+            useCase.getUserMonitoringDataByDateById(bearer, id, start, end).collect { res ->
                 when (res) {
                     is Resource.Loading -> _data.emit(Resource.Loading())
                     is Resource.Success -> _data.emit(Resource.Success(res.data!!))
                     is Resource.Error -> _data.emit(Resource.Error(res.message.toString()))
-                }
-            }
-        }
-    }
-
-    private val _sendNotification = MutableStateFlow<Resource<String>>(Resource.Loading())
-    val sendNotification: StateFlow<Resource<String>> get() = _sendNotification
-    fun sendNotification(bearer: String, status: Int, vibrate: Boolean) {
-        _sendNotification.value = Resource.Loading()
-        viewModelScope.launch {
-            useCase.sendNotification(bearer, status, vibrate).collect { res ->
-                when (res) {
-                    is Resource.Loading -> _sendNotification.emit(Resource.Loading())
-                    is Resource.Success -> _sendNotification.emit(Resource.Success(res.data!!))
-                    is Resource.Error -> _sendNotification.emit(Resource.Error(res.message.toString()))
                 }
             }
         }

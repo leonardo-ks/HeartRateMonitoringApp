@@ -16,6 +16,7 @@ import com.example.heartratemonitoringapp.databinding.ActivitySplashBinding
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import java.time.LocalDate
 import java.time.LocalDateTime
 
 @SuppressLint("CustomSplashScreen")
@@ -48,8 +49,8 @@ class SplashActivity : AppCompatActivity() {
                     if (it) {
                         val savedLoginDate = viewModel.latestLoginDate.first()
                         if (!savedLoginDate.isNullOrBlank()) {
-                            val latestLoginDate = LocalDateTime.parse(savedLoginDate)
-                            val now = LocalDateTime.now()
+                            val latestLoginDate = LocalDate.parse(savedLoginDate)
+                            val now = LocalDate.now()
                             if (now.minusDays(7).isAfter(latestLoginDate)) {
                                 logout(viewModel.getBearer().first().toString())
                             } else {

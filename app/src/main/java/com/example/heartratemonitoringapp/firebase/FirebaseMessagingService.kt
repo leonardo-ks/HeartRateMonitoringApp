@@ -42,7 +42,10 @@ class FirebaseMessagingService : FirebaseMessagingService() {
 
         notificationManager.notify(notificationId, notification)
 
-        vibrate()
+        if (message.data["vibrate"] == "true") {
+            vibrate()
+        }
+
     }
 
     private fun vibrate(){

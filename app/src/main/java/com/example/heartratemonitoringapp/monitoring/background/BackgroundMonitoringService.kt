@@ -139,20 +139,27 @@ class BackgroundMonitoringService : Service() {
         }
 
         val notificationIntent = Intent(this@BackgroundMonitoringService, FormActivity::class.java)
-        val notification = NotificationCompat.Builder(this, channelId)
+        val monitoringNotification = NotificationCompat.Builder(this, channelId)
             .setSmallIcon(R.drawable.ic_watch)
             .setOnlyAlertOnce(true)
+
+        val anomalyNotification = NotificationCompat.Builder(this, channelId)
+            .setSmallIcon(R.drawable.ic_watch)
+            .setOnlyAlertOnce(true)
+            .setAutoCancel(true)
+            .setContentTitle(resources.getString(R.string.background_monitoring))
+            .setContentText(getString(R.string.anomaly_detected))
 
         countDownTimer = object : CountDownTimer(60000, 1000) {
             override fun onTick(p0: Long) {
                 getStep()
-                notification.setContentTitle(getString(R.string.background_monitoring_undergoing))
+                monitoringNotification.setContentTitle(getString(R.string.background_monitoring_undergoing))
                 if (heartList.size > 0 && stepList.size > 0) {
-                    notification.setContentText(getString(R.string.background_monitoring_content, heartList.last(), stepList.last()))
+                    monitoringNotification.setContentText(getString(R.string.background_monitoring_content, heartList.last(), stepList.last()))
                 } else {
-                    notification.setContentText(getString(R.string.connecting))
+                    monitoringNotification.setContentText(getString(R.string.connecting))
                 }
-                notificationManager.notify(1, notification.build())
+                notificationManager.notify(1, monitoringNotification.build())
             }
 
             override fun onFinish() {
@@ -161,31 +168,31 @@ class BackgroundMonitoringService : Service() {
                     val avgHeart = heartList.average().toInt()
                     val stepChanges = stepList.last() - stepList.first()
                     val step = stepList.max()
-                    var labels = listOf<String>()
-                    scope.launch {
-                        val data = useCase.findData(useCase.getBearer().toString().first().toString(), avgHeart, stepChanges).first().data
-                        if (data != null) labels = data
-                    }
                     val status = getStatus(avgHeart, stepChanges)
                     if (status != 0) {
+                        notificationIntent.putExtra("avgHeartRate", avgHeart)
+                        notificationIntent.putExtra("stepChanges", stepChanges)
+                        notificationIntent.putExtra("step", step)
+                        notificationIntent.putExtra("status", status)
                         val pendingIntent = PendingIntent.getActivity(this@BackgroundMonitoringService, 0, notificationIntent, FLAG_UPDATE_CURRENT)
-                        notification.setContentIntent(pendingIntent)
-                        notification.setContentTitle(resources.getString(R.string.background_monitoring))
-                        notification.setContentText(getString(R.string.anomaly_detected))
-                        notificationManager.notify(1, notification.build())
+                        anomalyNotification.setContentIntent(pendingIntent)
+                        notificationManager.notify(2, anomalyNotification.build())
                         scope.launch {
-                            useCase.sendNotification(useCase.getBearer().first().toString(), status)
+                            useCase.sendNotification(useCase.getBearer().first().toString(), status, true)
+                        }
+                    } else {
+                        if (heartList.isNotEmpty()) {
+                            when (status) {
+                                0 -> sendData(avgHeart, stepChanges, step, "Normal")
+                                1 -> sendData(avgHeart, stepChanges, step, "Tidak normal 1")
+                                2 -> sendData(avgHeart, stepChanges, step, "Tidak normal 2")
+                                3 -> sendData(avgHeart, stepChanges, step, "Tidak normal 3")
+                                4 -> sendData(avgHeart, stepChanges, step, "Tidak normal 4")
+                            }
                         }
                     }
                     timer.schedule(period - 60000) {
                         countDownTimer.start()
-                    }
-                    if (labels.isNotEmpty()) {
-                        for (label in labels) {
-                            sendData(avgHeart, stepChanges, step, label)
-                        }
-                    } else {
-                        sendData(avgHeart, stepChanges, step, "")
                     }
                 }
             }

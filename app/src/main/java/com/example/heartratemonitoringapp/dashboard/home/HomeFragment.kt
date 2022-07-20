@@ -83,15 +83,18 @@ class HomeFragment : Fragment() {
                 BLE.bluetoothDevice = connectedDevices.first()
             }
             bluetoothManager.adapter.getRemoteDevice(BLE.bluetoothDevice?.address)
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            val bearer = viewModel.getBearer().first()
+            viewModel.getAverage(bearer.toString())
+            val format = DateTimeFormatter.ofPattern("yyyy-MM-d H:mm:ss")
+            val startFormat = DateTimeFormatter.ofPattern("yyyy-MM-d 00:00:00")
+            val start = LocalDate.now().format(startFormat)
+            val end = LocalDateTime.now().format(format)
+            viewModel.getDataByDate(viewModel.getBearer().first().toString(), start, end)
+            getDataObserver()
             averageDataObserver()
-            viewLifecycleOwner.lifecycleScope.launch {
-                val bearer = viewModel.getBearer().first()
-                viewModel.getAverage(bearer.toString())
-            }
-        } else {
-            binding.layoutNotConnected.root.visibility = View.VISIBLE
-            binding.layoutAverage.root.visibility = View.GONE
-            binding.layoutLoading.root.visibility = View.GONE
         }
 
         if (!BackgroundMonitoringService.isRunning) {
@@ -103,36 +106,23 @@ class HomeFragment : Fragment() {
         }
 
         binding.swipeRefreshLayout.setOnRefreshListener {
-            if (connectedDevices.isNotEmpty()) {
-                if (BLE.bluetoothDevice == null) {
-                    BLE.bluetoothDevice = connectedDevices.first()
-                }
-                bluetoothManager.adapter.getRemoteDevice(BLE.bluetoothDevice?.address)
+            viewLifecycleOwner.lifecycleScope.launch {
+                val bearer = viewModel.getBearer().first()
+                viewModel.getAverage(bearer.toString())
+                val format = DateTimeFormatter.ofPattern("yyyy-MM-d H:mm:ss")
+                val startFormat = DateTimeFormatter.ofPattern("yyyy-MM-d 00:00:00")
+                val start = LocalDate.now().format(startFormat)
+                val end = LocalDateTime.now().format(format)
+                viewModel.getDataByDate(bearer.toString(), start, end)
+                getDataObserver()
                 averageDataObserver()
-                viewLifecycleOwner.lifecycleScope.launch {
-                    val bearer = viewModel.getBearer().first()
-                    viewModel.getAverage(bearer.toString())
-                }
-            } else {
-                binding.layoutNotConnected.root.visibility = View.VISIBLE
-                binding.layoutAverage.root.visibility = View.GONE
-                binding.layoutLoading.root.visibility = View.GONE
             }
             binding.swipeRefreshLayout.isRefreshing = false
         }
 
-        viewLifecycleOwner.lifecycleScope.launch {
-            val format = DateTimeFormatter.ofPattern("yyyy-MM-d H:mm:ss")
-            val startFormat = DateTimeFormatter.ofPattern("yyyy-MM-d 00:00:00")
-            val start = LocalDate.now().format(startFormat)
-            val end = LocalDateTime.now().format(format)
-            viewModel.getDataByDate(viewModel.getBearer().first().toString(), start, end)
-            getDataObserver()
-        }
-
         binding.layoutEmergencyButton.btnEmergency.setOnClickListener {
             viewLifecycleOwner.lifecycleScope.launch {
-                viewModel.sendNotification(viewModel.getBearer().first().toString(), 4)
+                viewModel.sendNotification(viewModel.getBearer().first().toString(), 5, true)
                 sendNotificationObserver()
             }
         }
@@ -143,7 +133,7 @@ class HomeFragment : Fragment() {
             viewModel.data.collect { res ->
                 when (res) {
                     is Resource.Success -> {
-                        Toast.makeText(activity, res.data.toString(), Toast.LENGTH_SHORT).show()
+                        Toast.makeText(activity, getString(R.string.emergency_message_success), Toast.LENGTH_SHORT).show()
                     }
                     is Resource.Error -> {
                         Toast.makeText(activity, res.message.toString(), Toast.LENGTH_SHORT).show()
@@ -165,6 +155,7 @@ class HomeFragment : Fragment() {
                     }
                     is Resource.Success -> {
                         res.data?.let { populateChart(it) }
+                        binding.layoutAverage.tvLastCondition.text = getString(R.string.last_condition, res.data?.first()?.label)
                     }
                     is Resource.Error -> {
                         binding.layoutAverage.root.visibility = View.VISIBLE
@@ -220,14 +211,18 @@ class HomeFragment : Fragment() {
                         binding.layoutAverage.root.visibility = View.INVISIBLE
                     }
                     is Resource.Success -> {
-                        if (viewModel.backgroundMonitoringState.first()) {
-                            binding.layoutLoading.root.visibility = View.GONE
-                            binding.layoutEmergencyButton.root.visibility = View.VISIBLE
+                        if (res.data != null) {
+                            if (viewModel.backgroundMonitoringState.first()) {
+                                binding.layoutLoading.root.visibility = View.GONE
+                                binding.layoutEmergencyButton.root.visibility = View.VISIBLE
+                            } else {
+                                binding.layoutLoading.root.visibility = View.GONE
+                                binding.layoutAverage.root.visibility = View.VISIBLE
+                                binding.layoutAverage.tvAvgHeartText.text = getString(R.string.today_average_heart_rate, res.data?.avgHeartRate)
+                                binding.layoutAverage.tvTodayStepsValue.text = res.data?.todaySteps.toString()
+                            }
                         } else {
-                            binding.layoutLoading.root.visibility = View.GONE
-                            binding.layoutAverage.root.visibility = View.VISIBLE
-                            binding.layoutAverage.tvAvgHeartText.text = getString(R.string.today_average_heart_rate, res.data?.avgHeartRate)
-                            binding.layoutAverage.tvTodayStepsValue.text = res.data?.todaySteps.toString()
+                            binding.tvDataNotFound.visibility = View.VISIBLE
                         }
                     }
                     is Resource.Error -> {

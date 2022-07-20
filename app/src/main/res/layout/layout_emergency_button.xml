@@ -13,16 +13,29 @@
         android:textSize="24sp"
         android:textAlignment="center"
         style="@style/TextMedium"
-        app:layout_constraintBottom_toTopOf="@+id/btn_emergency"
+        app:layout_constraintBottom_toTopOf="@+id/btn_emergency_bg"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_emergency_bg"
+        android:layout_width="320dp"
+        android:layout_height="320dp"
+        android:background="@drawable/circle_button"
+        app:backgroundTint="@color/light_grey"
+        android:translationZ="1dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/btn_emergency"
         android:layout_width="300dp"
         android:layout_height="300dp"
         android:background="@drawable/circle_button"
-        android:backgroundTint="@null"
+        android:translationZ="10dp"
+        app:backgroundTint="@null"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

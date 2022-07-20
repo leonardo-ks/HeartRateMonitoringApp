@@ -58,14 +58,11 @@ class ContactAdapter : RecyclerView.Adapter<ContactAdapter.ViewHolder>() {
             }
         }
         init {
-            if (deleteButtonState) {
-                binding.btnDeleteContact.setOnClickListener {
-                    itemList[adapterPosition].id?.let { it1 -> onDeleteClick?.invoke(it1) }
-                }
-            } else {
-                binding.root.setOnClickListener {
-                    onItemClick?.invoke(itemList[adapterPosition])
-                }
+            binding.btnDeleteContact.setOnClickListener {
+                itemList[adapterPosition].id?.let { it1 -> onDeleteClick?.invoke(it1) }
+            }
+            binding.root.setOnClickListener {
+                onItemClick?.invoke(itemList[adapterPosition])
             }
         }
     }

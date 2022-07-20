@@ -75,6 +75,10 @@
     <string name="background_monitoring_undergoing">Monitoring latar belakang sedang berjalan</string>
     <string name="background_monitoring_content">Detak jantung: %1s, Langkah: %2s</string>
     <string name="emergency_button_hint">Tekan tombol untuk kondisi darurat</string>
+    <string name="emergency_message_success">Berhasil mengirimkan pesan darurat</string>
+    <string name="last_condition">Kondisi terakhir: %1$s</string>
+    <string name="data_not_found">Data tidak ditemukan</string>
+    <string name="show_contact_data_title">Data %1$s</string>
 
     <string-array name="periods">
         <item>1 menit</item>

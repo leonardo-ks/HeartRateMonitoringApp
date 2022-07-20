@@ -3,7 +3,9 @@ package com.example.heartratemonitoringapp.dashboard.profile.editprofile
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.core.data.Resource
+import com.example.core.data.source.remote.response.MonitoringData
 import com.example.core.domain.usecase.IUseCase
+import com.example.core.domain.usecase.model.MonitoringDataDomain
 import com.example.core.domain.usecase.model.UserDataDomain
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

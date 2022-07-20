@@ -4,25 +4,49 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.core.data.Resource
 import com.example.core.domain.usecase.IUseCase
+import com.example.core.domain.usecase.model.LimitDomain
+import com.example.core.domain.usecase.model.MonitoringDataDomain
+import com.example.core.domain.usecase.model.UserDataDomain
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 class FormViewModel(private val useCase: IUseCase): ViewModel() {
-    private val _labels = MutableStateFlow<Resource<List<String>>>(Resource.Loading())
-    val labels: StateFlow<Resource<List<String>>> get() = _labels
-    fun findData(bearer: String, avgHeartRate: Int, avgStep: Int) {
-        _labels.value = Resource.Loading()
+
+    private val _limit = MutableStateFlow<Resource<LimitDomain>>(Resource.Loading())
+    val limit: StateFlow<Resource<LimitDomain>> get() = _limit
+    fun getLimit(bearer: String) {
+        _sendData.value = Resource.Loading()
         viewModelScope.launch {
-            useCase.findData(bearer, avgHeartRate, avgStep).collect {
-                when (it) {
-                    is Resource.Loading -> _labels.emit(Resource.Loading())
-                    is Resource.Success -> _labels.emit(Resource.Success(it.data?: listOf()))
-                    is Resource.Error -> _labels.emit(Resource.Error(it.message.toString()))
+            useCase.getLimit(bearer).collect { res ->
+                when (res) {
+                    is Resource.Loading -> _limit.emit(Resource.Loading())
+                    is Resource.Success -> _limit.emit(Resource.Success(res.data!!))
+                    is Resource.Error -> _limit.emit(Resource.Error(res.message.toString()))
                 }
             }
         }
     }
+
+    private val _profile = MutableStateFlow<Resource<UserDataDomain>>(Resource.Loading())
+    val profile: StateFlow<Resource<UserDataDomain>> get() = _profile
+    fun getProfile(bearer: String) {
+        _profile.value = Resource.Loading()
+        viewModelScope.launch {
+            useCase.getProfile(bearer).collect { res ->
+                when (res) {
+                    is Resource.Loading -> _profile.emit(Resource.Loading())
+                    is Resource.Success -> _profile.emit(Resource.Success(res.data!!))
+                    is Resource.Error -> _profile.emit(Resource.Error(res.message.toString()))
+                }
+            }
+        }
+    }
+
+    fun insertMonitoringData(data: MonitoringDataDomain) = useCase.insertMonitoringData(data)
+    fun getUserId() = useCase.getUserId()
+    fun deleteMonitoringDataByDate(date: String) = useCase.deleteMonitoringDataByDate(date)
 
     private val _sendData = MutableStateFlow<Resource<Boolean>>(Resource.Loading())
     val sendData: StateFlow<Resource<Boolean>> get() = _sendData
@@ -40,10 +64,10 @@ class FormViewModel(private val useCase: IUseCase): ViewModel() {
     }
 
     fun getBearer() = useCase.getBearer()
-    fun getAnomalyDetectedTimes() = useCase.getAnomalyDetectedTimes()
+    val anomalyDetectedTimes = useCase.getAnomalyDetectedTimes()
     fun setAnomalyDetectedTimes(times: Int) {
         useCase.setAnomalyDetectedTimes(times)
     }
-    fun getLatestAnomalyDate() = useCase.getLatestAnomalyDate()
+    val latestAnomalyDate = useCase.getLatestAnomalyDate()
     fun setLatestAnomalyDate(date: String) = useCase.setLatestAnomalyDate(date)
 }
