@@ -19,7 +19,7 @@ import com.example.heartratemonitoringapp.util.hideSoftKeyboard
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import org.koin.androidx.viewmodel.ext.android.viewModel
-import java.time.LocalDateTime
+import java.time.LocalDate
 
 class LoginActivity : AppCompatActivity() {
     private lateinit var binding: ActivityLoginBinding
@@ -50,7 +50,7 @@ class LoginActivity : AppCompatActivity() {
                         )
                     }
                     is AuthState.Success -> {
-                        viewModel.setLatestLoginDate(LocalDateTime.now().toString())
+                        viewModel.setLatestLoginDate(LocalDate.now().toString())
                         viewModel.getProfile(viewModel.getBearer().first().toString())
                         getProfileObserver()
                     }

@@ -154,8 +154,11 @@ class HomeFragment : Fragment() {
                         binding.layoutAverage.root.visibility = View.INVISIBLE
                     }
                     is Resource.Success -> {
-                        res.data?.let { populateChart(it) }
-                        binding.layoutAverage.tvLastCondition.text = getString(R.string.last_condition, res.data?.first()?.label)
+                        val data = res.data
+                        if (!data.isNullOrEmpty()) {
+                            populateChart(data)
+                            binding.layoutAverage.tvLastCondition.text = getString(R.string.last_condition, data.first().label)
+                        }
                     }
                     is Resource.Error -> {
                         binding.layoutAverage.root.visibility = View.VISIBLE

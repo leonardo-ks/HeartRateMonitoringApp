@@ -3,13 +3,18 @@ package com.example.heartratemonitoringapp.firebase
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.NotificationManager.IMPORTANCE_HIGH
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
 import android.os.Build
 import android.os.VibrationEffect
 import android.os.Vibrator
 import android.os.VibratorManager
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.example.heartratemonitoringapp.R
+import com.example.heartratemonitoringapp.dashboard.MainActivity
+import com.example.heartratemonitoringapp.form.FormActivity
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 
@@ -37,10 +42,34 @@ class FirebaseMessagingService : FirebaseMessagingService() {
             .setContentTitle(message.data["title"])
             .setContentText(message.data["message"])
             .setSmallIcon(R.drawable.ic_watch)
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setAutoCancel(true)
             .build()
 
-        notificationManager.notify(notificationId, notification)
+
+        val fullScreenIntent = Intent(this, FormActivity::class.java)
+        val fullScreenPendingIntent = PendingIntent.getActivity(this, 0,
+            fullScreenIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+
+        val notificationBuilder =
+            NotificationCompat.Builder(this, CHANNEL_ID)
+                .setContentTitle(message.data["title"])
+                .setContentText(message.data["message"])
+                .setSmallIcon(R.drawable.ic_watch)
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setCategory(NotificationCompat.CATEGORY_CALL)
+                .setFullScreenIntent(fullScreenPendingIntent, true)
+
+        val incomingCallNotification = notificationBuilder.build()
+
+        Log.d("vibrate", (message.data["vibrate"] == "true").toString())
+
+        if (message.data["status"].equals("5")) {
+            startForeground(notificationId, incomingCallNotification)
+        } else {
+            notificationManager.notify(notificationId, notification)
+        }
+
 
         if (message.data["vibrate"] == "true") {
             vibrate()
