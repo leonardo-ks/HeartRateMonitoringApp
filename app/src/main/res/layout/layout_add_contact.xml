@@ -42,6 +42,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/til_name"
-        tools:listitem="@layout/item_contact_list" />
+        tools:listitem="@layout/item_add_contact_list" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

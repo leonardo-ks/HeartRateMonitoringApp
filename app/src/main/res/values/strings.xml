@@ -58,7 +58,7 @@
     <string name="today_average_heart_rate">Rata - rata hari ini: %1$s BPM</string>
     <string name="today_step">Total langkah hari ini:</string>
     <string name="contact">Kontak</string>
-    <string name="contact_title">Kontak anda</string>
+    <string name="contact_title">Kontak</string>
     <string name="add_contact">Tambah kontak</string>
     <string name="enter_name">Masukkan nama</string>
     <string name="contact_empty">Anda belum menambahkan kontak</string>
@@ -79,6 +79,8 @@
     <string name="last_condition">Kondisi terakhir: %1$s</string>
     <string name="data_not_found">Data tidak ditemukan</string>
     <string name="show_contact_data_title">Data %1$s</string>
+    <string name="delete">Hapus</string>
+    <string name="add">Tambah</string>
 
     <string-array name="periods">
         <item>1 menit</item>

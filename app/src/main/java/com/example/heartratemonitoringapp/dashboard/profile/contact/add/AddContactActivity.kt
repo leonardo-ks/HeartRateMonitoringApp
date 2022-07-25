@@ -9,7 +9,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.core.data.Resource
-import com.example.heartratemonitoringapp.dashboard.profile.contact.adapter.ContactAdapter
+import com.example.heartratemonitoringapp.dashboard.profile.contact.adapter.AddContactAdapter
 import com.example.heartratemonitoringapp.databinding.ActivityAddContactBinding
 import com.example.heartratemonitoringapp.util.hideSoftKeyboard
 import kotlinx.coroutines.flow.first
@@ -20,7 +20,7 @@ class AddContactActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityAddContactBinding
     private val viewModel: AddContactViewModel by viewModel()
-    private var mAdapter = ContactAdapter()
+    private var mAdapter = AddContactAdapter()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,13 +52,9 @@ class AddContactActivity : AppCompatActivity() {
             true
         }
 
-        mAdapter.onItemClick = {
+        mAdapter.onAddClick = {
             lifecycleScope.launch {
-                it.id?.let { it1 ->
-                    viewModel.addContacts(viewModel.getBearer().first().toString(),
-                        it1
-                    )
-                }
+                viewModel.addContacts(viewModel.getBearer().first().toString(), it)
                 addContactObserver()
             }
         }

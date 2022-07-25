@@ -11,6 +11,7 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
 
     <application
         android:name=".BaseApplication"
@@ -22,6 +23,12 @@
         android:theme="@style/Theme.HeartRateMonitoringApp"
         android:usesCleartextTraffic="true">
         <activity
+            android:name=".TestActivity"
+            android:exported="false"
+            android:showOnLockScreen="true"
+            android:showWhenLocked="true"
+            tools:targetApi="o_mr1" />
+        <activity
             android:name=".dashboard.profile.contact.showcontactdata.ShowContactDataActivity"
             android:exported="false" />
         <activity
@@ -32,8 +39,6 @@
             android:exported="false" />
         <activity
             android:name=".form.FormActivity"
-            android:showOnLockScreen="true"
-            android:showWhenLocked="true"
             android:exported="false" />
         <activity
             android:name=".dashboard.profile.editpassword.EditPasswordActivity"
@@ -89,6 +94,14 @@
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
                 <action android:name="com.google.android.c2dm.permission.RECEIVE" />
+            </intent-filter>
+        </service>
+        <service
+            android:name=".call.CallNotificationService"
+            android:exported="false"
+            android:permission="android.permission.BIND_TELECOM_CONNECTION_SERVICE">
+            <intent-filter>
+                <action android:name="android.telecom.ConnectionService" />
             </intent-filter>
         </service>
     </application>

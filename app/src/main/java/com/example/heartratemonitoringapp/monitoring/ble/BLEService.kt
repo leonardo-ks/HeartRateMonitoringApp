@@ -77,7 +77,6 @@ class BLEService: Service() {
             when (characteristic.uuid) {
                 UUIDs.HEART_RATE_MEASUREMENT_CHARACTERISTIC -> {
                     val heartRate = characteristic.value[1].toInt()
-                    Log.d("HR",heartRate.toString())
                     intent.putExtra("HR", heartRate)
                 }
                 UUIDs.BASIC_STEP_CHARACTERISTIC -> {
@@ -86,7 +85,6 @@ class BLEService: Service() {
                         String.format("%02X", it)
                     }
                     val step = toLittleEndian(hexString.slice(2..5))
-                    Log.d("STEP", step.toString())
                     intent.putExtra("step", step)
                 }
             }

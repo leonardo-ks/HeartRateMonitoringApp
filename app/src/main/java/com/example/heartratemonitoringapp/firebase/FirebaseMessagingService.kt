@@ -1,5 +1,6 @@
 package com.example.heartratemonitoringapp.firebase
 
+import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.app.NotificationManager.IMPORTANCE_HIGH
@@ -12,8 +13,9 @@ import android.os.Vibrator
 import android.os.VibratorManager
 import android.util.Log
 import androidx.core.app.NotificationCompat
+import androidx.core.graphics.drawable.IconCompat
 import com.example.heartratemonitoringapp.R
-import com.example.heartratemonitoringapp.dashboard.MainActivity
+import com.example.heartratemonitoringapp.TestActivity
 import com.example.heartratemonitoringapp.form.FormActivity
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
@@ -51,21 +53,30 @@ class FirebaseMessagingService : FirebaseMessagingService() {
         val fullScreenPendingIntent = PendingIntent.getActivity(this, 0,
             fullScreenIntent, PendingIntent.FLAG_UPDATE_CURRENT)
 
-        val notificationBuilder =
-            NotificationCompat.Builder(this, CHANNEL_ID)
-                .setContentTitle(message.data["title"])
-                .setContentText(message.data["message"])
-                .setSmallIcon(R.drawable.ic_watch)
-                .setPriority(NotificationCompat.PRIORITY_HIGH)
-                .setCategory(NotificationCompat.CATEGORY_CALL)
-                .setFullScreenIntent(fullScreenPendingIntent, true)
+        val action = NotificationCompat.Action.Builder(
+            IconCompat.createWithResource(applicationContext, R.drawable.ic_watch),
+                "terima",
+                fullScreenPendingIntent
+        ).build()
+
+        val intent = Intent(this, TestActivity::class.java)
+        val pendingIntent = PendingIntent.getActivity(applicationContext, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+
+        val notificationBuilder = NotificationCompat.Builder(this, CHANNEL_ID)
+            .setDefaults(Notification.DEFAULT_ALL)
+            .setContentTitle(message.data["title"])
+            .setContentText(message.data["message"])
+            .setSmallIcon(R.drawable.ic_watch)
+            .setOngoing(true)
+//            .setCustomContentView(RemoteViews(packageName, R.layout.activity_test))
+            .setFullScreenIntent(pendingIntent, true)
 
         val incomingCallNotification = notificationBuilder.build()
 
         Log.d("vibrate", (message.data["vibrate"] == "true").toString())
 
         if (message.data["status"].equals("5")) {
-            startForeground(notificationId, incomingCallNotification)
+            notificationManager.notify(notificationId, incomingCallNotification)
         } else {
             notificationManager.notify(notificationId, notification)
         }

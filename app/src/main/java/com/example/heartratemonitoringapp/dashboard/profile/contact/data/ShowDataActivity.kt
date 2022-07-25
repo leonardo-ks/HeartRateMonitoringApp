@@ -53,7 +53,7 @@ class ShowDataActivity : AppCompatActivity() {
         if (intent.extras != null) {
             id = intent.extras?.getInt("id") ?: 0
             val name = intent.extras?.getString("name")
-            binding.toolbar.title = getString(R.string.show_data_title, name)
+            binding.toolbar.title = getString(R.string.show_contact_data_title, name)
         }
 
         lifecycleScope.launch {
@@ -93,9 +93,9 @@ class ShowDataActivity : AppCompatActivity() {
                             res.data?.let { populateChart(it) }
                             val label = res.data?.first()?.label
                             if (label != null) {
-                                binding.layoutAverage.tvHeartCondition.text = getString(R.string.heart_condition, label)
+                                binding.layoutAverage.tvLastCondition.text = getString(R.string.last_condition, label)
                             } else {
-                                binding.layoutAverage.tvHeartCondition.visibility = View.INVISIBLE
+                                binding.layoutAverage.tvLastCondition.visibility = View.INVISIBLE
                             }
                         } else {
                             binding.layoutAverage.root.visibility = View.GONE
