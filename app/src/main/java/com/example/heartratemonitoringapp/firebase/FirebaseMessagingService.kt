@@ -48,10 +48,9 @@ class FirebaseMessagingService : FirebaseMessagingService() {
 
     }
 
-    private fun vibrate(){
+    private fun vibrate() {
         val vib = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            val vibratorManager =
-                getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager
+            val vibratorManager = getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager
             vibratorManager.defaultVibrator
         } else {
             @Suppress("DEPRECATION")

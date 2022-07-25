@@ -10,14 +10,12 @@ import android.bluetooth.BluetoothProfile
 import android.content.*
 import android.os.CountDownTimer
 import android.os.IBinder
-import android.text.method.TextKeyListener.clear
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.example.core.data.Resource
 import com.example.core.domain.usecase.IUseCase
 import com.example.core.domain.usecase.model.MonitoringDataDomain
 import com.example.heartratemonitoringapp.R
-import com.example.heartratemonitoringapp.dashboard.MainActivity
 import com.example.heartratemonitoringapp.form.FormActivity
 import com.example.heartratemonitoringapp.monitoring.ble.BLE
 import com.example.heartratemonitoringapp.monitoring.ble.BLEService
@@ -27,7 +25,6 @@ import com.example.heartratemonitoringapp.monitoring.live.LiveMonitoringActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import org.koin.android.ext.android.inject

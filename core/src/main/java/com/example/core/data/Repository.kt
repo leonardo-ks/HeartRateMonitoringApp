@@ -1,7 +1,6 @@
 package com.example.core.data
 
 import android.annotation.SuppressLint
-import android.util.Log
 import com.example.core.data.source.local.LocalDataSource
 import com.example.core.data.source.remote.RemoteDataSource
 import com.example.core.data.source.remote.network.ApiResponse

@@ -3,14 +3,11 @@ package com.example.heartratemonitoringapp.dashboard.profile.contact.adapter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.core.domain.usecase.model.UserDataDomain
 import com.example.heartratemonitoringapp.R
 import com.example.heartratemonitoringapp.databinding.ItemContactListBinding
-import com.example.heartratemonitoringapp.databinding.ItemLabelsBinding
-import kotlin.coroutines.coroutineContext
 
 class ContactAdapter : RecyclerView.Adapter<ContactAdapter.ViewHolder>() {
 
